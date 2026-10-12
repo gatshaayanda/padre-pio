@@ -61,8 +61,13 @@ export async function POST(request:Request){
     return NextResponse.json({requestId:result.id,alreadySaved:result.duplicate},{status:result.duplicate?200:201});
   }catch(error){
     console.error("[The Plug] sourcing request save failed:",error);
-    const message=error instanceof Error?error.message:"The request could not be saved.";
-    const status=/expired|token|authentication/i.test(message)?401:400;
-    return NextResponse.json({error:message},{status});
+    const message=error instanceof Error?error.message:"";
+    if(/expired|token|authentication/i.test(message)){
+      return NextResponse.json({error:"Your private session expired. Restore your session and retry."},{status:401});
+    }
+    if(message==="That request reference already exists. Please refresh My requests before retrying."){
+      return NextResponse.json({error:message},{status:409});
+    }
+    return NextResponse.json({error:"The request could not be saved right now. Check My requests before retrying."},{status:500});
   }
 }

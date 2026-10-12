@@ -23,13 +23,13 @@ export async function POST(request:Request){
     const app=adminApp();
     const token=await getAuth(app).verifyIdToken(match[1]);
     const body=await request.json() as {requestId?:unknown};
-    if(typeof body.requestId!=="string"||!body.requestId.trim())return NextResponse.json({error:"Missing request reference."},{status:400});
+    if(typeof body.requestId!=="string"||!/^[A-Za-z0-9_-]{10,128}$/.test(body.requestId))return NextResponse.json({error:"Invalid request reference."},{status:400});
     const db=getFirestore(app);
     const ref=db.collection("sourcingRequests").doc(body.requestId);
     const now=new Date().toISOString();
     const result=await db.runTransaction(async tx=>{
       const snap=await tx.get(ref);
-      if(!snap.exists)throw new Error("This sourcing request could not be found.");
+      if(!snap.exists)return {status:404 as const,error:"This sourcing request could not be found."};
       const data=snap.data()??{};
       if(data.customerId!==token.uid)return {status:403 as const,error:"This request does not belong to the signed-in account."};
       if(typeof data.quotedPrice!=="number"||!Number.isFinite(data.quotedPrice)||data.quotedPrice<0)return {status:409 as const,error:"Frank has not added a confirmed quote yet."};
@@ -42,6 +42,10 @@ export async function POST(request:Request){
     return NextResponse.json({approved:true,approvedAt:result.approvedAt,alreadyApproved:result.alreadyApproved});
   }catch(error){
     console.error("The Plug quote approval failed:",error);
-    return NextResponse.json({error:error instanceof Error?error.message:"We could not record your approval. Please try again."},{status:400});
+    const message=error instanceof Error?error.message:"";
+    if(/expired|token|authentication/i.test(message)){
+      return NextResponse.json({error:"Please restore your session and try again."},{status:401});
+    }
+    return NextResponse.json({error:"We could not record your approval right now. Refresh My Plug and try again."},{status:500});
   }
 }
