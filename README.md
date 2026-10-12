@@ -18,6 +18,7 @@ Customers can browse available products, ask The Plug to source a specific sneak
 - **[AGENTS_REPO_LABELED.md](./AGENTS_REPO_LABELED.md)** — labelled source map, customer/admin/API/data/PWA traces, clone runbook and verification matrix.
 - **[Admin Hub App Factory SOP](./docs/ADMIN-HUB-APP-FACTORY-SOP.md)** — reusable inspect → select foundation → clone/reset → prove → build → verify → checkpoint algorithm.
 - **[Clone and Reset Checklist](./docs/CLONE-RESET-CHECKLIST.md)** — ordered gates, exact commands, expected results and stop conditions for a fresh clone.
+- **[CLONING.md](./CLONING.md)** — mandatory end-to-end procedure for converting a clean clone into a separately branded and independently configured Admin Hub app.
 - **Identity contract:** `scripts/identity.config.json` drives `npm run verify:identity`; update its expected identity and source-residue patterns for every new app.
 - **Static foundation audit:** run `npm run verify:clone-readiness` after `npm ci`; it checks this repository's wiring without connecting to Firebase or consuming database reads. It is not a universal verifier for a different business.
 
