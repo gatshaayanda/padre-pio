@@ -23,24 +23,32 @@ export default function AdminGate({children}:{children:React.ReactNode}){
 
  useEffect(()=>{
   let stopAdmin:undefined|(()=>void);
+  let authGeneration=0;
   const stopAuth=onAuthStateChanged(auth,next=>{
+   const generation=++authGeneration;
    if(stopAdmin){stopAdmin();stopAdmin=undefined}
    setUser(next);
    setChecking(true);
+   setAuthorized(false);
    setOffline(false);
-   if(!next){setAuthorized(false);setChecking(false);return}
+   setError("");
+   if(!next){setChecking(false);return}
    stopAdmin=onSnapshot(doc(db,"admins",next.uid),snapshot=>{
+    if(generation!==authGeneration)return;
     const allowed=snapshot.exists()&&hasAdminRole(snapshot.data());
     setAuthorized(allowed);
     setOffline(false);
     setChecking(false);
     if(!allowed)void signOut(auth);
    },()=>{
+    if(generation!==authGeneration)return;
+    setAuthorized(false);
     setOffline(true);
     setChecking(false);
+    setError("We could not verify your Operations permissions. Reconnect and try again; admin access is blocked until permissions can be confirmed.");
    });
   });
-  return ()=>{if(stopAdmin)stopAdmin();stopAuth()};
+  return ()=>{authGeneration++;if(stopAdmin)stopAdmin();stopAuth()};
  },[]);
 
  async function signIn(e:React.FormEvent){
