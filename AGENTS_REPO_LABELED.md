@@ -36,7 +36,7 @@ SOURCE-VERIFIED:
 
 Key files: package.json, tsconfig.json, next.config.ts, src/app/layout.tsx, .github/workflows/quality.yml.
 
-NOT-RUNTIME-VERIFIED: this inspection used repository file access, not a local clone; dependency installation, fresh build, device tests and production customer flows were not executed here.
+NOT-RUNTIME-VERIFIED: the source inspection used repository file access, not a local clone. GitHub Actions separately installs from the lockfile and runs identity/static gates, TypeScript, lint and production build on the candidate SHA; those checks do not exercise live Firebase, UploadThing, push delivery, production aliases or real-device customer/admin/PWA journeys.
 
 ### 01.2 Product boundary
 
