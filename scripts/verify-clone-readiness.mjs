@@ -32,6 +32,8 @@ check("Firestore rules file exists", exists("firestore.rules"));
 check("Storage rules file exists", exists("storage.rules"));
 check("Firebase configuration exists", exists("firebase.json"));
 check("Firestore indexes file exists", exists("firestore.indexes.json"));
+const indexesConfig = JSON.parse(read("firestore.indexes.json"));
+check("Firestore indexes file has valid Firebase CLI structure", Array.isArray(indexesConfig.indexes) && Array.isArray(indexesConfig.fieldOverrides));
 
 const packageJson = JSON.parse(read("package.json"));
 const scripts = packageJson.scripts ?? {};
@@ -90,6 +92,7 @@ check("Storefront source exists", exists("src/components/StorefrontFeed.tsx"));
 
 const firebaseConfig = JSON.parse(read("firebase.json"));
 check("Firebase config points to Firestore rules", firebaseConfig.firestore?.rules === "firestore.rules");
+check("Firebase config points to Firestore indexes", firebaseConfig.firestore?.indexes === "firestore.indexes.json");
 check("Firebase config points to Storage rules", firebaseConfig.storage?.rules === "storage.rules");
 const firestoreRules = read("firestore.rules");
 check("Firestore rules contain final deny-all fallback", /match\s+\/\{document=\*\*\}\s*\{[\s\S]*?allow\s+read,\s*write\s*:\s*if\s+false\s*;?/.test(firestoreRules));

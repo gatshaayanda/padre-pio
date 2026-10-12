@@ -222,9 +222,9 @@ Before adding a collection/field, define owner, audience, trusted writer, reader
 | J04 | npm run verify:identity | Brand/config residue check. |
 | J05 | npm run build | Identity verifier followed by Next production build. |
 | J06 | .github/workflows/quality.yml | Node 22, npm ci, explicit identity and static foundation gates, typecheck, lint, build. |
+| J07 | scripts/verify-identity.mjs | Config-driven clone identity residue guard. |
 | J08 | scripts/identity.config.json | Per-project identity expectations and explicitly allowlisted legacy strings. |
 | J09 | docs/CLONE-RESET-CHECKLIST.md | Ordered clone/reset checkpoints, commands, expected results and stop conditions. |
-| J07 | scripts/verify-identity.mjs | Walks unignored text files and rejects known inherited brand/domain/color patterns. |
 
 Important gap: inspected package scripts do not define a test runner. README has manual acceptance checklists. Do not tell a new chat to run npm test, Playwright or Firebase rules tests unless it verifies they exist. Add a focused low-maintenance test harness deliberately rather than pretending one already exists.
 
@@ -533,7 +533,8 @@ No test runner is currently declared in the inspected package.json. Do not call 
 
 ### Source-verified observations
 
-- \`src/app/order/page.tsx\` redirects the canonical \`/order\` route to \`/request\`.
+- `/src/app/order/page.tsx` redirects the canonical `/order` route to `/request`; `/book` also redirects to `/request`.
+- `src/app/products/[id]/product-detail.tsx` still loads `MenuItem` records through legacy `getMenuItems` / `readCachedMenuItems` from `src/lib/firebase/data.ts`, not the current `storefrontContent` feed. Treat it as a legacy public route until callers, historical links and deployed data are checked.
 - \`src/app/order/order-form.tsx\` still imports and uses the food-menu/order data helpers, but that file is not the canonical \`/order\` route implementation. Do not infer global dead-code status from that observation alone.
 - \`src/app/orders/[id]/page.tsx\` still implements order tracking against the legacy \`orders\` collection and local same-device fallback. A direct/historical tracking URL may still be used even though the current order route redirects elsewhere.
 - \`src/lib/firebase/data.ts\` combines Plug-relevant customer profile, conversation and notification helpers with legacy food order, menu and daily reconciliation exports. It is not safe to delete the module as a whole.
