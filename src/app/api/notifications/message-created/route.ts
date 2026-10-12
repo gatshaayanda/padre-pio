@@ -22,7 +22,25 @@ export async function POST(request:Request){
   const admins=senderRole==="customer"?await db.collection("admins").get():null;const recipientIds:string[]=[];
   if(senderRole==="customer"&&admins){for(const admin of admins.docs){const role=String(admin.data().role??"").toLowerCase();if(!["owner","staff"].includes(role))continue;const pref=(await db.collection("notificationPreferences").doc(admin.id).get()).data();if(pref?.enabled)recipientIds.push(admin.id)}}else{recipientIds.push(customerId)}
   let sent=0;const preview=String(msg.text??"Attachment sent").slice(0,120);const title=senderRole==="customer"?String(data.customerName??"Customer")+" sent a message":"The Plug replied";
-  for(const recipient of recipientIds){const tokens=await db.collection("notificationTokens").doc(recipient).collection("tokens").get();for(const tokenDoc of tokens.docs){try{await messaging.send({token:String(tokenDoc.data().token),notification:{title,body:preview},data:{link:senderRole==="customer"?"/admin":"/account",conversationId,messageId},webpush:{fcmOptions:{link:(process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app")+(senderRole==="customer"?"/admin":"/account")}});sent++}catch(error){const code=(error as {code?:string})?.code||"";if(code==="messaging/registration-token-not-registered"||code==="messaging/invalid-registration-token")await tokenDoc.ref.delete().catch(()=>{});}}}
+  for(const recipient of recipientIds){
+    const tokens=await db.collection("notificationTokens").doc(recipient).collection("tokens").get();
+    for(const tokenDoc of tokens.docs){
+      try{
+        await messaging.send({
+          token:String(tokenDoc.data().token),
+          notification:{title,body:preview},
+          data:{link:senderRole==="customer"?"/admin":"/account",conversationId,messageId},
+          webpush:{fcmOptions:{link:(process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app")+(senderRole==="customer"?"/admin":"/account")}}
+        });
+        sent++;
+      }catch(error){
+        const code=(error as {code?:string})?.code||"";
+        if(code==="messaging/registration-token-not-registered"||code==="messaging/invalid-registration-token"){
+          await tokenDoc.ref.delete().catch(()=>{});
+        }
+      }
+    }
+  }
   return NextResponse.json({sent});
  }catch(error){console.error("The Plug conversation notification failed:",error);return NextResponse.json({sent:0,error:error instanceof Error?error.message:"Conversation notification unavailable while The Plug is being built."},{status:400})}
 }
