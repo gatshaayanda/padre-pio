@@ -41,7 +41,7 @@ check("Production build invokes identity verification", /verify:identity/.test(s
 check("Lint script exists", typeof scripts.lint === "string");
 const localNodeMajor = read(".nvmrc").trim().replace(/^v/, "").split(".")[0];
 const qualityWorkflow = read(".github/workflows/quality.yml");
-const ciNodeMajor = qualityWorkflow.match(/node-version:\\s*["\']?(\\d+)/)?.[1];
+const ciNodeMajor = qualityWorkflow.match(/node-version:\s*["\']?(\d+)/)?.[1];
 check("Local Node major matches CI Node major", Boolean(localNodeMajor && ciNodeMajor && localNodeMajor === ciNodeMajor), "local=" + localNodeMajor + ", CI=" + (ciNodeMajor ?? "not detected"));
 
 const manifest = JSON.parse(read("public/manifest.webmanifest"));
