@@ -6,7 +6,7 @@ Version 1.0 · Pilot foundation: The Plug · 12 October 2026
 
 Deliver apps by reusing proven systems, reducing repeated discovery and avoidable defects, and controlling database/deployment consumption. This is a repeatable procedure, not a mandate to give every product the same features.
 
-## The three-document contract
+## The four-document contract
 
 1. Universal Project Instructions: roles, work discipline, source-of-truth rules and general algorithm.
 2. Repository AGENTS.md: product requirements, security, current state, commands, known issues and behavior that must not regress.

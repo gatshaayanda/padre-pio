@@ -11,6 +11,7 @@
 1. Read AGENTS.md for product rules and non-negotiable behavior.
 2. Read this map for exact subsystem labels and flow traces.
 3. Read docs/ADMIN-HUB-APP-FACTORY-SOP.md before cloning or selecting reusable architecture.
+4. Read docs/CLONE-RESET-CHECKLIST.md and complete its gates in order for every clone/reset.
 4. Confirm current branch/head, Git status, recent commits, open PRs, CI and exact deployment status.
 5. Inspect all named files in the relevant label and follow callers, writes, readers, rules, indexes and error paths before editing.
 6. State the requested outcome, affected flows, smallest change, relevant tests and recovery point.
