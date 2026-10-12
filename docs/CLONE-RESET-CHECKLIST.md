@@ -8,7 +8,7 @@ This is the executable working procedure for a fresh agent. Complete gates in or
 
 **Inspect**
 - Confirm the current branch, commit, clean/dirty status, remotes, recent history, open PRs, CI state and actual deployment project/production alias.
-- Read `AGENTS.md`, `AGENTS_REPO_LABELED.md`, this checklist, the app-factory SOP, and the PWA contract when applicable.
+- Read `AGENTS.md`, `AGENTS_REPO_LABELED.md`, `CLONING.md`, this checklist, the app-factory SOP, and the PWA contract when applicable.
 - Inspect the complete repository tree. Trace customer journeys, admin workflows, routes, components, APIs, data helpers, rules, indexes, storage, environment-variable reads, CI/workflows, service workers, cache keys and deployment configuration.
 
 **Commands**
