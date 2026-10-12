@@ -27,7 +27,7 @@ check("Ordered clone/reset checklist exists", exists("docs/CLONE-RESET-CHECKLIST
 check("PWA foundation notes exist", exists("docs/PWA-FOUNDATION.md"));
 check("Identity verification script exists", exists("scripts/verify-identity.mjs"));
 check("Per-project identity configuration exists", exists("scripts/identity.config.json"));
-check("Identity verifier reads per-project configuration", exists("scripts/verify-identity.mjs") && /identity\\.config\\.json/.test(read("scripts/verify-identity.mjs")));
+check("Identity verifier reads per-project configuration", exists("scripts/verify-identity.mjs") && /identity\.config\.json/.test(read("scripts/verify-identity.mjs")));
 check("Firestore rules file exists", exists("firestore.rules"));
 check("Storage rules file exists", exists("storage.rules"));
 check("Firebase configuration exists", exists("firebase.json"));
@@ -95,7 +95,7 @@ const envExample = read(".env.example");
 for (const variable of ["NEXT_PUBLIC_BASE_URL", "NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID", "NEXT_PUBLIC_FIREBASE_VAPID_KEY", "FIREBASE_ADMIN_KEY", "UPLOADTHING_TOKEN", "THE_PLUG_OPERATIONS_WORD", "BOEMO_REMINDER_CRON_SECRET", "FIREBASE_PROJECT_ID"]) {
   check("Environment example documents " + variable, new RegExp("^" + variable + "=", "m").test(envExample));
 }
-check("Root agent instructions link the clone/reset checklist", /docs\\/CLONE-RESET-CHECKLIST\\.md/.test(read("AGENTS.md")));
+check("Root agent instructions link the clone/reset checklist", /docs\/CLONE-RESET-CHECKLIST\.md/.test(read("AGENTS.md")));
 
 const sourceMap = read("AGENTS_REPO_LABELED.md");
 for (const requiredLabel of ["## 00", "## 01", "## 02", "## 03", "## 04", "## 05", "## 06", "## 07", "## 08", "## 09", "## 10", "## 11", "## 12", "## 13"]) {

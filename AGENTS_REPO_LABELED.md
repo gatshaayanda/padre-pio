@@ -25,7 +25,7 @@ If the source contradicts this map, source wins. Update the map in the same chec
 
 SOURCE-VERIFIED:
 - Next.js 15 App Router, React 19, strict TypeScript.
-- npm package scripts: dev, build, start, lint, verify:identity. The build invokes identity verification before Next build.
+- npm package scripts: dev, build, start, lint, verify:identity, verify:clone-readiness. The build invokes identity verification before Next build.
 - Firebase Web SDK 11.9, Firebase Admin 13.4, UploadThing v7, Lucide React, Vercel Analytics and Speed Insights.
 - Tailwind CSS 4 dependencies, plus substantial app-specific CSS.
 - tsconfig path alias maps @/* to ./src/*.
