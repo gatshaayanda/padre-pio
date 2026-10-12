@@ -43,6 +43,7 @@ const localNodeMajor = read(".nvmrc").trim().replace(/^v/, "").split(".")[0];
 const qualityWorkflow = read(".github/workflows/quality.yml");
 const ciNodeMajor = qualityWorkflow.match(/node-version:.*?(\d+)/)?.[1];
 check("Local Node major matches CI Node major", Boolean(localNodeMajor && ciNodeMajor && localNodeMajor === ciNodeMajor), "local=" + localNodeMajor + ", CI=" + (ciNodeMajor ?? "not detected"));
+check("CI runs identity and clone-readiness gates explicitly", /run: npm run verify:identity/.test(qualityWorkflow) && /run: npm run verify:clone-readiness/.test(qualityWorkflow));
 
 const manifest = JSON.parse(read("public/manifest.webmanifest"));
 const generatedManifest = read("src/app/manifest.ts");
@@ -96,7 +97,7 @@ const storageRules = read("storage.rules");
 check("Storage rules contain deny-all fallback", /match\s+\/\{allPaths=\*\*\}\s*\{\s*allow\s+read,\s*write\s*:\s*if\s+false\s*;?\s*\}/.test(storageRules));
 
 const envExample = read(".env.example");
-for (const variable of ["NEXT_PUBLIC_BASE_URL", "NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID", "NEXT_PUBLIC_FIREBASE_VAPID_KEY", "FIREBASE_ADMIN_KEY", "UPLOADTHING_TOKEN", "THE_PLUG_OPERATIONS_WORD", "BOEMO_REMINDER_CRON_SECRET", "FIREBASE_PROJECT_ID"]) {
+for (const variable of ["NEXT_PUBLIC_BASE_URL", "NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID", "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID", "NEXT_PUBLIC_FIREBASE_VAPID_KEY", "FIREBASE_ADMIN_KEY", "UPLOADTHING_TOKEN", "THE_PLUG_OPERATIONS_WORD", "BOEMO_REMINDER_CRON_SECRET", "FIREBASE_PROJECT_ID"]) {
   check("Environment example documents " + variable, new RegExp("^" + variable + "=", "m").test(envExample));
 }
 check("Root agent instructions link the clone/reset checklist", /docs\/CLONE-RESET-CHECKLIST\.md/.test(read("AGENTS.md")));
