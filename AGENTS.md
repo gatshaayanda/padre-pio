@@ -1,6 +1,8 @@
 # START HERE — The Plug flagship clone foundation
 
-Before changing code, read **AGENTS_REPO_LABELED.md** for the source-linked architecture map and flow traces, **docs/ADMIN-HUB-APP-FACTORY-SOP.md** for the factory algorithm, and **docs/CLONE-RESET-CHECKLIST.md** for the gated clone procedure. This file remains the product behavior and implementation contract; the map and SOP supplement it. Source code wins when documentation conflicts, and the same checkpoint must correct stale documentation.
+Before changing code, read **AGENTS_REPO_LABELED.md** for the source-linked architecture map and flow traces, **docs/ADMIN-HUB-APP-FACTORY-SOP.md** for the factory algorithm, **docs/CLONE-RESET-CHECKLIST.md** for the gated checklist, and **CLONING.md** for the complete clean-clone-to-independent-app procedure. This file governs agent behavior and product invariants; the labelled map is the source-linked repository reference; the SOP/checklist/CLONING.md govern repeatable clone execution. Source code and current workflow configuration win when documentation conflicts, and the same checkpoint must correct stale documentation.
+
+**For a new Admin Hub app, CLONING.md is mandatory.** Complete its gates continuously in order without pausing for approval between stages; stop only when a gate is genuinely blocked by missing authorization, unknown production state, or unavailable evidence. Do not substitute feature hardening for the clone/foundation mission.
 
 ## Mandatory labelled workflow
 1. Establish reality before edits: inspect branch/head, status/diff, remotes, recent commits, PR/CI state and deployment target. Never reset a dirty tree or overwrite a target clone.
