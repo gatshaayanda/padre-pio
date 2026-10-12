@@ -33,10 +33,11 @@ export async function POST(request:Request){
   if(!canSend)return NextResponse.json({sent:0,duplicate:true});
   const admins=senderRole==="customer"?await db.collection("admins").get():null;const recipientIds:string[]=[];
   if(senderRole==="customer"&&admins){for(const admin of admins.docs){const role=String(admin.data().role??"").toLowerCase();if(!["owner","staff"].includes(role))continue;const pref=(await db.collection("notificationPreferences").doc(admin.id).get()).data();if(pref?.enabled)recipientIds.push(admin.id)}}else{recipientIds.push(customerId)}
-  let sent=0;const preview=String(msg.text??"Attachment sent").slice(0,120);const title=senderRole==="customer"?String(data.customerName??"Customer")+" sent a message":"The Plug replied";
+  let sent=0,attempted=0,failed=0;const preview=String(msg.text??"Attachment sent").slice(0,120);const title=senderRole==="customer"?String(data.customerName??"Customer")+" sent a message":"The Plug replied";
   for(const recipient of recipientIds){
     const tokens=await db.collection("notificationTokens").doc(recipient).collection("tokens").get();
     for(const tokenDoc of tokens.docs){
+      attempted++;
       try{
         await messaging.send({
           token:String(tokenDoc.data().token),
@@ -46,14 +47,17 @@ export async function POST(request:Request){
         });
         sent++;
       }catch(error){
+        failed++;
         const code=(error as {code?:string})?.code||"";
+        console.warn("The Plug conversation push failed:",code||"unknown");
         if(code==="messaging/registration-token-not-registered"||code==="messaging/invalid-registration-token"){
           await tokenDoc.ref.delete().catch(()=>{});
         }
       }
     }
   }
-  await deliveryRef.set({status:sent>0?"sent":"failed",sentCount:sent,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
-  return NextResponse.json({sent});
+  const status=sent===0?(attempted===0?"no-recipients":"failed"):(failed>0?"partial":"sent");
+  await deliveryRef.set({status,sentCount:sent,attemptedCount:attempted,failedCount:failed,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
+  return NextResponse.json({sent,attempted,failed,status});
  }catch(error){console.error("The Plug conversation notification failed:",error);return NextResponse.json({sent:0,error:error instanceof Error?error.message:"Conversation notification unavailable while The Plug is being built."},{status:400})}
 }
