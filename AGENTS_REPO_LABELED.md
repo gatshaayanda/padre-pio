@@ -572,23 +572,22 @@ This is source inspection, not penetration testing. Findings below require caref
 
 ### K01 — Operations login is a high-priority security review
 
-Source: \`src/app/api/operations-login/route.ts\`.
+Source: `src/app/api/operations-login/route.ts`.
 
 SOURCE-VERIFIED behavior:
-- Accepts a shared \`THE_PLUG_OPERATIONS_WORD\` from the request body and compares it with a timing-safe hash comparison.
-- Has no visible persistent attempt throttling or lockout in this route.
-- Uses the fixed UID \`the-plug-temporary-operations\`.
-- On successful access, writes/merges \`{role: "owner", temporaryAccess: true}\` into \`admins/{uid}\` and returns a Firebase custom token for that shared UID.
+- Accepts the shared `THE_PLUG_OPERATIONS_WORD` and compares it using a timing-safe hash comparison.
+- Uses Firestore-backed per-source-address throttling: five attempts per 15-minute window, HTTP 429 with `Retry-After`, oversized declared-body rejection, and bounded cleanup of expired limiter records.
+- Still issues a custom token for fixed UID `the-plug-temporary-operations` and writes/merges `{role: "owner", temporaryAccess: true}` into `admins/{uid}` after a successful shared-word login.
 
-Risk interpretation: anyone who obtains the shared operations word, or can successfully guess it if it is weak and unthrottled, receives the same owner-level identity. The fixed UID also means separate operators are not individually attributable. The route may be intentionally temporary, but its presence is not enough to certify secure admin access.
+Risk interpretation: the new throttle is defense in depth, not proof of brute-force resistance against distributed sources. Anyone who obtains the shared word receives the same owner-level identity, so individual operators are not attributable. Individual authenticated admin identities, least-privilege roles, and platform edge rate limiting remain preferred.
 
 Required follow-up:
-1. Inspect the client AdminGate and every other way an admin session can be created; confirm whether this endpoint is still used.
-2. Verify current secret strength/rotation policy without revealing the secret.
-3. Verify the new rate limiter under repeated/concurrent attempts and add platform-level edge rate limiting where available. Individual authenticated admin identities and least-privilege roles remain preferable to a shared owner token.
-4. Preserve a tested owner recovery path before changing login.
+1. Verify the limiter with repeated and concurrent attempts against a non-production environment.
+2. Verify secret strength/rotation policy without revealing the secret.
+3. Plan a migration to individual authenticated admin identities with least privilege.
+4. Preserve and test an owner recovery path before changing the login.
 5. Test wrong-word responses, repeated attempts, valid login, session expiry, direct API calls and non-admin access.
-6. Do not silently remove or rotate \`THE_PLUG_OPERATIONS_WORD\`; it can lock the operator out. Treat this as a high-priority release gate before certifying the admin surface.
+6. Do not silently remove or rotate `THE_PLUG_OPERATIONS_WORD`; it can lock the operator out. Do not certify the admin surface until role boundaries and unauthorized direct API/database access have been tested.
 
 ### K02 — Sourcing request API
 
