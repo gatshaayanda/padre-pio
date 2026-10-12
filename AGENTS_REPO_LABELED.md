@@ -8,15 +8,16 @@
 
 ## 00 — Mandatory reading order for every new chat
 
-1. Read AGENTS.md for product rules and non-negotiable behavior.
+1. Read AGENTS.md for agent behavior, product rules and non-negotiable behavior.
 2. Read this map for exact subsystem labels and flow traces.
-3. Read docs/ADMIN-HUB-APP-FACTORY-SOP.md before cloning or selecting reusable architecture.
-4. Read docs/CLONE-RESET-CHECKLIST.md and complete its gates in order for every clone/reset.
-4. Confirm current branch/head, Git status, recent commits, open PRs, CI and exact deployment status.
-5. Inspect all named files in the relevant label and follow callers, writes, readers, rules, indexes and error paths before editing.
-6. State the requested outcome, affected flows, smallest change, relevant tests and recovery point.
-7. Make the smallest controlled change. Run checks that actually exist. Update the map when code paths, schemas, rules or evidence change.
-8. Mark each check PASS, FAIL, NOT RUN or BLOCKED. Never infer runtime success from source inspection.
+3. Read docs/ADMIN-HUB-APP-FACTORY-SOP.md for the end-to-end production algorithm.
+4. Read docs/CLONE-RESET-CHECKLIST.md for the ordered operational checklist.
+5. For a new app, read CLONING.md and complete all clone gates in sequence.
+6. Confirm current branch/head, Git status, recent commits, open PRs, CI and exact deployment status.
+7. Inspect all named files in the relevant label and follow callers, writes, readers, rules, indexes and error paths before editing.
+8. State the requested outcome, affected flows, smallest change, relevant tests and recovery point.
+9. Make the smallest controlled change. Run checks that actually exist. Update the map when code paths, schemas, rules or evidence change.
+10. Mark each check PASS, FAIL, NOT RUN or BLOCKED. Never infer runtime success from source inspection.
 
 If the source contradicts this map, source wins. Update the map in the same checkpoint as a material implementation change.
 
