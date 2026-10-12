@@ -68,7 +68,7 @@ const storageRules = read("storage.rules");
 check("Storage rules contain deny-all fallback", /match\s+\/\{allPaths=\*\*\}\s*\{\s*allow\s+read,\s*write\s*:\s*if\s+false\s*;?\s*\}/.test(storageRules));
 
 const sourceMap = read("AGENTS_REPO_LABELED.md");
-for (const requiredLabel of ["## 00", "## 01", "## 02", "## 03", "## 04", "## 05", "## 06", "## 07", "## 08", "## 09"]) {
+for (const requiredLabel of ["## 00", "## 01", "## 02", "## 03", "## 04", "## 05", "## 06", "## 07", "## 08", "## 09", "## 10", "## 11", "## 12"]) {
   check("Source map includes " + requiredLabel, sourceMap.includes(requiredLabel));
 }
 check("Source map states runtime evidence limitations", /NOT-RUNTIME-VERIFIED/.test(sourceMap));
