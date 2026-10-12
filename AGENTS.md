@@ -368,3 +368,10 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - Inspect Firestore and Storage rules as source, then separately verify which rules are deployed. Do not broaden the default-deny catch-all.
 - Deployment state is independent of Git merge state. Do not ask the owner to QA until the exact merged SHA has a READY deployment and the production alias is confirmed to point to it.
 
+## Executable readiness and legacy safety
+
+Run \`npm run verify:clone-readiness\` after reading the labelled map. This is a deterministic static audit; it makes no Firebase/network calls and does not verify production. Standard local gate order is \`npm ci\`, \`npm run verify:identity\`, \`npm run verify:clone-readiness\`, \`npx tsc --noEmit\`, \`npm run lint\`, \`npm run build\`.
+
+The static audit reports known inherited BOEMO order/menu/reconciliation and \`boemoMedia\` footprints as warnings. **Do not delete them simply to make the audit quieter.** \`/order\` redirects to \`/request\`, but \`/orders/[id]\` still contains historical order tracking and \`data.ts\` mixes legacy and current customer/conversation helpers. Trace callers, scheduled workflows, historical links and authorized read-only live data before a separate reviewed cleanup/migration.
+
+No production Firebase reads/writes, rules deployment, upload, push test, or Vercel deployment should be triggered by static verification. Label real integration/device/production checks separately and record exact evidence. Free tools still have quotas; avoid polling and repeated probes.
