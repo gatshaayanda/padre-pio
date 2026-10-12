@@ -13,7 +13,8 @@ const ignoredFiles = new Set([
   "scripts/identity.config.json",
   "docs/PWA-FOUNDATION.md",
   "docs/ADMIN-HUB-APP-FACTORY-SOP.md",
-  "docs/CLONE-RESET-CHECKLIST.md"
+  "docs/CLONE-RESET-CHECKLIST.md",
+  "CLONING.md"
 ]);
 const textExtensions = new Set([".ts", ".tsx", ".js", ".mjs", ".css", ".json", ".webmanifest", ".md", ".yml", ".yaml", ".txt", ".html", ".svg", ".rules", ".example", ".toml", ".xml"]);
 
