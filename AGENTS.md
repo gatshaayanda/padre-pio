@@ -375,3 +375,7 @@ Run \`npm run verify:clone-readiness\` after reading the labelled map. This is a
 The static audit reports known inherited BOEMO order/menu/reconciliation and \`boemoMedia\` footprints as warnings. **Do not delete them simply to make the audit quieter.** \`/order\` redirects to \`/request\`, but \`/orders/[id]\` still contains historical order tracking and \`data.ts\` mixes legacy and current customer/conversation helpers. Trace callers, scheduled workflows, historical links and authorized read-only live data before a separate reviewed cleanup/migration.
 
 No production Firebase reads/writes, rules deployment, upload, push test, or Vercel deployment should be triggered by static verification. Label real integration/device/production checks separately and record exact evidence. Free tools still have quotas; avoid polling and repeated probes.
+
+### Known Firebase deployment blocker (12 October 2026)
+
+The last inspected Firestore-rules deployment run failed at the \`Write Firebase service account\` step because the required \`FIREBASE_SERVICE_ACCOUNT_JSON\` secret was empty/unavailable; the rules deployment step was skipped. See [run 38203816191](https://github.com/gatshaayanda/the-plug/actions/runs/38203816191). Do not describe source rules as deployed. An authorized repository administrator must configure the required GitHub Actions secrets (including \`FIREBASE_SERVICE_ACCOUNT_JSON\` and \`FIREBASE_PROJECT_ID\`), then deliberately rerun/deploy and verify the target Firebase project. Never print secret values or silently skip the deployment gate.
