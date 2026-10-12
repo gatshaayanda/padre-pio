@@ -553,3 +553,65 @@ The following are not certified by the static audit or documentation PR:
 - Production deployment SHA and current production smoke tests.
 
 For every row, update status only with an evidence link, exact SHA/environment, date, test action and result. “Not tested” is an acceptable honest status; an invented PASS is not.
+
+## 13 — Privileged API and data-cost findings from source review
+
+This is source inspection, not penetration testing. Findings below require careful handling because the product is live and admin/request workflows must be preserved.
+
+### K01 — Operations login is a high-priority security review
+
+Source: \`src/app/api/operations-login/route.ts\`.
+
+SOURCE-VERIFIED behavior:
+- Accepts a shared \`THE_PLUG_OPERATIONS_WORD\` from the request body and compares it with a timing-safe hash comparison.
+- Has no visible persistent attempt throttling or lockout in this route.
+- Uses the fixed UID \`the-plug-temporary-operations\`.
+- On successful access, writes/merges \`{role: "owner", temporaryAccess: true}\` into \`admins/{uid}\` and returns a Firebase custom token for that shared UID.
+
+Risk interpretation: anyone who obtains the shared operations word, or can successfully guess it if it is weak and unthrottled, receives the same owner-level identity. The fixed UID also means separate operators are not individually attributable. The route may be intentionally temporary, but its presence is not enough to certify secure admin access.
+
+Required follow-up:
+1. Inspect the client AdminGate and every other way an admin session can be created; confirm whether this endpoint is still used.
+2. Verify current secret strength/rotation policy without revealing the secret.
+3. Choose an appropriate protection that works in the current hosting environment (robust rate limiting, individual authenticated admin identities, and least-privilege roles are preferable to a shared owner token).
+4. Preserve a tested owner recovery path before changing login.
+5. Test wrong-word responses, repeated attempts, valid login, session expiry, direct API calls and non-admin access.
+6. Do not silently remove or rotate \`THE_PLUG_OPERATIONS_WORD\`; it can lock the operator out. Treat this as a high-priority release gate before certifying the admin surface.
+
+### K02 — Sourcing request API
+
+Source: \`src/app/api/sourcing-request/route.ts\`.
+
+Observed safeguards: verifies a Firebase ID token; validates an explicit field allowlist, required fields, field lengths and delivery method; verifies \`customerId\` matches the token UID; creates the record transactionally; checks an existing request ID for an apparent same-customer retry.
+
+Follow-up: test invalid/missing tokens, oversized JSON/body handling, malicious attachment URLs/metadata, conflicting request-ID reuse, concurrent retries and actual Firestore rules. Do not treat the transaction's duplicate response as proof that every field in the retry matches the original.
+
+### K03 — Quote approval API
+
+Source: \`src/app/api/sourcing-request/approve-quote/route.ts\`.
+
+Observed safeguards: verifies Firebase ID token, checks request ownership, requires a finite non-negative quote, restricts approval to the expected statuses, and records price/time/UID inside a transaction.
+
+Follow-up: test owner mismatch, missing/negative/non-finite quote, stale status, duplicate approval, concurrent status changes and admin/customer notifications. The source review is not a concurrency or live-data test.
+
+### K04 — Journey analytics write cost
+
+Source: \`src/app/api/analytics/journey/route.ts\`.
+
+Each accepted event currently performs an admin-document lookup before writing the event; customer events then add a \`customerJourneyEvents\` document. That is at least one Firestore document read per accepted event plus a write, excluding token verification and retries. This is a deliberate current cost profile, not a bill estimate. Avoid replaying event requests in production; test using local fixtures/emulator or a controlled low-volume QA account. Future optimization must preserve the rule that admin activity is excluded from customer analytics.
+
+### K05 — Firebase credentials are two distinct operational paths
+
+- Vercel server APIs use \`FIREBASE_ADMIN_KEY\` in inspected routes.
+- The GitHub rules deployment workflow expects \`FIREBASE_SERVICE_ACCOUNT_JSON\` and \`FIREBASE_PROJECT_ID\`.
+
+Do not assume setting one configures the other. Never expose either secret. Confirm the project identity each credential targets before deploying rules or testing writes.
+
+### Required security verification before certification
+
+- Individual admin attribution or documented, time-bounded shared access risk acceptance.
+- Rate-limit/brute-force protection for the privileged login.
+- Admin route, API, Firestore and Storage denial tests for unauthenticated and wrong-role identities.
+- Customer request ownership and quote-approval negative tests.
+- Confirmation that public Storage paths contain only intentionally public assets.
+- Redacted logs and no credentials/customer private content in CI artifacts.
