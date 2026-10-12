@@ -68,7 +68,7 @@ Changing the package name or page title is not an identity reset.
 5. Replace identity in install prompts, embedded-browser handoff, offline/error/loading states, customer/admin copy, emails/notification payloads, social/contact links, robots/sitemap/canonical URLs and analytics labels.
 6. Change all service-worker shell/media cache namespaces, legacy-cache deletion prefixes, localStorage/IndexedDB keys and any identity-scoped browser state. Preserve safe offline policy; avoid reading or copying customer caches.
 7. Update package/repository/readme/project names, favicon and any hosted-domain references.
-8. Search source, text assets, configuration and workflows for the old identity. The identity verifier intentionally excludes engineering instructions that discuss the source foundation and supports explicitly listed legacy environment names; do not broadly exclude product files or entire directories.
+8. Search source, text assets, configuration, Firestore/Storage rules and workflows for the old identity. The identity verifier intentionally excludes engineering instructions that discuss the source foundation and masks only the exact strings listed in `allowedLegacyStrings`; each exception must have an explicit KEEP/ADAPT/REPLACE decision and be removed from that list when no longer needed. Do not broadly exclude product files or entire directories.
 
 **Commands**
 ```sh

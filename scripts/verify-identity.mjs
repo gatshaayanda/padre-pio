@@ -15,7 +15,7 @@ const ignoredFiles = new Set([
   "docs/ADMIN-HUB-APP-FACTORY-SOP.md",
   "docs/CLONE-RESET-CHECKLIST.md"
 ]);
-const textExtensions = new Set([".ts", ".tsx", ".js", ".mjs", ".css", ".json", ".webmanifest", ".md", ".yml", ".yaml", ".txt", ".html", ".svg"]);
+const textExtensions = new Set([".ts", ".tsx", ".js", ".mjs", ".css", ".json", ".webmanifest", ".md", ".yml", ".yaml", ".txt", ".html", ".svg", ".rules", ".example", ".toml", ".xml"]);
 
 function read(relativePath) {
   const full = path.join(root, relativePath);

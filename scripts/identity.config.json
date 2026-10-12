@@ -12,12 +12,14 @@
     "tutorme",
     "namane-tyres\\.vercel\\.app",
     "boemo-joos-food-deals",
+    "boemoMedia",
     "#FFC800",
     "#FF7B00",
     "#FF2A85",
     "#00E5FF"
   ],
   "allowedLegacyStrings": [
-    "BOEMO_REMINDER_CRON_SECRET"
+    "BOEMO_REMINDER_CRON_SECRET",
+    "boemoMedia"
   ]
 }
