@@ -27,7 +27,7 @@ Preserve proven PWA behavior deliberately; do not blindly copy the source app's 
 - Version the service worker intentionally. Delete only obsolete caches belonging to this app. Never use cached public shells to serve private account, request, message, token or admin content. Do not broadly cache authenticated responses.
 - Keep a distinct, honest offline route and safe update/recovery behavior. Cached UI does not prove that a write was sent or accepted. Where relevant, show local/queued/syncing/confirmed/failed states and prevent duplicate writes on retry.
 - Maintain accessible labels, keyboard and focus behavior, visible focus, contrast, touch targets and reduced-motion support.
-- Do not impose The Plug's account-first journey or embedded-browser gate on another product automatically. Preserve the mechanism, then adapt product policy deliberately.
+- Do not impose The Plug's guest-first sourcing journey or embedded-browser gate on another product automatically. Preserve the mechanism, then adapt product policy deliberately.
 
 ## Clone identity and infrastructure reset
 
@@ -62,4 +62,4 @@ Verify the actual target project, not just code patterns:
 
 Start by asking which repository is the target and which repository is the foundation if not already stated. Read this file plus both repositories' `AGENTS.md` files. Treat this checklist as a baseline, not proof that the foundation implements it correctly. Compare the actual code and deployment to the checklist, report gaps, and make the smallest controlled changes.
 
-If cloning BOEMO, reuse only the mechanics that inspection confirms are reusable; reset BOEMO identity, Firebase resources, notification configuration and food-ordering business logic. If cloning The Plug, preserve its install journey and safe service-worker patterns while explicitly adapting its account-first and embedded-browser policies to the new product. If using PurePress or another foundation, inspect it with the same rigor. Never copy configuration blindly or claim success without evidence.
+If cloning BOEMO, reuse only the mechanics that inspection confirms are reusable; reset BOEMO identity, Firebase resources, notification configuration and food-ordering business logic. If cloning The Plug, preserve its install journey and safe service-worker patterns while explicitly adapting its guest-first sourcing and embedded-browser policies to the new product. If using PurePress or another foundation, inspect it with the same rigor. Never copy configuration blindly or claim success without evidence.

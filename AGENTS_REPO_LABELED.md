@@ -533,7 +533,7 @@ No test runner is currently declared in the inspected package.json. Do not call 
 
 ### Source-verified observations
 
-- `/src/app/order/page.tsx` redirects the canonical `/order` route to `/request`; `/book` also redirects to `/request`.
+- `src/app/order/page.tsx` redirects the canonical `/order` route to `/request`; `/book` also redirects to `/request`.
 - `src/app/products/[id]/product-detail.tsx` still loads `MenuItem` records through legacy `getMenuItems` / `readCachedMenuItems` from `src/lib/firebase/data.ts`, not the current `storefrontContent` feed. Treat it as a legacy public route until callers, historical links and deployed data are checked.
 - \`src/app/order/order-form.tsx\` still imports and uses the food-menu/order data helpers, but that file is not the canonical \`/order\` route implementation. Do not infer global dead-code status from that observation alone.
 - \`src/app/orders/[id]/page.tsx\` still implements order tracking against the legacy \`orders\` collection and local same-device fallback. A direct/historical tracking URL may still be used even though the current order route redirects elsewhere.
