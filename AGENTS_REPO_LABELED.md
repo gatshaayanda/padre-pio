@@ -551,11 +551,11 @@ Do not strip legacy data or rules in the documentation PR. Complete a caller mat
 ## 12 — Evidence still outstanding
 
 The following are not certified by the static audit or documentation PR:
-- Firebase rules workflow failure cause is SOURCE-VERIFIED: the `Write Firebase service account` step failed its non-empty check for `FIREBASE_SERVICE_ACCOUNT_JSON`, so deployment was skipped. The secret must be configured/authorized, then a deliberate rules deployment and deployed-rules verification are still outstanding. The failed run is https://github.com/gatshaayanda/the-plug/actions/runs/38203816191.
+- Firebase configuration was explicitly confirmed as handled by the user on 2026-10-12. Do not reopen the prior workflow-secret failure unless fresh evidence shows a current problem. This PR does not deploy rules or independently verify the currently deployed rules.
 - Firebase project identity and current data presence for legacy collections/prefixes.
 - Request creation → admin view → quote → customer approval → request status → conversation → customer notification as one end-to-end journey.
 - Actual FCM token registration, notification delivery and failure handling on supported devices.
-- UploadThing authorization, limits, file access and real upload/download.
+- UploadThing now requires a verified Firebase ID token before authorizing a 4 MB image/PDF upload. Actual upload/download, access behavior and unauthenticated rejection still require runtime verification.
 - WhatsApp/in-app browser handoff and normal-browser destination preservation on real devices.
 - Native install event and fallback instructions on Android/iOS/desktop.
 - Offline shell/content behavior, cache invalidation and recovery after reconnect.
@@ -583,7 +583,7 @@ Risk interpretation: anyone who obtains the shared operations word, or can succe
 Required follow-up:
 1. Inspect the client AdminGate and every other way an admin session can be created; confirm whether this endpoint is still used.
 2. Verify current secret strength/rotation policy without revealing the secret.
-3. Choose an appropriate protection that works in the current hosting environment (robust rate limiting, individual authenticated admin identities, and least-privilege roles are preferable to a shared owner token).
+3. Verify the new rate limiter under repeated/concurrent attempts and add platform-level edge rate limiting where available. Individual authenticated admin identities and least-privilege roles remain preferable to a shared owner token.
 4. Preserve a tested owner recovery path before changing login.
 5. Test wrong-word responses, repeated attempts, valid login, session expiry, direct API calls and non-admin access.
 6. Do not silently remove or rotate \`THE_PLUG_OPERATIONS_WORD\`; it can lock the operator out. Treat this as a high-priority release gate before certifying the admin surface.

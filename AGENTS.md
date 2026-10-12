@@ -378,7 +378,7 @@ No production Firebase reads/writes, rules deployment, upload, push test, or Ver
 
 ### Known Firebase deployment blocker (12 October 2026)
 
-The last inspected Firestore-rules deployment run failed at the \`Write Firebase service account\` step because the required \`FIREBASE_SERVICE_ACCOUNT_JSON\` secret was empty/unavailable; the rules deployment step was skipped. See [run 38203816191](https://github.com/gatshaayanda/the-plug/actions/runs/38203816191). Do not describe source rules as deployed. An authorized repository administrator must configure the required GitHub Actions secrets (including \`FIREBASE_SERVICE_ACCOUNT_JSON\` and \`FIREBASE_PROJECT_ID\`), then deliberately rerun/deploy and verify the target Firebase project. Never print secret values or silently skip the deployment gate.
+The last inspected Firestore-rules deployment run failed at the \`Write Firebase service account\` step because the required \`FIREBASE_SERVICE_ACCOUNT_JSON\` secret was empty/unavailable; the rules deployment step was skipped. See [run 38203816191](https://github.com/gatshaayanda/the-plug/actions/runs/38203816191). Do not describe source rules as deployed. The user confirmed Firebase configuration is handled on 2026-10-12. Do not reopen the previous workflow-secret issue unless fresh evidence shows a current failure. Before any deliberate rules deployment, verify the target Firebase project and deployed rules. Never print secret values or silently skip a deployment gate.
 
 ### Privileged operations-login risk
 
