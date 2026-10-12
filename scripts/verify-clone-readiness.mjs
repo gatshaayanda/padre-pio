@@ -125,7 +125,7 @@ for (const [file, pattern] of legacyFiles) {
 
 const rulesWorkflow = ".github/workflows/firebase-rules-deploy.yml";
 check("Firebase rules deployment workflow exists", exists(rulesWorkflow));
-check("Firebase deploy workflow covers Firestore index changes", exists(rulesWorkflow) && /firestore\\.indexes\\.json/.test(read(rulesWorkflow)) && /firebase deploy --only firestore:indexes/.test(read(rulesWorkflow)) && /indexes-changed/.test(read(rulesWorkflow)));
+check("Firebase deploy workflow covers Firestore index changes", exists(rulesWorkflow) && /firestore\.indexes\.json/.test(read(rulesWorkflow)) && /firebase deploy --only firestore:indexes/.test(read(rulesWorkflow)) && /indexes-changed/.test(read(rulesWorkflow)));
 if (exists(rulesWorkflow)) {
   const workflow = read(rulesWorkflow);
   check("Rules deployment is restricted to main pushes/manual dispatch", /branches:\s*\n\s+-\s+"?main"?/.test(workflow) && /workflow_dispatch/.test(workflow));
