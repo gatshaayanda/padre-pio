@@ -19,6 +19,18 @@ export async function POST(request:Request){
   if(senderRole==="customer"&&(uid!==customerId||isAdmin))return NextResponse.json({sent:0,error:"Customer message does not belong to this account."},{status:403});
   if(senderRole==="admin"&&!isAdmin)return NextResponse.json({sent:0,error:"Only authorized staff can notify a customer about an admin reply."},{status:403});
   if(senderRole!=="customer"&&senderRole!=="admin")return NextResponse.json({sent:0,error:"Invalid message sender role."},{status:400});
+  const deliveryKey="conversation_"+conversationId+"_"+messageId;
+  const deliveryRef=db.collection("notificationDeliveries").doc(deliveryKey);
+  const now=Date.now();
+  const canSend=await db.runTransaction(async transaction=>{
+    const saved=await transaction.get(deliveryRef);
+    const data=saved.data()??{};
+    const claimedAt=typeof data.claimedAtMs==="number"?data.claimedAtMs:0;
+    if(saved.exists&&(data.status==="sent"||now-claimedAt<300000))return false;
+    transaction.set(deliveryRef,{type:"conversation-message",conversationId,messageId,status:"sending",claimedAtMs:now,updatedAt:new Date(now).toISOString()},{merge:true});
+    return true;
+  });
+  if(!canSend)return NextResponse.json({sent:0,duplicate:true});
   const admins=senderRole==="customer"?await db.collection("admins").get():null;const recipientIds:string[]=[];
   if(senderRole==="customer"&&admins){for(const admin of admins.docs){const role=String(admin.data().role??"").toLowerCase();if(!["owner","staff"].includes(role))continue;const pref=(await db.collection("notificationPreferences").doc(admin.id).get()).data();if(pref?.enabled)recipientIds.push(admin.id)}}else{recipientIds.push(customerId)}
   let sent=0;const preview=String(msg.text??"Attachment sent").slice(0,120);const title=senderRole==="customer"?String(data.customerName??"Customer")+" sent a message":"The Plug replied";
@@ -41,6 +53,7 @@ export async function POST(request:Request){
       }
     }
   }
+  await deliveryRef.set({status:"sent",sentCount:sent,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
   return NextResponse.json({sent});
  }catch(error){console.error("The Plug conversation notification failed:",error);return NextResponse.json({sent:0,error:error instanceof Error?error.message:"Conversation notification unavailable while The Plug is being built."},{status:400})}
 }
