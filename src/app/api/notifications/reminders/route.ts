@@ -11,7 +11,7 @@ function matchesSecret(supplied:string,expected:string){
 
 export async function POST(request:Request){
   const expected=process.env.BOEMO_REMINDER_CRON_SECRET?.trim();
-  const supplied=request.headers.get("authorization")?.replace(/^Bearer\s+/i,"").trim();
+  const supplied=request.headers.get("authorization")?.replace(/^Bearer\s+/i,"").trim()??"";
   if(!expected||!matchesSecret(supplied,expected))return NextResponse.json({ok:false,error:"Unauthorized."},{status:401});
   try{
     const {runPickupReminders}=await import("@/lib/server/pickup-reminder-runner");

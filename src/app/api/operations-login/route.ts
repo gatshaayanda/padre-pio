@@ -61,7 +61,7 @@ export async function POST(request:Request){
   if(!expected)return NextResponse.json({error:"Operations access is not configured yet. Set THE_PLUG_OPERATIONS_WORD in Vercel."},{status:503});
   const contentLength=Number(request.headers.get("content-length")||"0");
   if(Number.isFinite(contentLength)&&contentLength>4096)return NextResponse.json({error:"Request is too large."},{status:413});
-  let attempt;
+  let attempt:{limited:boolean;retryAfter:number};
   try{attempt=await consumeLoginAttempt(request,expected)}catch(error){
    console.error("Operations login rate limit unavailable:",error instanceof Error?error.message:"unknown error");
    return NextResponse.json({error:"Operations sign-in is temporarily unavailable. Try again shortly."},{status:503});
