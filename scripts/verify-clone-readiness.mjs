@@ -104,6 +104,8 @@ for (const variable of ["NEXT_PUBLIC_BASE_URL", "NEXT_PUBLIC_FIREBASE_API_KEY", 
   check("Environment example documents " + variable, new RegExp("^" + variable + "=", "m").test(envExample));
 }
 check("Root agent instructions link the clone/reset checklist", /docs\/CLONE-RESET-CHECKLIST\.md/.test(read("AGENTS.md")));
+check("Root agent instructions require the end-to-end CLONING.md guide", /CLONING\.md/.test(read("AGENTS.md")) && exists("CLONING.md"));
+check("CLONING.md documents all ordered gates", ["Gate 0", "Gate 1", "Gate 2", "Gate 3", "Gate 4", "Gate 5", "Gate 6", "Gate 7"].every((gate) => read("CLONING.md").includes(gate)));
 
 const sourceMap = read("AGENTS_REPO_LABELED.md");
 for (const requiredLabel of ["## 00", "## 01", "## 02", "## 03", "## 04", "## 05", "## 06", "## 07", "## 08", "## 09", "## 10", "## 11", "## 12", "## 13"]) {
