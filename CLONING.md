@@ -193,3 +193,21 @@ The handoff must state:
 - the next concrete action and owner.
 
 Do not merge or deploy merely because the guide is complete. The reusable foundation is ready for a new project only when its identity, infrastructure, security, customer/admin journey and verification gates have evidence appropriate to that project's scope.
+
+## Evidence ledger template
+
+Copy this table into the project brief or PR description for each clone. Replace placeholders with actual results; do not leave a green status without evidence.
+
+| Gate | Status | Evidence / command / URL | Unresolved issue | Owner / next action |
+|---|---|---|---|---|
+| 0. Source revision and clean working tree | NOT RUN |  |  |  |
+| 1. Product brief and KEEP/ADAPT/REPLACE/EXCLUDE inventory | NOT RUN |  |  |  |
+| 2. Identity reset and `npm run verify:identity` | NOT RUN |  |  |  |
+| 3. Independent infrastructure, secrets, rules and deployment configuration | NOT RUN |  |  |  |
+| 4. Customer/admin behavior and schema adaptation | NOT RUN |  |  |  |
+| 5. Install, static gates, TypeScript, lint, build and diff review | NOT RUN |  |  |  |
+| 6. Staging/live integrations and physical-device checks | NOT RUN |  |  |  |
+| 7. Candidate commit, CI, PR and handoff | NOT RUN |  |  |  |
+
+**Status definitions:** PASS = evidence was observed for the stated acceptance condition; FAIL = observed behavior violates it; NOT RUN = no attempt was made; BLOCKED = attempted or planned but prevented by a named dependency, permission or unavailable environment. “CI passed” applies only to the exact SHA and checks shown in that run. Never use it as evidence of live Firebase, uploads, push receipt, deployment, offline behavior or physical-device QA.
+
