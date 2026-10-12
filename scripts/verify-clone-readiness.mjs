@@ -62,6 +62,7 @@ check("Sourcing-request API exists", exists("src/app/api/sourcing-request/route.
 check("Quote-approval API exists", exists("src/app/api/sourcing-request/approve-quote/route.ts"));
 check("Analytics API exists", exists("src/app/api/analytics/journey/route.ts"));
 check("Notification test API checks registered device-token ownership", exists("src/app/api/notifications/test/route.ts") && /notificationTokens/.test(read("src/app/api/notifications/test/route.ts")) && /registered\.empty/.test(read("src/app/api/notifications/test/route.ts")));
+check("Conversation notification API enforces sender role and conversation ownership", exists("src/app/api/notifications/message-created/route.ts") && /uid!==customerId/.test(read("src/app/api/notifications/message-created/route.ts")) && /senderAdmin\.exists/.test(read("src/app/api/notifications/message-created/route.ts")) && /Invalid message sender role/.test(read("src/app/api/notifications/message-created/route.ts")));
 check("Storefront source exists", exists("src/components/StorefrontFeed.tsx"));
 
 const firebaseConfig = JSON.parse(read("firebase.json"));
