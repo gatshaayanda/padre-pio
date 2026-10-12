@@ -1,0 +1,23 @@
+{
+  "manifestName": "The Plug | Sneakers & Apparel",
+  "shortName": "The Plug",
+  "themeColor": "#0866FF",
+  "canonicalIcon": "/plug-icon.svg",
+  "serviceWorkerCachePrefix": "theplug-",
+  "forbiddenPatterns": [
+    "\\bboemo\\b",
+    "meating[ -]?place",
+    "namane[ -]?tyres",
+    "atlas[ -]?service[ -]?centre",
+    "tutorme",
+    "namane-tyres\\.vercel\\.app",
+    "boemo-joos-food-deals",
+    "#FFC800",
+    "#FF7B00",
+    "#FF2A85",
+    "#00E5FF"
+  ],
+  "allowedLegacyStrings": [
+    "BOEMO_REMINDER_CRON_SECRET"
+  ]
+}
