@@ -18,9 +18,11 @@ git branch --show-current
 git log -5 --oneline --decorate
 git remote -v
 git diff --check
+node --version
+npm --version
 ```
 
-**PASS:** the exact source SHA and destination are known; every pre-existing change is accounted for; no important system is documented only by assumption.
+**PASS:** the exact source SHA and destination are known; every pre-existing change is accounted for; no important system is documented only by assumption. The local Node major matches `.nvmrc` and the CI workflow.
 
 **STOP:** unexpected dirty files, unknown remote, ambiguous production target, inaccessible source, unreviewed deployment/rules state, or an unexplained mismatch between docs and code. Inspect and reconcile first; do not reset, overwrite or deploy.
 
@@ -131,7 +133,7 @@ npm run build
 git diff --check
 ```
 
-**PASS:** each command exits successfully on the exact candidate commit; identity/readiness output has no unexplained failure; the diff is reviewed.
+**PASS:** each command exits successfully on the exact candidate commit; identity/readiness output has no unexplained failure; the diff is reviewed. Confirm local and CI Node majors match; do not dismiss environment-version drift.
 
 **STOP:** any command fails. Fix the cause and rerun the failed gate plus downstream gates. Do not mark a command PASS because CI is queued or because another branch passed.
 
