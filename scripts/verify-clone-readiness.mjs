@@ -42,7 +42,7 @@ check("Manifest has product name", typeof manifest.name === "string" && manifest
 check("Manifest has short name", typeof manifest.short_name === "string" && manifest.short_name.trim().length > 0);
 check("Manifest has icons", Array.isArray(manifest.icons) && manifest.icons.length > 0);
 for (const icon of manifest.icons ?? []) {
-  check("Manifest icon exists: " + icon.src, typeof icon.src === "string" && exists(path.join("public", icon.src.replace(/^\/+/, "")));
+  check("Manifest icon exists: " + icon.src, typeof icon.src === "string" && exists(path.join("public", icon.src.replace(/^\/+/, ""))));
 }
 check("Service worker exists", exists("public/sw.js"));
 if (exists("public/sw.js")) {
