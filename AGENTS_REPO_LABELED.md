@@ -383,3 +383,98 @@ Use PASS / FAIL / NOT RUN / BLOCKED with exact evidence. NOT RUN never becomes P
 - Never store secrets, tokens or private customer data here.
 - AGENTS.md remains the behavior contract; this file is the source map and traceability layer.
 - A clone needs a destination-specific map: remove The Plug business policy, retain generic workflow and verification method.
+
+
+## 09 — Supplemental trace: server routes, shared data helpers and inherited BOEMO footprint
+
+This section records a deeper source scan completed after the initial map draft. It is especially important when deciding whether The Plug is safe to clone without importing unrelated behavior.
+
+### K — Server/API route inventory
+
+| Label | Route source | Purpose / caller |
+|---|---|---|
+| K01 | src/app/api/operations-login/route.ts | Server-side operations login; validates credentials/role before issuing the custom-auth result used by AdminGate. Inspect rate limiting, secret handling and failure responses before modifying. |
+| K02 | src/app/api/sourcing-request/route.ts | Authenticated server-side sourcing-request operation, using Firebase Admin and sourcingRequests records. |
+| K03 | src/app/api/sourcing-request/approve-quote/route.ts | Customer quote approval endpoint; ownership and request state are security-critical. |
+| K04 | src/app/api/analytics/journey/route.ts | Authenticated analytics event acceptance. |
+| K05 | src/app/api/firebase/messaging-sw-config/route.ts | Dynamic client-safe Firebase config for service worker. |
+| K06 | src/app/api/notifications/sourcing-request/route.ts | Notification path associated with a new sourcing request. |
+| K07 | src/app/api/notifications/request-updated/route.ts | Notification path associated with request status changes. |
+| K08 | src/app/api/notifications/message-created/route.ts | Notification path associated with new conversation messages. |
+| K09 | src/app/api/notifications/test/route.ts | Admin/customer notification test path; inspect role and token handling. |
+| K10 | src/app/api/uploadthing/route.ts | UploadThing Next route adapter. |
+| K11 | src/app/api/uploadthing/core.ts | UploadThing router and constraints. |
+
+For every privileged route, inspect: HTTP method, authentication token source, token verification, role/ownership checks, request schema, allowed state transition, idempotency, response semantics, logs/PII, and which Firebase project credentials initialize Firebase Admin. A client call receiving HTTP success is not necessarily proof that a notification displayed or that a business operation completed as intended.
+
+### L — Supporting UI and data modules
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| L01 | src/lib/firebase/data.ts | Shared customer/profile/conversation/notification helpers, but also exports food-order, menu, business settings and daily reconciliation helpers inherited from BOEMO. |
+| L02 | src/lib/firebase/plug-data.ts | The Plug-specific sourcingRequests data contract and subscriptions; includes a server API interaction. |
+| L03 | src/components/StorefrontPublishing.tsx | Admin editor for storefront content; route wrapper is src/app/admin/storefront/page.tsx. |
+| L04 | src/app/admin/storefront/page.tsx | AdminGate-protected storefront publishing route. |
+| L05 | src/app/admin/community/page.tsx | AdminGate-protected community publishing route. |
+| L06 | src/app/admin/community/admin-community-dashboard.tsx | Admin community operations UI; verify exact path and role/data boundaries before edits. |
+| L07 | src/components/AdminConversations.tsx | Admin conversation list, selected conversation, messages, attachments and message-created notification path. |
+| L08 | src/components/CustomerConversations.tsx | Customer-side private conversation list. |
+| L09 | src/components/ConversationPanel.tsx | Shared conversation interaction surface; inspect before changing message semantics or attachment behavior. |
+| L10 | src/components/NotificationSettings.tsx | Notification opt-in, Firebase Messaging token flow, preferences and test notification action. |
+| L11 | src/lib/firebase/notifications.ts | Client messaging initialization helper (verify current file before edits). |
+| L12 | src/components/MemberCircle.tsx | Friend invites and connections. |
+| L13 | src/components/MemberPrivacySettings.tsx | Member privacy preferences and activity cleanup/batch behavior. |
+| L14 | src/components/MemberActivityFeed.tsx | Friend connections, member feed preferences and community activity reads. |
+| L15 | src/components/MemberPrivacySettings.tsx + src/components/MemberActivityFeed.tsx | These must be reviewed together with Firestore rules; UI filters are not an authorization boundary. |
+
+### M — Firestore collection map observed in rules and helpers
+
+| Collection/path | Purpose | Clone decision |
+|---|---|---|
+| admins/{uid} | Admin role records | Preserve role boundary; recreate only through controlled admin bootstrap. |
+| customers/{uid} | Customer profile | Adapt schema and privacy policy to destination. |
+| sourcingRequests/{requestId} | The Plug customer requests and quote/status flow | Core Plug domain; reuse only when the new app has sourcing-like workflow. |
+| storefrontContent/{contentId} | Curated public finds/offers | Reuse for retail/editorial catalog only. |
+| conversations/{conversationId}/messages/{messageId} | Private messages | Reuse only after owner/admin rules and attachment behavior are tested. |
+| notificationPreferences/{uid} | Notification preferences | Adapt event/setting schema; keep opt-in explicit. |
+| notificationTokens/{uid}/tokens/{tokenId} | Device/browser tokens | Never copy token data; bind tokens to destination users/project. |
+| customerJourneyEvents/{eventId} | Behavioral analytics | Reuse event discipline, not Plug-specific event names or assumed outcomes. |
+| memberSettings/{uid} | Member/privacy settings | Plug-specific; enable only when destination needs these controls. |
+| memberFeedPreferences/{uid} | Feed audience preferences | Plug-specific; keep audience enforcement in rules. |
+| friendInvites/{inviteId} | Invitation state | Plug-specific; acceptance must be explicit and authorized. |
+| friendConnections/{connectionId} | Confirmed relationships | Plug-specific; test ownership and removal. |
+| communityActivity/{activityId} | Published community activity | Plug-specific; consent and completed-record rules matter. |
+| memberships/{uid} | Membership/benefit state | Never infer membership from login or request submission. |
+| orders/{orderId}, menu/{itemId}, dailyReconciliations/{date} | Legacy food-order/menu/reconciliation model in Firestore rules and shared data helper | Treat as inherited BOEMO footprint; do not carry into a new product without a documented need and end-to-end test. |
+| businessSettings/{settingId} | Shared settings plus storefront disclaimer configuration | Inspect each document's purpose; do not delete wholesale because some settings may be Plug-specific. |
+
+Storage rules also include **boemoMedia/{fileName}** in addition to storefrontMedia and conversationAttachments. That is a confirmed inherited brand-specific path. Do not assume it is unused until all references and deployed data are checked; for a new clone, either remove it with a coordinated code/rules migration or explicitly document why it remains.
+
+### N — Important inherited-code finding
+
+SOURCE-VERIFIED: src/lib/firebase/data.ts exports food-specific types/functions such as FoodOrder, MenuItem, DailyReconciliation, createFoodOrder, subscribeToFoodOrders, menu seeding and daily reconciliation. firestore.rules still has rules for orders, menu and dailyReconciliations. storage.rules still contains boemoMedia. The Plug also has Plug-specific sourcingRequests, storefrontContent, community, conversation and analytics data.
+
+**Interpretation:** this is an inherited BOEMO code/rules footprint. It is not automatically a live vulnerability or proof that the old collections are used in production; those conclusions require call-site and deployed-data verification. It is, however, a clone-risk and maintenance risk. New chats must not copy these collections into a destination merely because they exist in the foundation.
+
+**Required follow-up before certifying The Plug as a reusable foundation:**
+1. Trace every export from src/lib/firebase/data.ts to all call sites. Classify each export as USED BY THE PLUG, UNUSED/LEGACY, or UNCERTAIN.
+2. Inspect Firestore rules for every match block, including the final catch-all deny. Confirm each collection has least-privilege read/write semantics.
+3. Trace every Storage path from source references and rules. Confirm whether boemoMedia has any current writer/reader or retained customer asset.
+4. Determine whether orders/menu/dailyReconciliations are queried or written by mounted Plug routes, admin components or API handlers.
+5. Do not delete legacy code/rules until usage, live data, indexes and deployed-project effects are understood. Then remove or isolate in a dedicated reviewed change, with rules tests and rollback.
+6. Ensure businessSettings documents needed for the editable storefront disclaimer remain supported if legacy food settings are removed.
+7. Record the final disposition and test evidence in this map.
+
+This finding should be addressed before describing The Plug as a clean, generic starter. The correct goal is a reusable core plus explicitly optional domain modules—not accidental inheritance of a food-order system.
+
+### O — Routes and component dependencies worth tracing next
+
+- src/components/PlugAdminDashboard.tsx → src/lib/firebase/plug-data.ts, src/components/AdminConversations.tsx, customerJourneyEvents and request-updated notification endpoint.
+- src/app/request/request-form.tsx → src/lib/firebase/plug-data.ts, src/lib/firebase/data.ts, UploadThing helper, analytics helper and sourcing-request notification endpoint.
+- src/app/account/page.tsx → src/lib/firebase/data.ts, plug-data.ts, NotificationSettings, CustomerConversations, MemberCircle, MemberPrivacySettings and MemberActivityFeed.
+- src/components/StorefrontFeed.tsx → storefrontContent, businessSettings/storefrontDisclaimer, saved-finds helper, analytics helper and request route.
+- src/components/NotificationSettings.tsx → Firebase messaging helper, notification preferences/token helpers, analytics and notification-test API.
+- src/components/MemberCircle.tsx / MemberPrivacySettings.tsx / MemberActivityFeed.tsx → friendInvites, friendConnections, memberSettings, memberFeedPreferences and communityActivity plus corresponding rules.
+- src/components/AdminConversations.tsx → conversation helpers, Storage attachment uploads and message-created notification endpoint.
+
+When changing one of these flows, read all named modules and the associated Firestore/Storage rules together. Avoid fixing one UI component while leaving a conflicting API, data helper or rule behind.
