@@ -1,3 +1,21 @@
+# START HERE — The Plug flagship clone foundation
+
+Before changing code, read **AGENTS_REPO_LABELED.md** for the source-linked architecture map, customer/admin/data/PWA flow traces, clone sequence and verification matrix. Read **docs/ADMIN-HUB-APP-FACTORY-SOP.md** for the reusable Admin Hub production algorithm. This file remains the authoritative product behavior and implementation contract; those documents supplement it rather than override it.
+
+## Mandatory labelled workflow
+1. Confirm current branch/head, diff/status, recent commits, open PRs and exact deployment state.
+2. Read the relevant subsystem labels in AGENTS_REPO_LABELED.md and inspect every named source/rules/index file before editing.
+3. Define the outcome and affected customer/admin/security/data/PWA flows.
+4. Choose KEEP / ADAPT / REPLACE / EXCLUDE for inherited behavior before cloning or redesigning.
+5. Make the smallest controlled change; preserve working behavior outside scope.
+6. Run actual available checks (typecheck, lint, identity, build and relevant integration/device tests). Never invent a test script or mark unrun checks as passed.
+7. Update this contract and the labelled map when behavior, paths, schemas, rules, environment variables, cache namespaces or verification evidence materially change.
+8. Inspect diff, checkpoint coherently, and report exact commit, checks, deployment and remaining gaps.
+
+**Flagship status:** The Plug is the candidate foundation. It is not certified production-verified until the labelled map's verification matrix has evidence. Source rules are not deployed rules; a successful build is not proof of live Firebase, UploadThing, push, PWA or customer-flow behavior.
+
+---
+
 # The Plug — Agent Operating Contract
 
 ## Product
