@@ -541,7 +541,7 @@ Do not strip legacy data or rules in the documentation PR. Complete a caller mat
 ## 12 — Evidence still outstanding
 
 The following are not certified by the static audit or documentation PR:
-- Firebase rules workflow failure/root cause and whether deployed Firestore/Storage rules match source.
+- Firebase rules workflow failure cause is SOURCE-VERIFIED: the `Write Firebase service account` step failed its non-empty check for `FIREBASE_SERVICE_ACCOUNT_JSON`, so deployment was skipped. The secret must be configured/authorized, then a deliberate rules deployment and deployed-rules verification are still outstanding. The failed run is https://github.com/gatshaayanda/the-plug/actions/runs/38203816191.
 - Firebase project identity and current data presence for legacy collections/prefixes.
 - Request creation → admin view → quote → customer approval → request status → conversation → customer notification as one end-to-end journey.
 - Actual FCM token registration, notification delivery and failure handling on supported devices.
