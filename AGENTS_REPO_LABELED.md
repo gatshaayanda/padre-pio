@@ -25,9 +25,10 @@ If the source contradicts this map, source wins. Update the map in the same chec
 ### 01.1 Runtime and stack
 
 SOURCE-VERIFIED:
-- Next.js 15 App Router, React 19, strict TypeScript.
+- Next.js 15 App Router, React 19, strict TypeScript. `.nvmrc` and the GitHub Actions quality workflow both target Node 22.
 - npm package scripts: dev, build, start, lint, verify:identity, verify:clone-readiness. The build invokes identity verification before Next build.
 - Firebase Web SDK 11.9, Firebase Admin 13.4, UploadThing v7, Lucide React, Vercel Analytics and Speed Insights.
+- The observed `npm ci` CI log reported 27 npm audit findings (1 low, 9 moderate, 17 high); individual advisories have not been triaged in this foundation pass. Do not run a blind `npm audit fix`; schedule a focused lockfile/advisory review and test compatibility.
 - Tailwind CSS 4 dependencies, plus substantial app-specific CSS.
 - tsconfig path alias maps @/* to ./src/*.
 - Firebase client initializes persistent Firestore local cache.
