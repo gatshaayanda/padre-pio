@@ -196,7 +196,8 @@ Notification proof ladder: browser support → permission → service worker →
 | I04 | firestore.indexes.json | Composite indexes. |
 | I05 | firebase.json | Rule/index paths and emulator ports: Auth 9099, Firestore 8080, Storage 9199. |
 | I06 | .github/workflows/quality.yml | Typecheck, lint and build. |
-| I07 | scripts/verify-identity.mjs | Clone identity residue guard. |
+| I07 | scripts/verify-identity.mjs | Config-driven clone identity residue guard. |
+| I08 | .github/workflows/firebase-rules-deploy.yml | Firestore rules deployment; Storage rules and Firestore indexes deploy only when their respective files change on push. |
 
 Firebase web config uses `NEXT_PUBLIC_FIREBASE_*` values. Client code has build placeholders so prerender/build can work without production config; `hasFirebaseWebConfig` prevents auth actions when required values are absent. A successful build with placeholders does not prove production Firebase works. `.env.example` documents client config, `FIREBASE_ADMIN_KEY`, `UPLOADTHING_TOKEN`, `NEXT_PUBLIC_BASE_URL`, `THE_PLUG_OPERATIONS_WORD`, and the legacy `BOEMO_REMINDER_CRON_SECRET`. GitHub rules deployment separately expects `FIREBASE_SERVICE_ACCOUNT_JSON` plus `FIREBASE_PROJECT_ID`; these are not interchangeable with the Vercel server credential.
 
@@ -220,7 +221,9 @@ Before adding a collection/field, define owner, audience, trusted writer, reader
 | J03 | npm run lint | ESLint. |
 | J04 | npm run verify:identity | Brand/config residue check. |
 | J05 | npm run build | Identity verifier followed by Next production build. |
-| J06 | .github/workflows/quality.yml | npm ci, typecheck, lint, build. |
+| J06 | .github/workflows/quality.yml | Node 22, npm ci, explicit identity and static foundation gates, typecheck, lint, build. |
+| J08 | scripts/identity.config.json | Per-project identity expectations and explicitly allowlisted legacy strings. |
+| J09 | docs/CLONE-RESET-CHECKLIST.md | Ordered clone/reset checkpoints, commands, expected results and stop conditions. |
 | J07 | scripts/verify-identity.mjs | Walks unignored text files and rejects known inherited brand/domain/color patterns. |
 
 Important gap: inspected package scripts do not define a test runner. README has manual acceptance checklists. Do not tell a new chat to run npm test, Playwright or Firebase rules tests unless it verifies they exist. Add a focused low-maintenance test harness deliberately rather than pretending one already exists.

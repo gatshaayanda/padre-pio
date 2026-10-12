@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "firestore.rules"
+      - "firestore.indexes.json"
       - "storage.rules"
       - "firebase.json"
       - ".firebaserc"
@@ -49,6 +50,22 @@ jobs:
         run: |
           test -n "${{ secrets.FIREBASE_PROJECT_ID }}"
           firebase deploy --only firestore:rules --project "${{ secrets.FIREBASE_PROJECT_ID }}" --non-interactive
+
+      - name: Check whether Firestore indexes changed
+        id: indexes-changed
+        if: github.event_name == 'push'
+        run: |
+          if git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" | grep -qx 'firestore.indexes.json'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy Firestore indexes only when the index file changes
+        if: steps.indexes-changed.outputs.changed == 'true'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+        run: firebase deploy --only firestore:indexes --project "${{ secrets.FIREBASE_PROJECT_ID }}" --non-interactive
 
       - name: Check whether Storage rules changed
         id: storage-changed
