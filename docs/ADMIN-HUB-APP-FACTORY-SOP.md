@@ -127,3 +127,36 @@ A profile is configuration, not a reason to add every module.
 ## Current pilot rule
 
 The Plug is the flagship candidate, not automatically a certified template. Close its verification gaps, maintain its labelled map, then extract reusable scripts/templates. Reuse behavior only after its operation and security boundaries are verified; otherwise reuse the design pattern and mark it unverified.
+
+## 13. ZERO-COST LOCAL GATES AND DATABASE BUDGET
+
+The standard first-line checks must use tools already in the repository and Node/npm already required by the project. Do not add a paid test platform, hosted browser grid, observability vendor, database, or plugin merely to satisfy the workflow.
+
+For The Plug, run:
+
+1. \`npm ci\` — deterministic install from the committed lockfile.
+2. \`npm run verify:identity\` — inherited identity guard.
+3. \`npm run verify:clone-readiness\` — static architecture, manifest, rules-file wiring, route and documentation checks. It performs no network calls and no Firebase reads/writes.
+4. \`npx tsc --noEmit\` — type check.
+5. \`npm run lint\` — lint.
+6. \`npm run build\` — production compilation with identity verification.
+7. Run focused Node built-in tests or existing test commands if present. Do not claim tests exist until you inspect package scripts and the actual test files.
+
+These gates do not replace Firebase Rules Emulator tests, upload tests, push-delivery tests, browser/device QA or production smoke tests. Label those NOT RUN or BLOCKED until executed.
+
+### Data and service-cost policy
+
+- Source inspection, static checks, TypeScript, lint, and local builds should not call Firebase or mutate production.
+- Prefer Firebase Emulator Suite for rules and integration tests when available; do not point destructive tests at production.
+- Before running a production smoke test, name the exact reads/writes/events/uploads it may create and obtain authorization when it can mutate customer-visible state or spend money.
+- Avoid repeated production probes and polling. One deliberate verification run is better than a loop of refreshes.
+- Never dump customer records, tokens, service-account JSON, environment values, or private messages into logs or PRs.
+- Record which service is touched, whether the operation is read-only, its expected cost/risk, and how test data will be removed.
+- A free tier is a quota, not an unlimited resource. Confirm current quotas only when a planned feature or test could materially increase usage; do not research pricing as busywork.
+- Keep the clone-readiness script deterministic and offline. Any check requiring credentials, network access, or external service state belongs in a separately labelled integration/production gate.
+
+### Legacy disposition rule
+
+The Plug's old order/menu/reconciliation symbols, old order-tracking route and BOEMO storage path are warnings, not automatic deletion targets. Some route files may be historical/dead while customer bookmarks or deployed data can still exist. Before deleting or migrating any footprint, produce a call-site matrix and inspect deployed collection/bucket usage with a read-only, authorized method. Then preserve/ migrate any required records, update rules and callers atomically, test in emulator, and only then deploy. Never infer that a collection is empty from lack of code references.
+
+The static audit reports these findings without touching Firebase. Its success means repository wiring is present, not that the product is certified safe or production-ready.
