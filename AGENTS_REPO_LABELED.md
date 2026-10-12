@@ -1,0 +1,385 @@
+# The Plug — Labelled Repository Engineering Map
+
+**Purpose:** source-linked blueprint for The Plug and the reference map for future Admin Hub clones.
+
+**Audit baseline:** repository gatshaayanda/the-plug, default branch main, latest commit observed in commit search: b9b347f4d700342e0375ada1e3d408b0e526de95 (12 October 2026). Re-check current main before relying on this snapshot.
+
+**Evidence vocabulary:** SOURCE-VERIFIED = file inspected. REPOSITORY-DOCUMENTED = README/AGENTS states behavior. NOT-RUNTIME-VERIFIED = source alone cannot prove deployed behavior. FOLLOW-UP = evidence still required.
+
+## 00 — Mandatory reading order for every new chat
+
+1. Read AGENTS.md for product rules and non-negotiable behavior.
+2. Read this map for exact subsystem labels and flow traces.
+3. Read docs/ADMIN-HUB-APP-FACTORY-SOP.md before cloning or selecting reusable architecture.
+4. Confirm current branch/head, Git status, recent commits, open PRs, CI and exact deployment status.
+5. Inspect all named files in the relevant label and follow callers, writes, readers, rules, indexes and error paths before editing.
+6. State the requested outcome, affected flows, smallest change, relevant tests and recovery point.
+7. Make the smallest controlled change. Run checks that actually exist. Update the map when code paths, schemas, rules or evidence change.
+8. Mark each check PASS, FAIL, NOT RUN or BLOCKED. Never infer runtime success from source inspection.
+
+If the source contradicts this map, source wins. Update the map in the same checkpoint as a material implementation change.
+
+## 01 — System silhouette
+
+### 01.1 Runtime and stack
+
+SOURCE-VERIFIED:
+- Next.js 15 App Router, React 19, strict TypeScript.
+- npm package scripts: dev, build, start, lint, verify:identity. The build invokes identity verification before Next build.
+- Firebase Web SDK 11.9, Firebase Admin 13.4, UploadThing v7, Lucide React, Vercel Analytics and Speed Insights.
+- Tailwind CSS 4 dependencies, plus substantial app-specific CSS.
+- tsconfig path alias maps @/* to ./src/*.
+- Firebase client initializes persistent Firestore local cache.
+- CI workflow .github/workflows/quality.yml runs npm ci, npx tsc --noEmit, npm run lint and npm run build for main pushes and PRs.
+
+Key files: package.json, tsconfig.json, next.config.ts, src/app/layout.tsx, .github/workflows/quality.yml.
+
+NOT-RUNTIME-VERIFIED: this inspection used repository file access, not a local clone; dependency installation, fresh build, device tests and production customer flows were not executed here.
+
+### 01.2 Product boundary
+
+The Plug is a Botswana sneaker/apparel discovery and sourcing experience. Its curated storefront is not a complete mirror of the WhatsApp catalogue and is not online payment checkout. A request is purchase intent, not a confirmed order.
+
+Keep distinct:
+- Public featured finds and active deals.
+- Browser/device-local Saved Finds.
+- Private customer requests and conversations.
+- Admin operations and private records.
+- Community activity with explicit audience and consent.
+- Journey analytics events.
+- Authoritative commercial outcomes: quote, approval, deposit receipt, fulfilment and revenue.
+
+## 02 — Labelled source map
+
+### A — Entry, layout and metadata
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| A01 | src/app/page.tsx | Home composition; StorefrontFeed and CommunityFeed; account/saved links; member-benefits disclosure; dispatches install event. |
+| A02 | src/app/layout.tsx | Root metadata, manifest/icon references, analytics, early install capture, server-side embedded-browser classification and PWA controller. |
+| A03 | src/app/globals.css | Global/storefront CSS; inspect cascade before visual changes. |
+| A04 | src/app/pwa.css | PWA/install/offline styles and responsive states. |
+| A05 | src/app/offline/page.tsx | Offline route and honest freshness/submission limitations. |
+| A06 | public/manifest.webmanifest | App name, short name, description, theme, start URL, scope, standalone display and icon declarations. |
+| A07 | public/plug-icon.svg, public/plug-icon-192.png, public/plug-icon-512.png | Identity assets declared by metadata/manifest; verify URLs and actual dimensions. |
+| A08 | next.config.ts | Remote image configuration; Firebase Storage host is allowed. |
+
+Identity changes must also inspect scripts/verify-identity.mjs, public/sw.js, cache namespaces, social metadata, environment configuration and all visible product strings. A title change alone does not reset installed PWA identity or cached assets.
+
+### B — PWA, embedded browser, install and offline
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| B01 | src/app/layout.tsx | Server-derived embedded-browser hint; early beforeinstallprompt capture. |
+| B02 | src/app/pwa-register.tsx | Shared client controller: install state, embedded gate, native prompt/fallback, installed state, connectivity feedback. |
+| B03 | public/sw.js | Service worker; Firebase Messaging, background notification behavior, shell/public-page/media caching, cache cleanup and click navigation. |
+| B04 | src/app/offline/page.tsx | Offline message and return navigation. |
+| B05 | public/manifest.webmanifest | Install identity and scope. |
+| B06 | scripts/verify-identity.mjs | Residual-brand/domain/color scan and explicit ignore policy. |
+| B07 | docs/PWA-FOUNDATION.md | Portable PWA clone contract. Read before adapting the system to another app. |
+
+Cache facts at the observed baseline: shell cache theplug-shell-v15; media cache theplug-media-v1; local public storefront snapshot key theplug:public-storefront:v1; Saved Finds key theplug-saved-finds-v1. Treat these names as migration-sensitive. Inspect cache deletion, staleness, scope and old-cache cleanup before changes.
+
+Offline boundary: public storefront snapshots and eligible public media may remain available offline. This does not mean requests, account changes, messages or uploads were delivered. The UI must distinguish stale cached data from fresh data and never duplicate a write on retry.
+
+FOLLOW-UP: test WhatsApp/Instagram handoff, normal-browser arrival, native install prompt, iOS manual steps, standalone suppression, old-cache cleanup, offline images, reconnect and physical-device installation. Source inspection cannot prove these.
+
+### C — Storefront, finds, deals and saved items
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| C01 | src/components/StorefrontFeed.tsx | Public Firestore query, live eligibility, find/deal cards, detail dialogs, save/share/request actions, offline snapshot fallback. |
+| C02 | src/app/page.tsx | Homepage section hierarchy. |
+| C03 | src/lib/saved-finds.ts | Browser-local Saved Finds data shape, storage key and change event. |
+| C04 | src/app/saved/page.tsx | Saved Finds list, removal and navigation. |
+| C05 | src/app/request/request-form.tsx | Receives item context from URL/query and submits a private sourcing request. |
+| C06 | firestore.rules | Public storefront reads and admin write boundary. |
+| C07 | storage.rules | Storefront media permissions. |
+| C08 | firestore.indexes.json | Composite indexes for supported queries. |
+
+Observed storefront shape includes ID, type find/deal, category, title, description, image URL, optional current/original price, status, audience, start/end timestamps, CTA label, sort order and update timestamp. Public live checks require published status, everyone audience, valid current price, non-empty image URL and active date bounds. Inspect actual component and rules before changing schema.
+
+No fake products, stock, prices, discounts, urgency or activity. Draft, paused, scheduled, expired and archived records must not appear live. A valid deal must have regular price greater than offer price. A request is not a payment or stock reservation.
+
+### D — Customer sourcing request
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| D01 | src/app/request/page.tsx | Route wrapper and metadata. |
+| D02 | src/app/request/request-form.tsx | Form, validation, anonymous-auth attempt at submit, attachment workflow, Firestore write and error/success behavior. |
+| D03 | src/app/api/uploadthing/route.ts | UploadThing route documented in AGENTS; verify current file before edits. |
+| D04 | src/app/api/uploadthing/core.ts | UploadThing router and constraints documented in AGENTS; verify current file before edits. |
+| D05 | src/lib/uploadthing.ts | Typed upload helper documented in AGENTS; verify current file before edits. |
+| D06 | firestore.rules | Request ownership, schema and admin access. |
+| D07 | storage.rules | Attachment access where Firebase Storage is used. |
+| D08 | src/app/account/page.tsx | Customer request history/tracking, private conversations, account linking and settings. |
+| D09 | src/components/PlugAdminDashboard.tsx | Admin-side request operations and commercial workflow. |
+| D10 | src/app/admin/admin-gate.tsx | Admin identity and role gate. |
+
+Required sequence: browse real finds/offers → open request with item context → enter details and optional reference → submit once → confirm only after authoritative save → arrive at My Plug/account with the saved request → later view recorded status/quote and private replies.
+
+Failure cases: missing Firebase config, anonymous-auth failure, network loss, upload rejection/timeout, Firestore permission denial, double submit/retry, interrupted navigation, customer cannot read own request, admin cannot see authorized request, unrelated user can read private data.
+
+AGENTS documents UploadThing v7, images/PDF only, one file and 4 MB maximum. Keep client and server constraints aligned. Failed upload must preserve form data and block silent submission without an attachment the customer thought was included. Production image and PDF upload must be tested with deployed credentials.
+
+Commercial boundary: request is not an order; quote is not customer approval; approval is not proof of deposit; deposit is not fulfilment; a status is not delivery proof unless recorded.
+
+### E — Account, identity and local state
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| E01 | src/lib/firebase/client.ts | Firebase client init, real-config predicate, persistent Firestore cache. |
+| E02 | src/app/account/page.tsx | Auth state/persistence, anonymous-session linking, requests, private conversations, preferences and community controls. |
+| E03 | src/lib/firebase/journey-analytics.ts | Client event union, bounded event details, optional authenticated identity and bearer-token POST. |
+| E04 | src/lib/saved-finds.ts | Device-local saved item snapshots. |
+| E05 | firestore.rules | Owner-scoped access and admin boundaries. |
+
+Anonymous Firebase auth is still authenticated for owner-scoped data, but is not verified phone/email identity and never makes a user an admin. Link Google credentials to the existing anonymous UID where possible. If the credential belongs to a different UID, do not silently merge records or claim guest history moved; explain the conflict and require a deliberate choice.
+
+Saved Finds are browser/device-local and not synced across devices. Public offline snapshot is also local. Do not market either as durable cross-device account sync.
+
+### F — Admin and publishing operations
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| F01 | src/app/admin/page.tsx | Composes AdminGate and PlugAdminDashboard. |
+| F02 | src/app/admin/admin-gate.tsx | Auth and role gate. |
+| F03 | src/components/PlugAdminDashboard.tsx | Operations, content studio and analytics UI. |
+| F04 | src/app/api/analytics/journey/route.ts | Server analytics event acceptance and identity checks. |
+| F05 | firestore.rules | Database authorization. |
+| F06 | storage.rules | Media upload/read rules. |
+| F07 | firestore.indexes.json | Query index definitions. |
+
+Admin acceptance: authorized owner/staff signs in → non-admin denied at route and data boundaries → records/content load → CRUD and lifecycle states work → saved values survive refresh → only eligible content appears publicly → customer sees only their own updates → analytics is described as activity, not sales.
+
+A hidden admin link or client role check is not security. Privileged server routes, Firestore and Storage must enforce authorization independently.
+
+### G — Analytics and customer intelligence
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| G01 | src/lib/firebase/journey-analytics.ts | Client event contract and bounded metadata. |
+| G02 | src/app/api/analytics/journey/route.ts | Server token verification, event allow-list, detail filtering and event write. |
+| G03 | src/components/StorefrontFeed.tsx | Find/offer opened, request clicked, bookmark and share events. |
+| G04 | src/app/page.tsx | Entry and community context. |
+| G05 | src/components/PlugAdminDashboard.tsx | Reporting and demand signals. |
+| G06 | firestore.rules | Analytics event access. |
+
+Client event names observed: request_flow_opened, account_confirmed, notification_enabled, friend_invite_created, request_submitted, storefront_find_opened, storefront_offer_opened, product_request_clicked, community_feed_opened, catalogue_opened, instagram_opened, product_share_clicked, product_shared, product_bookmarked and product_unbookmarked.
+
+When changing event names, update the client helper, server allow-list, Firestore rules and dashboard aggregation together. Event count is not unique people, qualified leads, accepted quotes, purchases, revenue or causal lift. Commercial outcomes must come from authoritative business records.
+
+### H — Notifications and messaging
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| H01 | src/app/pwa-register.tsx | Shared browser PWA state; inspect current notification-related code before edits. |
+| H02 | public/sw.js | Firebase Messaging background behavior and click navigation. |
+| H03 | src/app/api/firebase/messaging-sw-config/route.ts | Client-safe runtime Firebase config for the service worker; must never return private server credentials. |
+| H04 | src/app/account/page.tsx | Customer notification preferences and opt-in. |
+| H05 | src/components/PlugAdminDashboard.tsx | Admin operations and related controls where implemented. |
+| H06 | firestore.rules | Token ownership and privileged writes. |
+
+Notification proof ladder: browser support → permission → service worker → token created → token stored for correct owner → server accepts send request → provider accepts message → device displays it. These are separate states. Permission or HTTP success is not proof of delivery. Keep in-app history useful when push is unsupported, denied or misconfigured.
+
+### I — Firebase, security and resource use
+
+| Label | Source path | Responsibility / coupling |
+|---|---|---|
+| I01 | src/lib/firebase/client.ts | Client SDK, real config detection and persistent cache. |
+| I02 | firestore.rules | Firestore authorization and schema constraints. |
+| I03 | storage.rules | Storage authorization. |
+| I04 | firestore.indexes.json | Composite indexes. |
+| I05 | firebase.json | Rule/index paths and emulator ports: Auth 9099, Firestore 8080, Storage 9199. |
+| I06 | .github/workflows/quality.yml | Typecheck, lint and build. |
+| I07 | scripts/verify-identity.mjs | Clone identity residue guard. |
+
+Firebase web config uses NEXT_PUBLIC_FIREBASE_* values. Client code has build placeholders so prerender/build can work without production config; hasFirebaseWebConfig prevents auth actions when required values are absent. A successful build with placeholders does not prove production Firebase works.
+
+Cost discipline:
+- Filter, paginate and bound queries.
+- Limit real-time listeners to the active view and detach them on unmount.
+- Avoid repeated reads, polling and duplicate writes on retry.
+- Cache only explicitly public data; never service-worker-cache private requests, messages, account or admin pages.
+- Use Firebase emulators for repeatable auth/rules tests where supported.
+- Review current plan quotas and consumption before adding reads, writes, storage, egress or analytics.
+- Separate independent client apps by Firebase project by default. Shared multi-tenant data requires explicit tenant isolation and cross-tenant negative tests.
+
+Before adding a collection/field, define owner, audience, trusted writer, readers, schema, validation, index, deletion/retention, retry/idempotency, offline behavior, cost and negative security tests. Update rules/indexes with the schema change.
+
+### J — Quality gates and identity
+
+| Label | Command/path | Purpose |
+|---|---|---|
+| J01 | package.json | Canonical scripts. |
+| J02 | npx tsc --noEmit | TypeScript check. |
+| J03 | npm run lint | ESLint. |
+| J04 | npm run verify:identity | Brand/config residue check. |
+| J05 | npm run build | Identity verifier followed by Next production build. |
+| J06 | .github/workflows/quality.yml | npm ci, typecheck, lint, build. |
+| J07 | scripts/verify-identity.mjs | Walks unignored text files and rejects known inherited brand/domain/color patterns. |
+
+Important gap: inspected package scripts do not define a test runner. README has manual acceptance checklists. Do not tell a new chat to run npm test, Playwright or Firebase rules tests unless it verifies they exist. Add a focused low-maintenance test harness deliberately rather than pretending one already exists.
+
+## 03 — Flow traces
+
+### FLOW-01: Storefront to request
+
+1. src/app/layout.tsx supplies metadata, analytics and root PWA handling.
+2. src/app/page.tsx mounts StorefrontFeed and CommunityFeed.
+3. src/components/StorefrontFeed.tsx reads eligible published public records and renders actions.
+4. Request action carries item title, optional listed price and item type to /request.
+5. src/app/request/page.tsx mounts RequestForm in src/app/request/request-form.tsx.
+6. Form validates input and optional attachment; anonymous auth is attempted at submit where configured.
+7. UploadThing handles supplied attachments; Firestore write is authoritative for the request.
+8. Success leads to My Plug/account with saved request visible.
+9. src/components/PlugAdminDashboard.tsx exposes the operational record to authorized admin.
+10. Quote, approval, deposit and fulfilment must follow explicit recorded states.
+
+### FLOW-02: Account continuity
+
+1. Account page observes Firebase auth state.
+2. Guest remains an anonymous Firebase user for owner-scoped records.
+3. Google linking preserves UID and records when credential linking succeeds.
+4. Different-UID credential conflict is explained; no silent merge.
+5. Requests, messages, attachments and profile remain owner-scoped.
+6. External catalogue/contact utilities are low priority and gated by product policy.
+7. Explain the risk of losing unlinked guest history when browser data is cleared or device changes.
+
+### FLOW-03: Admin and publishing
+
+1. /admin composes AdminGate and PlugAdminDashboard.
+2. Auth gate checks Firebase identity and admins/{uid} role.
+3. Privileged APIs independently verify identity and role.
+4. Firestore and Storage rules independently restrict access.
+5. Draft creation/edit stays private.
+6. Publishing validates audience, status, dates and pricing.
+7. Public queries and live checks expose only eligible records.
+8. Pause/archive/expiry removes content from live display; cached content is marked stale.
+9. Test authorized roles and unauthorized negative cases.
+
+### FLOW-04: PWA and offline
+
+1. Root layout classifies embedded browsers and captures install event early.
+2. src/app/pwa-register.tsx owns install and connection UI.
+3. Explicit install click uses native prompt if retained, otherwise accurate platform guidance.
+4. Standalone state suppresses install promotion.
+5. public/sw.js handles shell/public/media caches and Firebase Messaging.
+6. StorefrontFeed saves a bounded public snapshot in localStorage.
+7. Offline route explains stale data and that writes need a connection and confirmation.
+8. Reconnect revalidates data without duplicate writes or private cache exposure.
+
+### FLOW-05: Analytics
+
+1. UI action calls trackPlugJourney from journey-analytics.ts.
+2. Helper uses configured Firebase identity and bearer-token POST.
+3. /api/analytics/journey verifies token, event and bounded details, then writes.
+4. Admin dashboard aggregates activity.
+5. Sales/revenue outcomes must come from authoritative business records.
+6. Event contract changes across helper, route, rules and dashboard together.
+
+### FLOW-06: Push
+
+1. Customer explicitly opts in after seeing a relevant benefit.
+2. Support/permission and service worker are checked.
+3. Messaging config route returns only client-safe config.
+4. Token is saved to the correct owner under rules.
+5. Protected server path sends message.
+6. Service worker handles background behavior/click navigation without duplicate display.
+7. UI reports exact stage; actual device display is separately verified.
+
+## 04 — Data boundaries
+
+| Surface | Boundary | Clone rule |
+|---|---|---|
+| Public storefront | Published, active, everyone audience | Never expose drafts or Circle-only records publicly. |
+| Saved Finds | Browser/device local | Do not promise cross-device sync. |
+| Requests/profile | Owner + authorized admin | Test owner, unrelated user and anonymous cases. |
+| Private conversations/files | Owner + authorized admin | Never include in public cache/community. |
+| Admin records | Role-controlled | Secure route, API, database and storage. |
+| Analytics | Authenticated submitter, server allow-list | Bound payloads; events are not sales. |
+| Community | Explicit consent and audience | Only eligible completed records; no private transaction details. |
+| Notification tokens | User-owned / admin-authorized | Do not leak tokens; permission is not delivery. |
+| Offline cache | Explicitly eligible public content | Bound/version/expire; disclose staleness. |
+
+## 05 — Clone/reset runbook
+
+### CLONE-01 Protect source and target
+Inspect target directory and remote before writing. Select foundation based on actual workflow fit. Record source SHA, target repo/branch and intended deployment. Protect existing work. Do not copy .env, service account keys, Firebase project IDs, production data, Vercel linkage or service-worker namespaces blindly.
+
+### CLONE-02 Decide reuse
+For each subsystem classify KEEP / ADAPT / REPLACE / EXCLUDE: identity, customer routes, admin/roles, database/schema/rules/indexes, upload/storage, notifications, PWA/offline, analytics, CI/scripts/docs. Record exact paths and assumptions before broad edits.
+
+### CLONE-03 Reset identity
+Reset app name, titles, descriptions, canonical URL/domain, manifest, icons/Apple metadata, OG/Twitter, visible copy, contact details, cache namespaces, analytics labels, Firebase project and environment. Run identity verifier; inspect false positives. Add source-brand tokens to verifier rather than ignoring whole directories. Confirm no credentials or business data are reused.
+
+### CLONE-04 Prove infrastructure
+Set correct environment variables; confirm Firebase project and deployment target; inspect rules/indexes; run typecheck/lint/identity/build; verify admin bootstrap; set up emulator fixtures where supported. Build with placeholders proves buildability only, not production integration.
+
+### CLONE-05 Complete customer flow
+Test direct arrival, embedded browser handoff where applicable, browse, primary action, validation, upload, authoritative save, confirmation, customer history, account continuity, retry/error, mobile keyboard/touch and return visit.
+
+### CLONE-06 Complete admin flow
+Test admin login, non-admin denial, CRUD/lifecycle, uploads, customer communication, notifications, reporting, refresh persistence and unauthorized data denial.
+
+### CLONE-07 Verify PWA/offline
+Test handoff and install separately; manifest/icons, service-worker scope/update, standalone suppression, cache cleanup, offline content, stale notice, reconnect and write truthfulness. Private data must not enter public cache.
+
+### CLONE-08 Release checkpoint
+Run available checks, inspect diff/status, update AGENTS and map, commit coherently, push to intended branch when authorized, check CI, check exact Vercel SHA/status, and separately verify Firebase rules/index deployment. Avoid unnecessary production deployments during iteration.
+
+## 06 — Verification matrix
+
+| ID | Area | Minimum evidence |
+|---|---|---|
+| V01 | Identity | Script passes; title, manifest, icons, cache, domain and old-brand scan inspected. |
+| V02 | Build | Typecheck, lint and build pass on exact candidate SHA. |
+| V03 | Public content | Published/in-date appears; draft, paused, future and expired do not. |
+| V04 | Request | Saves once; owner/admin can see it; failure preserves input and says not sent. |
+| V05 | Privacy | Other customer cannot read request, conversation, file, token or profile. |
+| V06 | Admin | Owner/staff allowed; unauthorized users denied at UI/API/database/storage. |
+| V07 | Upload | File constraints, rejection, URL persistence, rules and production credentials verified. |
+| V08 | Analytics | Event allow-list/payload bounds; no PII leak; event not counted as sale. |
+| V09 | PWA | Manifest, icons, service worker, handoff, install/fallback and installed state checked. |
+| V10 | Offline | Public snapshot after online load; stale notice; no private cache; writes not falsely confirmed. |
+| V11 | Push | Permission, token, send, service worker and actual device display recorded separately. |
+| V12 | Firebase deploy | Active project and deployed rules/indexes confirmed; source is insufficient. |
+| V13 | Deployment | Exact source SHA has READY deployment; deployed routes checked. |
+| V14 | Recovery | Retry/idempotency, missing config, network failure, stale cache and interrupted flow tested. |
+
+Use PASS / FAIL / NOT RUN / BLOCKED with exact evidence. NOT RUN never becomes PASS because source looks correct.
+
+## 07 — Baseline findings and open work
+
+### Source-confirmed
+- package.json defines dev/build/start/lint/verify:identity; build runs identity verification.
+- CI runs npm ci, typecheck, lint and build.
+- firebase.json declares Firestore rules/indexes, Storage rules, and Auth/Firestore/Storage emulator ports.
+- PWA source has shell/public/media cache versioning and a local public storefront snapshot.
+- Request, account, saved finds, storefront, admin, analytics API, messaging-config API and rules/index files have identifiable paths.
+- README explicitly states Saved Finds are device-local and requests are not online payment checkout.
+
+### Not established
+- Whether live Vercel deployment is READY and matches the latest commit.
+- Whether Firestore/Storage rules and indexes are deployed to the intended Firebase project.
+- Whether current production environment variables support all API, upload, auth and notification flows.
+- Whether Android/iOS/desktop install, handoff and offline behavior pass on physical devices.
+- Whether push is displayed on a real device.
+- Whether UploadThing image/PDF uploads work in production.
+- Whether a formal automated unit/rules/browser test suite exists beyond inspected scripts/workflow.
+- Actual conversion, retention, revenue or causal campaign impact.
+
+### Priority
+1. Re-check main SHA and deployment. At audit baseline b9b347f, the combined status returned a Vercel failure linking to a build-rate-limit upgrade page; this is not a successful production deployment.
+2. Identify and inspect the actual Firebase rules deployment workflow and latest run.
+3. Run checks against the exact candidate SHA in a local checkout or CI.
+4. Execute V01–V14 and record real evidence.
+5. Treat The Plug as flagship candidate, not a certified template, until verification gaps are closed.
+
+## 08 — Map maintenance rules
+
+- Update labels and paths when files/routes change.
+- Any new API, collection, field, Storage path, env variable, cache namespace or privileged role must document callers, readers, writers, rules, cost and tests.
+- Never store secrets, tokens or private customer data here.
+- AGENTS.md remains the behavior contract; this file is the source map and traceability layer.
+- A clone needs a destination-specific map: remove The Plug business policy, retain generic workflow and verification method.
