@@ -60,6 +60,7 @@ check("Admin gate fails closed when role verification fails", exists("src/app/ad
 check("Sourcing-request API exists", exists("src/app/api/sourcing-request/route.ts"));
 check("Quote-approval API exists", exists("src/app/api/sourcing-request/approve-quote/route.ts"));
 check("Analytics API exists", exists("src/app/api/analytics/journey/route.ts"));
+check("Notification test API checks registered device-token ownership", exists("src/app/api/notifications/test/route.ts") && /notificationTokens/.test(read("src/app/api/notifications/test/route.ts")) && /registered\.empty/.test(read("src/app/api/notifications/test/route.ts")));
 check("Storefront source exists", exists("src/components/StorefrontFeed.tsx"));
 
 const firebaseConfig = JSON.parse(read("firebase.json"));

@@ -407,6 +407,8 @@ This section records a deeper source scan completed after the initial map draft.
 
 For every privileged route, inspect: HTTP method, authentication token source, token verification, role/ownership checks, request schema, allowed state transition, idempotency, response semantics, logs/PII, and which Firebase project credentials initialize Firebase Admin. A client call receiving HTTP success is not necessarily proof that a notification displayed or that a business operation completed as intended.
 
+**Notification test ownership check:** `/api/notifications/test` must only send to a device token already registered beneath the authenticated UID. The route has been hardened to verify this relationship before calling Firebase Messaging. This adds one bounded token lookup only when a user explicitly requests a notification test; it does not send messages or read customer records during static checks.
+
 **K01 follow-up (source-verified):** `src/app/admin/admin-gate.tsx` is the only observed UI caller. The route currently accepts a shared `THE_PLUG_OPERATIONS_WORD`, issues a custom token for fixed UID `the-plug-temporary-operations`, and merges `role: owner` into `admins/{uid}`. Persistent throttling is not implemented in the route. A targeted gate fix on branch `docs/flagship-repo-audit-2026-10-12` now clears authorization on every auth transition, ignores stale role-listener callbacks, and denies access when role verification fails. This reduces stale authorization risk but does **not** solve brute-force protection or the shared-owner-identity design. Do not claim the operations login is fully hardened until rate limiting, secret strength, identity recovery, and direct API/rules boundaries have been tested.
 
 ### L — Supporting UI and data modules
