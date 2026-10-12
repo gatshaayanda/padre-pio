@@ -78,7 +78,7 @@ Identity changes must also inspect scripts/verify-identity.mjs, public/sw.js, ca
 | B06 | scripts/verify-identity.mjs | Residual-brand/domain/color scan and explicit ignore policy. |
 | B07 | docs/PWA-FOUNDATION.md | Portable PWA clone contract. Read before adapting the system to another app. |
 
-Cache facts at the observed baseline: shell cache theplug-shell-v15; media cache theplug-media-v1; local public storefront snapshot key theplug:public-storefront:v1; Saved Finds key theplug-saved-finds-v1. Treat these names as migration-sensitive. Inspect cache deletion, staleness, scope and old-cache cleanup before changes.
+Cache facts at the observed baseline: shell cache theplug-shell-v15; media cache theplug-media-v1; local public storefront snapshot key theplug:public-storefront:v1; Saved Finds key theplug-saved-finds-v1. Treat these names as migration-sensitive. Inspect cache deletion, staleness, scope and old-cache cleanup before changes. The service worker now caches only image requests to the configured Firebase Storage bucket in a separate bounded media cache (80 entries), with cached fallback when offline. This is source-level behavior; real device/offline image retrieval remains NOT-RUNTIME-VERIFIED.
 
 Offline boundary: public storefront snapshots and eligible public media may remain available offline. This does not mean requests, account changes, messages or uploads were delivered. The UI must distinguish stale cached data from fresh data and never duplicate a write on retry.
 

@@ -47,6 +47,7 @@ self.addEventListener("notificationclick", (event) => {
 
 const CACHE_VERSION = "theplug-shell-v15";
 const MEDIA_CACHE = "theplug-media-v1";
+const MEDIA_LIMIT = 80;
 const SHELL_CACHE = CACHE_VERSION;
 const STATIC_LIMIT = 100;
 const PUBLIC_PAGE_LIMIT = 12;
@@ -98,8 +99,17 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const request = event.request;
-  if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
+  if (request.method !== "GET") return;
   const url = new URL(request.url);
+
+  // Public storefront cards use Firebase Storage download URLs. Cache only image
+  // requests from this app's configured bucket; never cache arbitrary third-party
+  // media or API responses. This makes already-viewed catalogue images available offline.
+  if (isConfiguredStorefrontImage(request, url)) {
+    event.respondWith(cacheStorefrontImage(request));
+    return;
+  }
+  if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
 
   const isNavigation = request.mode === "navigate" || request.headers.get("accept")?.includes("text/html");
@@ -130,6 +140,28 @@ self.addEventListener("fetch", event => {
     }));
   }
 });
+
+function isConfiguredStorefrontImage(request, url) {
+  const bucket = self.__THE_PLUG_FIREBASE_CONFIG__?.storageBucket;
+  if (request.destination !== "image" || url.hostname !== "firebasestorage.googleapis.com") return false;
+  if (typeof bucket !== "string" || !bucket.trim()) return false;
+  return url.pathname.startsWith("/v0/b/" + bucket + "/o/");
+}
+
+async function cacheStorefrontImage(request) {
+  const cache = await caches.open(MEDIA_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response.ok || response.type === "opaque") {
+      await cache.put(request, response.clone());
+      await trimCache(MEDIA_CACHE, MEDIA_LIMIT);
+      return response;
+    }
+    return await cache.match(request) || response;
+  } catch {
+    return await cache.match(request) || Response.error();
+  }
+}
 
 async function cacheFirst(request) {
   const cache = await caches.open(SHELL_CACHE);

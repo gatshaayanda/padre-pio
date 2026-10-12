@@ -49,6 +49,7 @@ if (exists("public/sw.js")) {
   const sw = read("public/sw.js");
   check("Service worker has versioned cache namespace", /theplug-shell-v\d+/.test(sw));
   check("Service worker uses installable app shell", /addAll|cache\.add|cache\.put/.test(sw));
+  check("Service worker caches configured Firebase Storage images separately", /isConfiguredStorefrontImage/.test(sw) && /cacheStorefrontImage/.test(sw) && /MEDIA_LIMIT\s*=\s*80/.test(sw));
 }
 check("Root app route exists", exists("src/app/page.tsx"));
 check("Customer request route exists", exists("src/app/request/page.tsx"));
