@@ -12,6 +12,7 @@ Deliver apps by reusing proven systems, reducing repeated discovery and avoidabl
 2. Repository AGENTS.md: product requirements, security, current state, commands, known issues and behavior that must not regress.
 3. Repository labelled map: exact paths, architecture, flow traces, data contracts, boundaries, verification and clone decisions.
 4. `docs/CLONE-RESET-CHECKLIST.md`: ordered clone gates, commands, expected results and stop conditions.
+5. `CLONING.md`: complete, step-by-step conversion of a clean The Plug clone into an independently branded and configured Admin Hub app; use this as the end-to-end execution guide.
 
 The project brief supplies only product, user, required workflow, target directory, destination repo and special constraints.
 
