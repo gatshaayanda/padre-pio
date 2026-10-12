@@ -1,16 +1,16 @@
 # START HERE — The Plug flagship clone foundation
 
-Before changing code, read **AGENTS_REPO_LABELED.md** for the source-linked architecture map, customer/admin/data/PWA flow traces, clone sequence and verification matrix. Read **docs/ADMIN-HUB-APP-FACTORY-SOP.md** for the reusable Admin Hub production algorithm. This file remains the authoritative product behavior and implementation contract; those documents supplement it rather than override it.
+Before changing code, read **AGENTS_REPO_LABELED.md** for the source-linked architecture map and flow traces, **docs/ADMIN-HUB-APP-FACTORY-SOP.md** for the factory algorithm, and **docs/CLONE-RESET-CHECKLIST.md** for the gated clone procedure. This file remains the product behavior and implementation contract; the map and SOP supplement it. Source code wins when documentation conflicts, and the same checkpoint must correct stale documentation.
 
 ## Mandatory labelled workflow
-1. Confirm current branch/head, diff/status, recent commits, open PRs and exact deployment state.
-2. Read the relevant subsystem labels in AGENTS_REPO_LABELED.md and inspect every named source/rules/index file before editing.
-3. Define the outcome and affected customer/admin/security/data/PWA flows.
-4. Choose KEEP / ADAPT / REPLACE / EXCLUDE for inherited behavior before cloning or redesigning.
-5. Make the smallest controlled change; preserve working behavior outside scope.
-6. Run actual available checks (typecheck, lint, identity, build and relevant integration/device tests). Never invent a test script or mark unrun checks as passed.
-7. Update this contract and the labelled map when behavior, paths, schemas, rules, environment variables, cache namespaces or verification evidence materially change.
-8. Inspect diff, checkpoint coherently, and report exact commit, checks, deployment and remaining gaps.
+1. Establish reality before edits: inspect branch/head, status/diff, remotes, recent commits, PR/CI state and deployment target. Never reset a dirty tree or overwrite a target clone.
+2. Read the relevant map labels and follow callers through UI, APIs, data helpers, rules, indexes, environment variables, workflows and error paths.
+3. Define customer/admin outcomes and explicit exclusions; classify inherited behavior KEEP / ADAPT / REPLACE / EXCLUDE with evidence.
+4. For clone work, complete `docs/CLONE-RESET-CHECKLIST.md` gates in order. A failed or assumed gate blocks dependent work.
+5. Make the smallest controlled change and preserve behavior outside scope. Do not expand feature hardening unless inspection proves a foundation/verification requirement.
+6. Run only real available commands. Standard local gates: `npm ci`, `npm run verify:identity`, `npm run verify:clone-readiness`, `npx tsc --noEmit`, `npm run lint`, `npm run build`, `git diff --check`.
+7. Update this contract, map, checklist and verifier when source paths, flows, schemas, rules, environment variables, cache namespaces or evidence change materially.
+8. Inspect the final diff and exact candidate SHA; report PASS / FAIL / NOT RUN / BLOCKED evidence and deployment state separately.
 
 **Flagship status:** The Plug is the candidate foundation. It is not certified production-verified until the labelled map's verification matrix has evidence. Source rules are not deployed rules; a successful build is not proof of live Firebase, UploadThing, push, PWA or customer-flow behavior.
 
@@ -175,10 +175,11 @@ The BOEMO foundation commit remains a reference for infrastructure behavior only
 - UX principle: offer a clear install value proposition on the landing page before asking for installation. Respectful dismissal must leave the user on the route they chose. The browser/OS remains the final installation consent surface. If the native install event is absent, never leave the install control inert: show a branded, platform-specific fallback with concise steps, while continuing to investigate why native installability/event delivery is absent. Do not imply JavaScript can force a native prompt.
 
 
-## PWA manifest single source of truth (2026-10-10)
-- In this Next.js App Router project, `src/app/manifest.ts` is the canonical generated manifest route and must contain the complete installability metadata, including explicit 192×192 and 512×512 PNG icons. Do not assume `public/manifest.webmanifest` is what Chrome receives when the generated route exists.
-- Whenever manifest/icon installability metadata changes, bump the service-worker cache version in `public/sw.js` so an older cached `/manifest.webmanifest` cannot keep Chrome evaluating stale metadata.
-- Verify the generated production manifest and each declared icon URL, then inspect Chrome's installability diagnostics before claiming the native prompt works.
+## PWA manifest definitions and parity (2026-10-12)
+- `src/app/manifest.ts` defines Next.js's generated `/manifest.webmanifest` route. `public/manifest.webmanifest` also exists with overlapping identity/installability fields. The generated route is intended to be canonical, but source presence alone does not prove which response a deployed browser receives; keep both definitions aligned until one is deliberately removed after a production-route check.
+- `scripts/verify-identity.mjs` checks configured identity values against both definitions, the root metadata, icon assets and service-worker cache namespace. Do not edit only one manifest.
+- Whenever manifest/icon installability metadata changes, bump the service-worker shell cache version in `public/sw.js` so older cached metadata is not reused.
+- Verify the actual production `GET /manifest.webmanifest` response and every declared icon URL, then inspect browser installability diagnostics before claiming native install works.
 
 
 ## Golden system: WhatsApp embedded browser → normal browser → install (2026-10-10)
@@ -283,7 +284,7 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 
 
 ## Sourcing attachment upload — verified implementation contract
-- Use the existing UploadThing v7 route at `src/app/api/uploadthing/route.ts`, router at `src/app/api/uploadthing/core.ts`, and typed client helper at `src/lib/uploadthing.ts`. Follow the proven working pattern from `gatshaayanda/adhubmvp` and `gatshaayanda/sparkle-legacy-insurance-brokers`: `uploadFiles("fileUploader", { files: [file] })`, then read the returned URL from `url` with `ufsUrl` / `appUrl` fallbacks. Do not add custom Firebase Admin verification middleware or require `FIREBASE_ADMIN_KEY` solely to upload a file; those additions caused an unnecessary configuration dependency and diverged from the proven projects.
+- Use the existing UploadThing v7 route at `src/app/api/uploadthing/route.ts`, router at `src/app/api/uploadthing/core.ts`, and typed client helper at `src/lib/uploadthing.ts`. The current `fileUploader` middleware requires a Firebase ID token and verifies it with Firebase Admin before authorizing a request attachment; this uses `FIREBASE_ADMIN_KEY`. It verifies authentication, not an admin role, because customers need to attach references to their own sourcing requests. Preserve that boundary unless a reviewed replacement changes both the user journey and threat model.
 - Keep the supported file types to images and PDF, max one file, **4 MB maximum for both images and PDFs**. The request-form client-side check and UploadThing router must agree. Accept image/PDF files whose mobile browser MIME type is blank or generic when the filename extension confirms the type. If a file is rejected or too large, preserve that validation error and block submission until the customer removes/replaces the file; never silently submit a request without an attachment the customer thought was included. Never leave the UI stuck indefinitely: provide an explicit upload state, a bounded wait with an actionable error, and preserve the rest of the request form when upload fails.
 - The production UploadThing secret/token must exist in the Vercel project environment for the deployed route. Build success alone does not prove that a live upload works; test a real small image and PDF in production and inspect the UploadThing dashboard/logs if either fails.
 - My Plug screen priority: request history and a clear New request action first, then private conversation history, with starting a new conversation topic collapsed by default. Keep Google account linking, device notifications, interests/purchase-sharing privacy and friend-circle management together in an optional disclosure so they do not compete with the customer’s immediate task. Keep profile editing and member activity below. Request history and private conversations remain prominent; never expose private requests/messages to friends.
@@ -296,7 +297,7 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - The homepage’s permanent **My Plug** link opens `/account`. Returning Google-linked customers should be restored from Firebase browser-local persistence and see their existing private requests/conversations without being asked to create another account.
 - `/account` must await `setPersistence(auth, browserLocalPersistence)` before registering its auth-state listener. Do not race persistence restoration against account UI initialization.
 - Do **not** create a fresh anonymous Firebase UID merely because someone opened `/account`. Anonymous sessions are created when a customer submits a sourcing request; this lets a returning customer on a new browser choose Google sign-in directly instead of accidentally creating an anonymous UID and then colliding with their existing Google UID.
-- With an existing anonymous request session, **Connect Google** must use Firebase credential linking so that same UID and its private data remain intact. If the Google credential belongs to a different UID, keep the current session and explain that histories have not been merged; never switch identities or claim migration without an explicitly reviewed data-migration plan.
+- With an existing anonymous request session, **Connect Google** must use Firebase credential linking so that same UID and its private data remain intact. If the credential belongs to a different UID, offer a deliberate path to sign in to that existing Google account and explain that the separate guest-session history was not merged and will not appear in that account. Never merge or claim migration implicitly. This matches the higher-level account-collision policy above.
 - QA the two distinct return paths: (1) same browser with an existing linked Google session automatically opens My Plug with prior history; (2) new browser with an existing Google account can use **Continue with Google** without an anonymous account being created first. Also verify first-time request submission still creates an anonymous session and lands on `/account?submitted=...` with the saved request visible.
 
 
@@ -356,7 +357,7 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - Keep this admin focused on the real workflow. Do not introduce a general inventory/ERP or mirror WhatsApp Business's entire catalogue; Frank curates only the finds/offers The Plug publishes.
 
 ### Image upload and reference-repository findings
-- The Plug currently uses UploadThing for customer sourcing attachments through `src/app/api/uploadthing/core.ts` and `src/lib/uploadthing.ts`. The current file route accepts one image (4 MB) or PDF (4 MB) and has no auth middleware. It is not an admin-only upload boundary.
+- The Plug currently uses UploadThing for customer sourcing attachments through `src/app/api/uploadthing/core.ts` and `src/lib/uploadthing.ts`. The current file route accepts one image (4 MB) or PDF (4 MB) and verifies a Firebase ID token in UploadThing middleware using `FIREBASE_ADMIN_KEY`. This is customer-authenticated, not admin-role-only, by design; real upload/download and unauthenticated rejection remain runtime checks.
 - The current `StorefrontPublishing` image picker uses Firebase Storage path `storefrontMedia/`, with admin-only Storage rules and a 12 MB image limit. If migrating this workflow to UploadThing, add a distinct admin-only file route whose server middleware verifies the Firebase ID token and the user's `admins/{uid}` role. Do not make the existing customer attachment endpoint admin-only or copy its public authorization model.
 - `gatshaayanda/theihub` and `gatshaayanda/adminhub-global` use the UploadThing App Router `createUploadthing` / `FileRouter` pattern and `generateReactHelpers` client helper. Their inspected upload core logs an UploadThing secret prefix; do not copy that logging or expose any part of secrets. Use UploadThing's official App Router/file-route docs: https://docs.uploadthing.com/getting-started/appdir and https://docs.uploadthing.com/file-routes.
 - `gatshaayanda/boemo-joos-food-deals` uses Firebase Storage patterns and has no UploadThing dependency in its inspected package manifest. Reuse its authenticated CRUD/storage approach only where applicable; never copy its Firebase project configuration, food-specific models, or credentials into The Plug.
@@ -370,7 +371,7 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 
 ## Executable readiness and legacy safety
 
-Run \`npm run verify:clone-readiness\` after reading the labelled map. This is a deterministic static audit; it makes no Firebase/network calls and does not verify production. Standard local gate order is \`npm ci\`, \`npm run verify:identity\`, \`npm run verify:clone-readiness\`, \`npx tsc --noEmit\`, \`npm run lint\`, \`npm run build\`.
+Run `npm run verify:identity` and `npm run verify:clone-readiness` after reading the map. Both are deterministic local/static checks with no Firebase reads or deployments. The identity guard is configured in `scripts/identity.config.json`; update that config and its forbidden source-identity patterns during a clone. The clone-readiness verifier contains The Plug-specific route/schema assertions and is a foundation audit, not a universal app test; adapt those assertions and the target's route/data map when cloning. Standard gate order: `npm ci`, `npm run verify:identity`, `npm run verify:clone-readiness`, `npx tsc --noEmit`, `npm run lint`, `npm run build`, `git diff --check`.
 
 The static audit reports known inherited BOEMO order/menu/reconciliation and \`boemoMedia\` footprints as warnings. **Do not delete them simply to make the audit quieter.** \`/order\` redirects to \`/request\`, but \`/orders/[id]\` still contains historical order tracking and \`data.ts\` mixes legacy and current customer/conversation helpers. Trace callers, scheduled workflows, historical links and authorized read-only live data before a separate reviewed cleanup/migration.
 
@@ -382,4 +383,4 @@ The last inspected Firestore-rules deployment run failed at the \`Write Firebase
 
 ### Privileged operations-login risk
 
-The source map's K01 finding is a release gate: \`src/app/api/operations-login/route.ts\` issues a Firebase custom token for the shared fixed UID \`the-plug-temporary-operations\` and writes that UID as owner when the shared \`THE_PLUG_OPERATIONS_WORD\` is accepted. The route has no visible persistent attempt throttling. Before changing it, inspect all callers and preserve a verified recovery path; do not silently rotate/remove the secret or break the current admin access. Do not certify the admin surface until the access-word strength, brute-force protection, role boundaries and unauthorized direct API/database access have been tested.
+The source map's K01 finding remains a release review item: `src/app/api/operations-login/route.ts` accepts the shared `THE_PLUG_OPERATIONS_WORD`, applies Firestore-backed per-source-address throttling (five attempts per 15-minute window with HTTP 429/Retry-After), and issues a custom token for fixed UID `the-plug-temporary-operations` with owner role. The throttle is not proof against distributed guessing, and the shared credential prevents individual operator attribution. Preserve a recovery path; do not silently rotate/remove the secret. Remaining checks include limiter behavior in non-production, secret strength/rotation, direct API/database denial and migration to individual least-privilege admin identities.

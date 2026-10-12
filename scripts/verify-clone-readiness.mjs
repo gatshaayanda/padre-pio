@@ -23,8 +23,11 @@ function warn(label, detail) {
 check("Repository instructions exist", exists("AGENTS.md"));
 check("Labelled source map exists", exists("AGENTS_REPO_LABELED.md"));
 check("Reusable app-factory SOP exists", exists("docs/ADMIN-HUB-APP-FACTORY-SOP.md"));
+check("Ordered clone/reset checklist exists", exists("docs/CLONE-RESET-CHECKLIST.md"));
 check("PWA foundation notes exist", exists("docs/PWA-FOUNDATION.md"));
 check("Identity verification script exists", exists("scripts/verify-identity.mjs"));
+check("Per-project identity configuration exists", exists("scripts/identity.config.json"));
+check("Identity verifier reads per-project configuration", exists("scripts/verify-identity.mjs") && /identity\\.config\\.json/.test(read("scripts/verify-identity.mjs")));
 check("Firestore rules file exists", exists("firestore.rules"));
 check("Storage rules file exists", exists("storage.rules"));
 check("Firebase configuration exists", exists("firebase.json"));
@@ -38,6 +41,11 @@ check("Production build invokes identity verification", /verify:identity/.test(s
 check("Lint script exists", typeof scripts.lint === "string");
 
 const manifest = JSON.parse(read("public/manifest.webmanifest"));
+const generatedManifest = read("src/app/manifest.ts");
+const identityConfig = JSON.parse(read("scripts/identity.config.json"));
+check("Identity config matches public manifest", manifest.name === identityConfig.manifestName && manifest.short_name === identityConfig.shortName && manifest.theme_color === identityConfig.themeColor && manifest.icons?.some((icon) => icon.src === identityConfig.canonicalIcon));
+check("Generated and public manifests keep identity fields aligned", generatedManifest.includes('name: "' + manifest.name + '"') && generatedManifest.includes('short_name: "' + manifest.short_name + '"') && generatedManifest.includes('theme_color: "' + manifest.theme_color + '"') && generatedManifest.includes('src: "' + identityConfig.canonicalIcon + '"'));
+check("Clone checklist documents explicit stop conditions", /STOP:/.test(read("docs/CLONE-RESET-CHECKLIST.md")) && /PASS:/.test(read("docs/CLONE-RESET-CHECKLIST.md")));
 check("Manifest has product name", typeof manifest.name === "string" && manifest.name.trim().length > 0);
 check("Manifest has short name", typeof manifest.short_name === "string" && manifest.short_name.trim().length > 0);
 check("Manifest has icons", Array.isArray(manifest.icons) && manifest.icons.length > 0);
@@ -82,6 +90,12 @@ const firestoreRules = read("firestore.rules");
 check("Firestore rules contain final deny-all fallback", /match\s+\/\{document=\*\*\}\s*\{[\s\S]*?allow\s+read,\s*write\s*:\s*if\s+false\s*;?/.test(firestoreRules));
 const storageRules = read("storage.rules");
 check("Storage rules contain deny-all fallback", /match\s+\/\{allPaths=\*\*\}\s*\{\s*allow\s+read,\s*write\s*:\s*if\s+false\s*;?\s*\}/.test(storageRules));
+
+const envExample = read(".env.example");
+for (const variable of ["NEXT_PUBLIC_BASE_URL", "NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "NEXT_PUBLIC_FIREBASE_APP_ID", "NEXT_PUBLIC_FIREBASE_VAPID_KEY", "FIREBASE_ADMIN_KEY", "UPLOADTHING_TOKEN", "THE_PLUG_OPERATIONS_WORD", "BOEMO_REMINDER_CRON_SECRET", "FIREBASE_PROJECT_ID"]) {
+  check("Environment example documents " + variable, new RegExp("^" + variable + "=", "m").test(envExample));
+}
+check("Root agent instructions link the clone/reset checklist", /docs\\/CLONE-RESET-CHECKLIST\\.md/.test(read("AGENTS.md")));
 
 const sourceMap = read("AGENTS_REPO_LABELED.md");
 for (const requiredLabel of ["## 00", "## 01", "## 02", "## 03", "## 04", "## 05", "## 06", "## 07", "## 08", "## 09", "## 10", "## 11", "## 12", "## 13"]) {

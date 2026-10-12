@@ -64,7 +64,9 @@ Keep distinct:
 | A07 | public/plug-icon.svg, public/plug-icon-192.png, public/plug-icon-512.png | Identity assets declared by metadata/manifest; verify URLs and actual dimensions. |
 | A08 | next.config.ts | Remote image configuration; Firebase Storage host is allowed. |
 
-Identity changes must also inspect scripts/verify-identity.mjs, public/sw.js, cache namespaces, social metadata, environment configuration and all visible product strings. A title change alone does not reset installed PWA identity or cached assets.
+Identity changes must also inspect `scripts/identity.config.json`, `scripts/verify-identity.mjs`, `public/sw.js`, cache namespaces, social metadata, environment configuration and all visible product strings. The verifier config is the per-project contract for expected manifest name, short name, theme color, canonical icon, service-worker cache prefix and forbidden source-identity patterns. A title change alone does not reset installed PWA identity or cached assets.
+
+**Verified source caveat:** both `src/app/manifest.ts` and `public/manifest.webmanifest` define overlapping manifest identity/installability fields. The generated App Router route is intended to be canonical; deployed response precedence has not been independently checked here. Keep them aligned and verify the real `GET /manifest.webmanifest` before consolidating either file. Also, `src/app/layout.tsx`, `src/app/robots.ts` and `src/app/sitemap.ts` default `NEXT_PUBLIC_BASE_URL` to `https://the-plug.vercel.app`, while the last inspected production alias was `https://the-plug-pearl.vercel.app`; configure/verify the canonical domain explicitly instead of trusting the fallback.
 
 ### B — PWA, embedded browser, install and offline
 
@@ -194,7 +196,7 @@ Notification proof ladder: browser support → permission → service worker →
 | I06 | .github/workflows/quality.yml | Typecheck, lint and build. |
 | I07 | scripts/verify-identity.mjs | Clone identity residue guard. |
 
-Firebase web config uses NEXT_PUBLIC_FIREBASE_* values. Client code has build placeholders so prerender/build can work without production config; hasFirebaseWebConfig prevents auth actions when required values are absent. A successful build with placeholders does not prove production Firebase works.
+Firebase web config uses `NEXT_PUBLIC_FIREBASE_*` values. Client code has build placeholders so prerender/build can work without production config; `hasFirebaseWebConfig` prevents auth actions when required values are absent. A successful build with placeholders does not prove production Firebase works. `.env.example` documents client config, `FIREBASE_ADMIN_KEY`, `UPLOADTHING_TOKEN`, `NEXT_PUBLIC_BASE_URL`, `THE_PLUG_OPERATIONS_WORD`, and the legacy `BOEMO_REMINDER_CRON_SECRET`. GitHub rules deployment separately expects `FIREBASE_SERVICE_ACCOUNT_JSON` plus `FIREBASE_PROJECT_ID`; these are not interchangeable with the Vercel server credential.
 
 Cost discipline:
 - Filter, paginate and bound queries.

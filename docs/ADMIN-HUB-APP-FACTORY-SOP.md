@@ -11,6 +11,7 @@ Deliver apps by reusing proven systems, reducing repeated discovery and avoidabl
 1. Universal Project Instructions: roles, work discipline, source-of-truth rules and general algorithm.
 2. Repository AGENTS.md: product requirements, security, current state, commands, known issues and behavior that must not regress.
 3. Repository labelled map: exact paths, architecture, flow traces, data contracts, boundaries, verification and clone decisions.
+4. `docs/CLONE-RESET-CHECKLIST.md`: ordered clone gates, commands, expected results and stop conditions.
 
 The project brief supplies only product, user, required workflow, target directory, destination repo and special constraints.
 
@@ -47,13 +48,13 @@ Verify target path and remote. Protect existing work. Clone/init from the select
 
 ### 6. RESET — identity and environment
 
-Reset app name/title/description, canonical URL/domain, manifest, icons, Apple/social metadata, brand colors, cache namespaces, route labels, customer copy, contact details, analytics labels, Firebase project and environment. Run identity verifier; review false positives. Never weaken it by ignoring whole directories.
+Reset app name/title/description, canonical URL/domain, both manifest definitions, icons, Apple/social metadata, brand colors, cache namespaces and cleanup prefixes, browser storage keys, route labels, customer copy, contact details, analytics labels, Firebase project and environment. Update `scripts/identity.config.json` (or the target's equivalent) and the identity verifier's forbidden source-identity patterns. Run the verifier; review false positives. Never weaken it by ignoring whole directories. The current identity verifier deliberately checks `src/app/manifest.ts`, `public/manifest.webmanifest`, `src/app/layout.tsx`, icon assets and service-worker cache names.
 
 Default to separate Firebase projects for independent client apps. Separate development/test data from production. Keep secrets out of Git and client bundles. Verify the active backend/deployment target before production writes.
 
 ### 7. PROVE FOUNDATION before new features
 
-Run available dependency, type, lint, build, identity/environment, auth/admin bootstrap, Firestore/Storage rules/index, manifest/icon/service-worker and existing integration checks. Use Firebase Emulator Suite for auth/Firestore/Storage/rules tests where supported. If no test harness exists, do not claim one ran; add a focused low-maintenance harness after checking framework compatibility. Build with placeholders proves buildability, not production integration.
+Run `npm ci`, `npm run verify:identity`, `npm run verify:clone-readiness`, `npx tsc --noEmit`, `npm run lint`, `npm run build` and `git diff --check` where those scripts exist. Then run the target-specific auth/admin bootstrap, Firestore/Storage rules/index, manifest/icon/service-worker and integration checks. The existing `verify:clone-readiness` is The Plug-specific and must be adapted for a different product; a green foundation audit is not a green target-app audit. Use Firebase Emulator Suite for auth/Firestore/Storage/rules tests where supported. If no test harness exists, do not claim one ran; add a focused low-maintenance harness after checking framework compatibility. Build with placeholders proves buildability, not production integration.
 
 ### 8. BUILD CUSTOMER FLOW FIRST
 
