@@ -58,6 +58,6 @@ export async function POST(request:Request){
   }
   const status=sent===0?(attempted===0?"no-recipients":"failed"):(failed>0?"partial":"sent");
   await deliveryRef.set({status,sentCount:sent,attemptedCount:attempted,failedCount:failed,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
-  return NextResponse.json({sent,attempted,failed,status});
+  return NextResponse.json({sent,attempted,failed,status},{status:sent===0?503:200});
  }catch(error){console.error("The Plug conversation notification failed:",error);return NextResponse.json({sent:0,error:error instanceof Error?error.message:"Conversation notification unavailable while The Plug is being built."},{status:400})}
 }
