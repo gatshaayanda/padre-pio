@@ -17,6 +17,7 @@ Customers can browse available products, ask The Plug to source a specific sneak
 - **[AGENTS.md](./AGENTS.md)** — required product contract and starting rules for every implementation chat.
 - **[AGENTS_REPO_LABELED.md](./AGENTS_REPO_LABELED.md)** — labelled source map, customer/admin/API/data/PWA traces, clone runbook and verification matrix.
 - **[Admin Hub App Factory SOP](./docs/ADMIN-HUB-APP-FACTORY-SOP.md)** — reusable inspect → select foundation → clone/reset → prove → build → verify → checkpoint algorithm.
+- **Static clone-readiness gate:** run `npm run verify:clone-readiness` after `npm ci`; it checks repository wiring without connecting to Firebase or consuming database reads.
 
 The Plug is the flagship clone candidate, not automatically a certified production-ready template. Follow the labelled map and record real evidence for runtime, Firebase rules deployment, PWA/offline, upload, notifications and complete customer/admin journeys before claiming those areas verified.
 
