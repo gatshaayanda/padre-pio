@@ -478,3 +478,78 @@ This finding should be addressed before describing The Plug as a clean, generic 
 - src/components/AdminConversations.tsx → conversation helpers, Storage attachment uploads and message-created notification endpoint.
 
 When changing one of these flows, read all named modules and the associated Firestore/Storage rules together. Avoid fixing one UI component while leaving a conflicting API, data helper or rule behind.
+
+## 10 — Executable clone-readiness gates
+
+### Command
+
+\`npm run verify:clone-readiness\`
+
+Implementation: \`scripts/verify-clone-readiness.mjs\`; package command is declared in \`package.json\`; GitHub quality workflow invokes it before TypeScript/lint/build.
+
+This is deliberately a zero-network, zero-Firebase-cost static audit. It checks:
+- Required project instructions, labelled map, app-factory SOP and PWA foundation notes exist.
+- Identity/readiness scripts and required package commands exist.
+- Manifest has product identity and valid local icon paths; service worker has a versioned The Plug cache namespace and an app-shell caching strategy.
+- Canonical customer, admin, sourcing-request, quote-approval and analytics paths exist.
+- Firebase config points at the committed Firestore/Storage rules and rules files contain deny-all fallback matches.
+- The source map contains the expected label set and accurately records the legacy footprint.
+- The Firebase rules deployment workflow and expected secret *names* are wired without printing secret values.
+- Known inherited food-order/menu/reconciliation symbols, historical order routes, the old BOEMO storage path and BOEMO-named cron secret are reported as warnings, not silently deleted.
+
+### Run order for local work
+
+\`\`\`bash
+npm ci
+npm run verify:identity
+npm run verify:clone-readiness
+npx tsc --noEmit
+npm run lint
+npm run build
+\`\`\`
+
+No test runner is currently declared in the inspected package.json. Do not call these static gates “end-to-end tests.” Add focused tests using existing Node tooling or a deliberately selected no-cost local emulator only after inspecting the actual behavior to cover.
+
+## 11 — Explicit legacy disposition and route findings
+
+### Source-verified observations
+
+- \`src/app/order/page.tsx\` redirects the canonical \`/order\` route to \`/request\`.
+- \`src/app/order/order-form.tsx\` still imports and uses the food-menu/order data helpers, but that file is not the canonical \`/order\` route implementation. Do not infer global dead-code status from that observation alone.
+- \`src/app/orders/[id]/page.tsx\` still implements order tracking against the legacy \`orders\` collection and local same-device fallback. A direct/historical tracking URL may still be used even though the current order route redirects elsewhere.
+- \`src/lib/firebase/data.ts\` combines Plug-relevant customer profile, conversation and notification helpers with legacy food order, menu and daily reconciliation exports. It is not safe to delete the module as a whole.
+- \`src/app/api/notifications/order-created/route.ts\` remains present and authenticates a Firebase ID token before invoking the old order-notification path.
+- \`firestore.rules\` still contains order/menu/reconciliation rules; \`storage.rules\` still contains a public-read \`boemoMedia\` path. Source presence does not establish deployed use, and public-read access does not by itself prove sensitive content is stored there.
+- \`.github/workflows/pickup-reminders.yml\` and \`src/app/api/notifications/reminders/route.ts\` use \`BOEMO_REMINDER_CRON_SECRET\`. This inherited environment-variable name is an operational dependency; renaming it requires a coordinated secret/config change and is not an identity-only rename.
+
+### Required classification before any removal
+
+For every legacy symbol/path, add one disposition and evidence:
+
+| Disposition | Evidence required |
+|---|---|
+| ACTIVE / KEEP | Current caller or scheduled workflow, intended behavior, rules and runtime evidence |
+| HISTORICAL / PRESERVE | Customer-facing old links, required record access, or business records that must remain readable |
+| DEAD / REMOVE | Repository-wide caller scan plus route/cron check and authorized read-only evidence that no required live data depends on it |
+| MIGRATE | Destination schema, data mapping, rollback, emulator tests, rules/index changes and a scheduled deployment plan |
+| UNCERTAIN / HOLD | Any missing evidence; default disposition until investigated |
+
+### Safe next engineering step
+
+Do not strip legacy data or rules in the documentation PR. Complete a caller matrix for every export in \`src/lib/firebase/data.ts\`, identify every reader/writer of the old collections and Storage prefix, inspect historical links and scheduled jobs, and verify the Firebase project ID/rules deployment state without exposing credentials. Then make a separate, tightly scoped code/rules change with emulator evidence. Preserve existing customer history unless a verified migration or retention decision says otherwise.
+
+## 12 — Evidence still outstanding
+
+The following are not certified by the static audit or documentation PR:
+- Firebase rules workflow failure/root cause and whether deployed Firestore/Storage rules match source.
+- Firebase project identity and current data presence for legacy collections/prefixes.
+- Request creation → admin view → quote → customer approval → request status → conversation → customer notification as one end-to-end journey.
+- Actual FCM token registration, notification delivery and failure handling on supported devices.
+- UploadThing authorization, limits, file access and real upload/download.
+- WhatsApp/in-app browser handoff and normal-browser destination preservation on real devices.
+- Native install event and fallback instructions on Android/iOS/desktop.
+- Offline shell/content behavior, cache invalidation and recovery after reconnect.
+- Admin authorization at UI, API, Firestore and Storage boundaries.
+- Production deployment SHA and current production smoke tests.
+
+For every row, update status only with an evidence link, exact SHA/environment, date, test action and result. “Not tested” is an acceptable honest status; an invented PASS is not.
