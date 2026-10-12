@@ -409,6 +409,8 @@ For every privileged route, inspect: HTTP method, authentication token source, t
 
 **Operations login follow-up:** the shared access-word endpoint now applies a Firestore-backed per-source-address limit (five attempts per 15 minutes), emits HTTP 429 with `Retry-After`, rejects oversized declared bodies, and prunes expired limiter records in bounded batches. This is defense in depth; it does not replace migrating to individual admin identities or configuring platform-level edge rate limiting.
 
+The message-created endpoint also claims a deterministic `notificationDeliveries` record before sending and suppresses duplicate retries for five minutes; successful deliveries are marked sent.
+
 **Notification maintenance:** the scheduled reminder endpoint now compares its bearer secret using a constant-time digest comparison. Conversation notifications delete Firebase Messaging tokens only when Firebase explicitly reports them invalid/unregistered; transient delivery failures are not treated as invalid tokens.
 
 **UploadThing attachment boundary:** the request attachment route now requires a valid Firebase ID token before it issues an upload URL; the request form sends the current anonymous-or-registered user's token. Server-side file limits remain one image or PDF up to 4 MB. Unauthenticated uploads are rejected before the file upload is authorized. Runtime upload verification is still pending.

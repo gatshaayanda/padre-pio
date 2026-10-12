@@ -53,7 +53,7 @@ export async function POST(request:Request){
       }
     }
   }
-  await deliveryRef.set({status:"sent",sentCount:sent,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
+  await deliveryRef.set({status:sent>0?"sent":"failed",sentCount:sent,sentAt:new Date().toISOString(),updatedAt:new Date().toISOString()},{merge:true});
   return NextResponse.json({sent});
  }catch(error){console.error("The Plug conversation notification failed:",error);return NextResponse.json({sent:0,error:error instanceof Error?error.message:"Conversation notification unavailable while The Plug is being built."},{status:400})}
 }
