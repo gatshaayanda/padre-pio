@@ -1,18 +1,17 @@
 {
   "id": "/",
-  "name": "The Plug | Sneakers & Apparel",
-  "short_name": "The Plug",
-  "description": "Install The Plug for one-tap access to sneaker and apparel sourcing in Botswana. If we can source it, you can get it.",
-  "categories": ["shopping", "lifestyle"],
+  "name": "Padre Pio Medical Centre",
+  "short_name": "Padre Pio",
+  "description": "Find the clinic, request an appointment, and hear back from reception.",
+  "categories": ["health", "medical"],
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#0866FF",
+  "background_color": "#F7F4EC",
+  "theme_color": "#21483D",
   "icons": [
-    {"src":"/plug-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"/plug-icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
-    {"src":"/plug-icon-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"},
-    {"src":"/plug-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
+    {"src":"/padre-pio-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/padre-pio-icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/padre-pio-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
   ]
 }
