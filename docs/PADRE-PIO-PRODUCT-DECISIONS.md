@@ -6,7 +6,7 @@ Updated: 14 October 2026
 
 The primary job is to help a patient recognise the real location, understand the next step, request an appointment, and know that reception still needs to confirm it. The entrance video is a recognition cue, not the entire visual identity. The 9.29-second portrait film is optimized to 5,968,032 bytes and paired with a 162,432-byte WebP poster extracted from a recognizable real frame. The page preserves the portrait framing, respects reduced-motion/data-saving/2G settings, and uses a custom SVG illustration for location context.
 
-The primary CTA is “Request an appointment”. Directions are the secondary action. Call and WhatsApp actions are withheld until the clinic confirms an official reception number; the number shown in third-party directories remains an unverified lead. The appointment form collects name, phone, preferred date/time, a broad appointment category, consent, and a short optional note. It explicitly discourages medical history and does not promise live availability.
+The primary CTA is “Request an appointment”. Directions are the secondary action. Call and WhatsApp actions are withheld until the clinic confirms an official reception number; the number shown in third-party directories remains an unverified lead. The public UI no longer exposes that unverified number. The appointment form collects name, phone, preferred date/time, a broad appointment category, consent, and a short optional note. It explicitly discourages medical history and does not promise live availability.
 
 ## External UX references reviewed
 
@@ -35,7 +35,7 @@ No verified official logo or clinic-controlled website was identified in the sou
 - Admin queue uses Firebase Authentication plus server-side role verification and writes audit events for status changes.
 - Current dependency versions are Next.js 15.5.27, Firebase JS SDK 12.19.0, and Firebase Admin SDK 14.5.0. The production audit gate reports zero high/critical vulnerabilities.
 - Full audit still reports five high findings in the development-only ESLint dependency chain via braces/fast-glob/micromatch. No compatible patched braces release was available in the reviewed registry at checkpoint; the audit's suggested eslint-config-next downgrade conflicts with the Next.js 15 line.
-- CI passed on source commit fe1f99b56f8b130f5244f78bb62ee6b6d6dda716. Live Firebase integration and physical-device PWA tests remain unrun until project credentials/roles and test devices are available.
+- CI passed on code commit 1f52994de754ec2ba043e4c514b3282607d82be0 in run 38558095574, including identity/readiness, TypeScript, lint, build, and the production vulnerability gate. Live Firebase integration and physical-device PWA tests remain unrun until project credentials/roles and test devices are available.
 
 ## Still requiring clinic confirmation
 
