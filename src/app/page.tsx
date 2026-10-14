@@ -37,7 +37,8 @@ export default function HomePage() {
         </Link>
         <nav className="padreNav" aria-label="Main navigation">
           <a href="#visit">Find the clinic</a>
-          <a href="#care">Patient information</a>
+          <a href="#services">Care enquiries</a>
+          <a href="#care">How it works</a>
         </nav>
         <button className="padreInstallLink" type="button" onClick={requestInstall}>Add to home screen <span aria-hidden="true">↗</span></button>
       </header>
@@ -95,12 +96,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="padreServicesSection" id="services" aria-labelledby="padre-services-title">
+        <div className="padreServicesIntro">
+          <span className="padreEyebrow">WHAT DO YOU NEED HELP WITH?</span>
+          <h2 id="padre-services-title">Start with the<br /><em>right conversation.</em></h2>
+          <p>Choose the closest match and send a request to reception. These are common primary-care enquiry types, not a confirmed list of services at Padre Pio. The clinic will advise what is available and whether you need an appointment.</p>
+        </div>
+        <div className="padreServicesGrid">
+          <article className="padreServiceCard"><span aria-hidden="true">✚</span><h3>General consultation</h3><p>For a general medical visit or a concern you would like to discuss with a clinician.</p><Link href="/appointments/request?type=GENERAL_APPOINTMENT">Request a visit <span aria-hidden="true">↗</span></Link></article>
+          <article className="padreServiceCard"><span aria-hidden="true">↻</span><h3>Follow-up visit</h3><p>For a review after a previous consultation or ongoing care.</p><Link href="/appointments/request?type=FOLLOW_UP">Request a follow-up <span aria-hidden="true">↗</span></Link></article>
+          <article className="padreServiceCard"><span aria-hidden="true">♡</span><h3>Health check or screening</h3><p>Ask reception about routine checks, preventive screening or health assessments.</p><Link href="/appointments/request?type=HEALTH_CHECK">Ask about a health check <span aria-hidden="true">↗</span></Link></article>
+          <article className="padreServiceCard"><span aria-hidden="true">⌂</span><h3>Child health</h3><p>Ask about a child health visit, growth check or immunisation enquiry.</p><Link href="/appointments/request?type=CHILD_HEALTH">Ask about child health <span aria-hidden="true">↗</span></Link></article>
+          <article className="padreServiceCard"><span aria-hidden="true">＋</span><h3>Women's health</h3><p>Ask reception whether the care or consultation you need is available.</p><Link href="/appointments/request?type=WOMENS_HEALTH">Make an enquiry <span aria-hidden="true">↗</span></Link></article>
+          <article className="padreServiceCard"><span aria-hidden="true">⌁</span><h3>Tests or wound care</h3><p>Ask whether a test, screening or minor wound-care visit can be arranged.</p><Link href="/appointments/request?type=TESTS_WOUND_CARE">Ask reception <span aria-hidden="true">↗</span></Link></article>
+        </div>
+        <p className="padreServicesDisclaimer">No treatment, test, vaccine, opening time, price or medical-aid arrangement is promised on this page. Reception must confirm availability.</p>
+      </section>
+
       <section className="padreCareSection" id="care">
         <div><span className="padreEyebrow">BEFORE YOU VISIT</span><h2>A clearer next step.</h2></div>
         <div className="padreCareGrid">
           <article><span className="padreCareNumber">01</span><h3>Request a time</h3><p>Send your preferred date and time to reception for review. Wait for the clinic to confirm before treating it as booked.</p><Link href="/appointments/request">Start a request <span aria-hidden="true">↗</span></Link></article>
           <article><span className="padreCareNumber">02</span><h3>Find your way</h3><p>Use the address and map directions to plan your journey to the clinic entrance.</p><a href="#visit">View location <span aria-hidden="true">↗</span></a></article>
-          <article><span className="padreCareNumber">03</span><h3>Get the details</h3><p>Clinic hours, services and reception contact options will be shown here once verified by the practice.</p><span className="padreCarePending">Details being verified</span></article>
+          <article><span className="padreCareNumber">03</span><h3>Know what happens next</h3><p>Reception reviews the request and contacts you. Your preferred date is not reserved until the clinic confirms it.</p><Link href="/appointments/request">Start an appointment request <span aria-hidden="true">↗</span></Link></article>
         </div>
       </section>
 
