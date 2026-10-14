@@ -29,6 +29,13 @@ Research informing these choices:
 
 These are design inputs, not evidence that this interface has passed usability testing. Research conducted in other healthcare settings should not be assumed to predict outcomes in Botswana without local testing.
 
+## Additional inspection — 2026-10-14
+
+- **Security/design review:** The current `work/padre-pio-identity-reset` request form, admin queue, and `firestore.rules` use the same `patientName`/`patientNote` schema, so the basic client-side schema is aligned. Public request creation requires Firebase Authentication (the form signs in anonymously), limits field sizes, fixes initial status to `NEW`, and does not permit patients to read appointment records. Staff reads/updates require a role document. These are source-inspection findings, not emulator proof.
+- **Release risk still open:** direct browser-to-Firestore submission has no server-side rate limit, idempotency key, or durable appointment event trail in this candidate. Anonymous authentication alone does not prevent scripted request flooding. A separate older branch (`feat/padre-pio-digital-reception`) has a server-side Admin SDK endpoint with request validation, hashed-address throttling, idempotent IDs, and appointment event records, but it uses a different appointment schema and admin UI/API contract. Copying only that route would break the candidate; do not mix the implementations piecemeal. Resolve this as one coherent implementation, then test it.
+- **Branch reconciliation:** `main` is five commits ahead of the shared video-seed base and the candidate is 56 commits ahead of that base. The five main-only changes are confined to `.github/workflows/firebase-rules-deploy.yml` and removal of `.github/workflows/pickup-reminders.yml`; no application source conflicts were shown by the compare summary. Still, do not force-push or merge blindly; preserve the main workflow changes when reconciling.
+- **CI evidence:** GitHub Actions run `38558095574` passed on older branch commit `1f52994de754ec2ba043e4c514b3282607d82be0`. No workflow run was returned for current candidate checkpoint `d978f24a59f0fc843c832b1c3067bba7d89d4f38`. Therefore current candidate static gates remain NOT RUN, not PASS.
+
 ## Source-only observations
 
 - The location shown in the interface was supplied in the project brief.
