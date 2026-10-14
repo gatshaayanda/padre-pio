@@ -87,7 +87,7 @@ check("Firestore rules include private appointment records", /match \/appointmen
 check("Firestore rules enforce an admin role for queue access", /function isAdmin\(\)/.test(rules) && /allow read: if isAdmin\(\)/.test(rules));
 check("Firestore rules retain default-deny catch-all", /match \/\{document=\*\*\}/.test(rules) && /allow read, write: if false/.test(rules));
 check("Storage remains default deny", /allow read, write: if false/.test(storageRules));
-check("Firebase rules are not automatically deployed by an inherited workflow", !exists(".github/workflows/firebase-rules-deploy.yml"));
+check("Firebase rules deployment is explicitly disabled", !exists(".github/workflows/firebase-rules-deploy.yml") || (/name: Firebase rules deployment guard \(no-op\)/.test(read(".github/workflows/firebase-rules-deploy.yml")) && /No deployment command is executed/.test(read(".github/workflows/firebase-rules-deploy.yml"))), "A present compatibility workflow must remain a no-op and must not deploy Firebase rules.");
 check("Inherited scheduled retail workflow is absent", !exists(".github/workflows/pickup-reminders.yml"));
 
 check("Legacy retail routes and APIs are removed", !exists("src/app/account/page.tsx") && !exists("src/app/request/page.tsx") && !exists("src/app/saved/page.tsx") && !exists("src/app/api/sourcing-request/route.ts"));

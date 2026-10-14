@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import PwaRegister from "@/app/pwa-register";
 import "./globals.css";
 
@@ -45,6 +46,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <Script id="padre-pio-early-install-capture" strategy="beforeInteractive">
+          {`(function () {
+            var w = window;
+            w.__padrePioPwaListenerReady = false;
+            w.addEventListener("beforeinstallprompt", function (event) {
+              var standalone = w.matchMedia("(display-mode: standalone)").matches ||
+                Boolean(navigator.standalone);
+              if (standalone || w.__padrePioPwaListenerReady) return;
+              event.preventDefault();
+              w.__padrePioInstallPrompt = event;
+            });
+          })();`}
+        </Script>
         <PwaRegister />
         {children}
       </body>
