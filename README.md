@@ -18,11 +18,11 @@ Help visitors recognise the clinic, find verified information, request an appoin
 
 ## Architecture
 
-Next.js App Router, React, TypeScript, Tailwind CSS, and Firebase SDKs retained from the approved application foundation. The application identity has been reset; clinic-specific workflows and isolated infrastructure remain to be implemented and verified.
+Next.js App Router, React, TypeScript, Tailwind CSS, and Firebase SDKs retained from the approved application foundation. The first reset pass removes inherited retail routes and scheduled/deployment workflows, isolates cache and storage rules, and introduces appointment/reception source code. A dedicated Firebase project and runtime verification are still required.
 
 ## Verification status
 
-No local dependency install, typecheck, lint, production build, Firebase rules test, browser/device test, or deployment test is claimed by this repository note. See `AGENTS.md` and the clone-reset checklist for the evidence ledger and required gates.
+No local dependency install, typecheck, lint, production build, Firebase rules test, browser/device test, or deployment test has been run by the assistant. See `docs/PADRE-PIO-EVIDENCE-LEDGER.md`. See `AGENTS.md` and the clone-reset checklist for the evidence ledger and required gates.
 
 ## Development
 
