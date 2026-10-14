@@ -16,7 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["medical", "health"],
     prefer_related_applications: false,
     icons: [
-      { src: "/padre-pio-mark.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }
+      { src: "/padre-pio-mark.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/padre-pio-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/padre-pio-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/padre-pio-icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
     ]
   };
 }
