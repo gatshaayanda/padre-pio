@@ -36,7 +36,10 @@ service cloud.firestore {
         && request.resource.data.phone.size() <= 30
         && request.resource.data.preferredDate is string
         && request.resource.data.preferredTime in ['MORNING', 'AFTERNOON', 'FLEXIBLE']
-        && request.resource.data.category in ['GENERAL_APPOINTMENT', 'FOLLOW_UP', 'NOT_SURE']
+        && request.resource.data.category in [
+          'GENERAL_APPOINTMENT', 'FOLLOW_UP', 'HEALTH_CHECK', 'CHILD_HEALTH',
+          'WOMENS_HEALTH', 'TESTS_WOUND_CARE', 'NOT_SURE'
+        ]
         && request.resource.data.patientNote is string
         && request.resource.data.patientNote.size() <= 300
         && request.resource.data.status == 'NEW'
