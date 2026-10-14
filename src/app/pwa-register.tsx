@@ -39,45 +39,25 @@ export default function PwaRegister() {
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [installed, setInstalled] = useState(false);
   const [embedded, setEmbedded] = useState(false);
+  const [platformReady, setPlatformReady] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [nativePromptAvailable, setNativePromptAvailable] = useState(false);
 
   useEffect(() => {
     const onBeforeInstall = (event: Event) => {
       if (isStandalone()) return;
       event.preventDefault();
       promptRef.current = event as InstallPromptEvent;
+      setNativePromptAvailable(true);
+      setDismissed(false);
     };
     const onInstalled = () => {
       promptRef.current = null;
+      setNativePromptAvailable(false);
       setInstalled(true);
+      setDismissed(true);
       setHelpOpen(false);
       setEmbedded(false);
-    };
-    const onInstallClick = () => {
-      setPlatform(detectPlatform());
-      if (isStandalone()) {
-        setInstalled(true);
-        setHelpOpen(true);
-        return;
-      }
-      if (isEmbeddedBrowser()) {
-        setEmbedded(true);
-        setHelpOpen(true);
-        return;
-      }
-      setEmbedded(false);
-      const prompt = promptRef.current;
-      if (prompt) {
-        // Call prompt() directly during the user's click gesture.
-        promptRef.current = null;
-        void prompt.prompt().then(() => prompt.userChoice).then(() => {
-          setHelpOpen(false);
-        }).catch(() => {
-          setHelpOpen(true);
-        });
-        return;
-      }
-      // The native event is browser-controlled; use guidance only when unavailable.
-      setHelpOpen(true);
     };
     const register = async () => {
       if (!("serviceWorker" in navigator)) return;
@@ -89,7 +69,10 @@ export default function PwaRegister() {
     };
 
     const installWindow = window as InstallWindow;
-    if (isStandalone()) setInstalled(true);
+    setPlatform(detectPlatform());
+    setEmbedded(isEmbeddedBrowser());
+    setPlatformReady(true);
+    if (isStandalone()) { setInstalled(true); setDismissed(true); }
     // Adopt an event captured before React hydrated, then mark the regular
     // listener as ready so the early listener does not swallow later events.
     const earlyPrompt = installWindow.__padrePioInstallPrompt;
@@ -100,15 +83,45 @@ export default function PwaRegister() {
     installWindow.__padrePioPwaListenerReady = true;
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
-    window.addEventListener("padre-pio-install", onInstallClick);
     void register();
 
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
-      window.removeEventListener("padre-pio-install", onInstallClick);
     };
   }, []);
+
+  function installOrExplain() {
+    setPlatform(detectPlatform());
+    if (isStandalone()) {
+      setInstalled(true);
+      setHelpOpen(true);
+      return;
+    }
+    if (isEmbeddedBrowser()) {
+      setEmbedded(true);
+      setHelpOpen(true);
+      return;
+    }
+    setEmbedded(false);
+    const prompt = promptRef.current;
+    if (prompt) {
+      // Call prompt() directly in this button's click handler.
+      promptRef.current = null;
+      setNativePromptAvailable(false);
+      void prompt.prompt().then(() => prompt.userChoice).then((choice) => {
+        if (choice.outcome === "accepted") {
+          setInstalled(true);
+          setDismissed(true);
+          setHelpOpen(false);
+        } else {
+          setHelpOpen(true);
+        }
+      }).catch(() => setHelpOpen(true));
+      return;
+    }
+    setHelpOpen(true);
+  }
 
   function openInBrowser() {
     const url = window.location.href;
@@ -122,10 +135,28 @@ export default function PwaRegister() {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  if (!helpOpen) return null;
+  if (!platformReady) return null;
 
   return (
-    <div className="padreInstallBackdrop" role="presentation" onMouseDown={(event) => {
+    <>
+      {!installed && !dismissed && (
+        <aside className="padreFloatingInstall" aria-label="Install Padre Pio Medical Centre">
+          <div className="padreFloatingInstallCopy">
+            <span className="padreFloatingInstallMark" aria-hidden="true">✚</span>
+            <span>
+              <strong>{nativePromptAvailable ? "Install Padre Pio" : platform === "ios" ? "Add Padre Pio to Home Screen" : "Keep Padre Pio close"}</strong>
+              <small>{nativePromptAvailable ? "Tap Install to open the browser prompt." : "Optional quick access to the clinic."}</small>
+            </span>
+          </div>
+          <button className="padreFloatingInstallAction" type="button" onClick={installOrExplain}>
+            {nativePromptAvailable ? "Install" : platform === "ios" ? "How to add" : embedded ? "Open in browser" : "Install options"}
+          </button>
+          <button className="padreFloatingInstallDismiss" type="button" aria-label="Dismiss install prompt" onClick={() => setDismissed(true)}>×</button>
+        </aside>
+      )}
+
+      {helpOpen && (
+      <div className="padreInstallBackdrop" role="presentation" onMouseDown={(event) => {
       if (event.target === event.currentTarget) setHelpOpen(false);
     }}>
       <section className="padreInstallDialog" role="dialog" aria-modal="true" aria-labelledby="padre-install-title">
@@ -141,15 +172,20 @@ export default function PwaRegister() {
             <p className="padreInstallNote">If the button does not open your browser, use this app’s menu and choose Open in browser. You can still use the website without installing it.</p>
           </>
         ) : platform === "ios" ? (
-          <p>In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong>. Installation is not required to use the website.</p>
+          <>
+            <p>On iPhone or iPad, tap <strong>Share</strong>, choose <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>. If you cannot see the option, scroll the Share actions or check <strong>Edit Actions</strong>.</p>
+            <p>If your current browser does not offer this option, open this same page in Safari and repeat the steps. This website cannot open the iOS installation sheet for you.</p>
+          </>
         ) : platform === "android" ? (
-          <p>Chrome has not provided a native install prompt in this visit. Check that you are using Chrome, then try again; if the prompt is still unavailable, open Chrome’s menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>, if offered.</p>
+          <p>Your browser has not provided a native install prompt in this visit. Open this page in Chrome and use its menu to choose <strong>Install app</strong> or <strong>Add to Home screen</strong>, if offered. The native prompt will appear directly when the browser makes it available.</p>
         ) : (
           <p>When supported, your browser will show its native install prompt. If it is unavailable, use Chrome or Edge’s <strong>Install app</strong> option.</p>
         )}
-        {!installed && !embedded && <p className="padreInstallNote">You can keep using this website without installing it.</p>}
+        {!installed && <p className="padreInstallNote">Installation is optional. You can continue using this website normally.</p>}
         <button className="padreButton padreButtonPrimary" type="button" onClick={() => setHelpOpen(false)}>Continue on website</button>
       </section>
-    </div>
+      </div>
+      )}
+    </>
   );
 }
