@@ -1,13 +1,177 @@
 "use client";
-import Link from "next/link";
-import StorefrontFeed from "@/components/StorefrontFeed";
-import CommunityFeed from "@/components/CommunityFeed";
-import {useEffect,useState} from "react";
-function openInstallPrompt(){window.dispatchEvent(new Event("theplug-open-install"));}
-export default function Home(){const [benefitsOpen,setBenefitsOpen]=useState(false);return <main className="plugSite plugEditorialHome">
-<div className="plugNotice"><div className="plugContainer"><span>🇧🇼 BOTSWANA</span><strong>If we can source it, you can get it.</strong><span>GABORONE · BW</span></div></div>
-<header className="plugNav plugEditorialNav"><div className="plugContainer plugNavInner"><Link href="/" className="plugBrand"><span className="plugMark">P</span><span><strong>THE PLUG</strong><small>SNEAKERS · APPAREL · SOURCING</small></span></Link><nav className="plugEditorialLinks" aria-label="Main navigation"><a href="#featured">Finds</a><a href="#deals">Live offers</a><Link href="/saved">Saved finds</Link></nav><div className="plugActions"><Link href="/account" className="plugButton plugButtonGhost plugMyPlugLink">My Plug ↗</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install ↓</button></div></div></header>
-<StorefrontFeed/><CommunityFeed/>
-<section className="plugMemberLoop"><div className="plugContainer"><div className="plugMemberLoopHead"><div><span className="plugKicker">THE PLUG · YOUR SPACE</span><h2>Keep your finds <em>close.</em></h2></div><button type="button" aria-expanded={benefitsOpen} aria-controls="plug-member-benefits" onClick={()=>setBenefitsOpen(open=>!open)} className="plugMemberLoopToggle">{benefitsOpen?"Hide member benefits":"Show member benefits"} <span aria-hidden="true">{benefitsOpen?"−":"＋"}</span></button></div>{benefitsOpen&&<div id="plug-member-benefits" className="plugMemberPerks"><article><span>01 / YOUR HISTORY</span><h3>Requests, together.</h3><p>Keep your requests, private replies and progress in My Plug.</p></article><article><span>02 / YOUR TIMING</span><h3>Only useful updates.</h3><p>Choose whether to receive relevant notifications when you’re ready.</p></article><article><span>03 / REAL OFFERS</span><h3>No made-up perks.</h3><p>See offers and rewards only when Frank has actually published and confirmed them.</p></article><article><span>04 / KEEP ACCESS</span><h3>Take your history with you.</h3><p>Connect Google to keep access to this session’s history across devices.</p></article><div className="plugMemberPerksAction"><Link href="/account" className="plugCircleAction">Open My Plug <span>↗</span></Link><small>Browsing stays open. Account linking is your choice.</small></div></div>}</div></section>
-<footer className="plugFooter plugEditorialFooter"><div className="plugContainer"><strong>THE PLUG</strong><span>SNEAKERS · APPAREL · SOURCING IN BOTSWANA</span><Link href="/account">My Plug</Link><Link href="/saved">Saved finds</Link><Link href="/request">Request a product</Link><button type="button" onClick={openInstallPrompt}>Install The Plug ↑</button><Link href="/admin">Admin</Link></div></footer>
-</main>}
+
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowDown, ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, Clock3, MapPin, Phone, ShieldCheck, Sparkles } from "lucide-react";
+
+type FormState = {
+  name: string;
+  phone: string;
+  preferredDate: string;
+  preferredTime: string;
+  category: string;
+  note: string;
+  privacyConsent: boolean;
+  website: string;
+};
+
+const initialForm: FormState = {
+  name: "",
+  phone: "",
+  preferredDate: "",
+  preferredTime: "",
+  category: "appointment",
+  note: "",
+  privacyConsent: false,
+  website: ""
+};
+
+function botswanaToday() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Gaborone",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find(item => item.type === type)?.value ?? "";
+  return part("year") + "-" + part("month") + "-" + part("day");
+}
+
+function install() {
+  window.dispatchEvent(new Event("padre-pio-open-install"));
+}
+
+export default function HomePage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [receipt, setReceipt] = useState<{ reference: string; duplicate?: boolean } | null>(null);
+  const [error, setError] = useState("");
+  const [today, setToday] = useState("");
+
+  useEffect(() => {
+    setToday(botswanaToday());
+    const video = videoRef.current;
+    if (!video) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (connection?.saveData || reducedMotion) return;
+    video.src = "/videos/padre.mp4";
+    video.load();
+    const playback = video.play();
+    if (playback) void playback.catch(() => undefined);
+    return () => {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, []);
+
+  function change<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setForm(current => ({ ...current, [key]: value }));
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setReceipt(null);
+    if (!form.privacyConsent) {
+      setError("Please confirm that reception may use these details to respond to your request.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: window.crypto.randomUUID(),
+          name: form.name,
+          phone: form.phone,
+          preferredDate: form.preferredDate,
+          preferredTime: form.preferredTime,
+          category: form.category,
+          note: form.note,
+          privacyConsent: form.privacyConsent,
+          website: form.website
+        })
+      });
+      const payload = await response.json() as { reference?: string; error?: string; duplicate?: boolean };
+      if (!response.ok || !payload.reference) {
+        throw new Error(payload.error || "Your request could not be sent. Please check your connection and try again.");
+      }
+      setReceipt({ reference: payload.reference, duplicate: payload.duplicate });
+      setForm(initialForm);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Your request could not be sent. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <main className="siteShell">
+      <div className="topline"><div className="wrap toplineInner"><span>PADRE PIO MEDICAL CENTRE</span><span className="toplineLocation"><MapPin size={13} aria-hidden="true" /> GABORONE WEST · BOTSWANA</span></div></div>
+      <header className="siteHeader">
+        <div className="wrap navInner">
+          <a className="brand" href="#top" aria-label="Padre Pio Medical Centre home"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a>
+          <nav className="mainNav" aria-label="Main navigation"><a href="#your-visit">Your visit</a><a href="#location">Find us</a></nav>
+          <div className="navActions"><button className="installLink" type="button" onClick={install}>Install app <ArrowDown size={15} aria-hidden="true" /></button><a className="button buttonSmall" href="#request-appointment">Request appointment <ArrowUpRight size={15} aria-hidden="true" /></a></div>
+        </div>
+      </header>
+
+      <section className="hero" id="top">
+        <div className="heroMedia" aria-hidden="true"><img className="heroPoster" src="/clinic-entrance-poster.svg" alt="" /><video ref={videoRef} className="heroVideo" muted loop playsInline preload="none" poster="/clinic-entrance-poster.svg" aria-hidden="true" /><div className="heroShade" /></div>
+        <div className="wrap heroContent">
+          <div className="heroEyebrow"><span className="eyebrowDot" /> A clearer way to reach reception</div>
+          <h1>Care starts<br /><em>with a welcome.</em></h1>
+          <p>Find your way to Padre Pio, request an appointment, and let reception take it from there.</p>
+          <div className="heroActions"><a className="button buttonLight" href="#request-appointment">Request an appointment <ArrowRight size={17} aria-hidden="true" /></a><a className="heroCall" href="tel:+2673164811"><Phone size={17} aria-hidden="true" /><span><small>Call reception</small><strong>+267 316 4811</strong></span></a></div>
+          <div className="heroFoot"><span><ShieldCheck size={15} aria-hidden="true" /> Your request stays a request until reception confirms</span><a href="#your-visit">How it works <ArrowDown size={14} aria-hidden="true" /></a></div>
+        </div>
+        <div className="heroIndex" aria-hidden="true"><span>01</span><i /><span>WELCOME</span></div>
+      </section>
+
+      <section className="visitSection sectionPad" id="your-visit">
+        <div className="wrap">
+          <div className="sectionIntro"><div><span className="kicker">YOUR VISIT, MADE SIMPLE</span><h2>One small step.<br /><em>Then we’ll help.</em></h2></div><p>No long forms or medical history here. Share how reception can reach you and the time you would prefer. The clinic will confirm the next step with you.</p></div>
+          <div className="visitSteps">
+            <article className="visitStep"><span className="stepNumber">01</span><div className="stepIcon"><CalendarDays size={22} aria-hidden="true" /></div><h3>Tell us what suits you</h3><p>Choose a preferred date and time, then leave your contact details.</p></article>
+            <article className="visitStep"><span className="stepNumber">02</span><div className="stepIcon"><Phone size={22} aria-hidden="true" /></div><h3>Reception reviews it</h3><p>Your request is sent for review. We do not show unverified live availability.</p></article>
+            <article className="visitStep"><span className="stepNumber">03</span><div className="stepIcon"><CheckCircle2 size={22} aria-hidden="true" /></div><h3>Wait for confirmation</h3><p>Your appointment is confirmed only after the clinic contacts you.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section className="requestSection sectionPad" id="request-appointment">
+        <div className="wrap requestGrid">
+          <div className="requestAside"><span className="kicker">APPOINTMENT REQUEST</span><h2>Let’s find<br /><em>a time that works.</em></h2><p>Complete the short form and reception can follow up with you directly.</p><div className="privacyNote"><ShieldCheck size={19} aria-hidden="true" /><div><strong>Just the essentials</strong><span>Please do not include symptoms, diagnoses, medication details or other sensitive medical information in this form.</span></div></div><div className="asideContact"><Clock3 size={17} aria-hidden="true" /><span>Preferred times are requests, not live availability.</span></div></div>
+          <div className="formCard">
+            {receipt ? <div className="receiptState" role="status" aria-live="polite"><div className="receiptIcon"><CheckCircle2 size={28} aria-hidden="true" /></div><span className="kicker">REQUEST RECEIVED</span><h3>Thank you. Reception has your request.</h3><p>Your reference is <strong>{receipt.reference}</strong>. This is not an appointment confirmation. Please wait for reception to contact you.</p><button className="button buttonDark" type="button" onClick={() => { setReceipt(null); setError(""); }}>Make another request <ArrowRight size={16} aria-hidden="true" /></button></div> : (
+              <form onSubmit={submit} className="appointmentForm">
+                <div className="formHead"><span>01 / YOUR DETAILS</span><span>About 1 minute</span></div>
+                <div className="fieldGrid"><label className="field"><span>Full name <b>*</b></span><input autoComplete="name" name="name" value={form.name} onChange={event => change("name", event.target.value)} minLength={2} maxLength={80} required placeholder="Name and surname" /></label><label className="field"><span>Phone number <b>*</b></span><input autoComplete="tel" inputMode="tel" name="phone" value={form.phone} onChange={event => change("phone", event.target.value)} minLength={7} maxLength={24} required placeholder="+267 ..." /></label></div>
+                <div className="formHead formHeadSpaced"><span>02 / YOUR PREFERENCE</span><span>Not a booking yet</span></div>
+                <div className="fieldGrid"><label className="field"><span>Preferred date <b>*</b></span><input type="date" name="preferredDate" value={form.preferredDate} onChange={event => change("preferredDate", event.target.value)} min={today || undefined} required /></label><label className="field"><span>Preferred time <b>*</b></span><input type="time" name="preferredTime" value={form.preferredTime} onChange={event => change("preferredTime", event.target.value)} required /></label></div>
+                <label className="field"><span>What do you need help with? <b>*</b></span><select name="category" value={form.category} onChange={event => change("category", event.target.value)} required><option value="appointment">Appointment / consultation</option><option value="follow-up">Follow-up visit</option><option value="not-sure">Not sure — please guide me</option></select></label>
+                <label className="field"><span>Short note <small>Optional</small></span><textarea name="note" value={form.note} onChange={event => change("note", event.target.value)} maxLength={300} rows={3} placeholder="A simple message for reception only — no medical history, please." /></label>
+                <label className="consentField"><input type="checkbox" checked={form.privacyConsent} onChange={event => change("privacyConsent", event.target.checked)} required /><span>I agree that the clinic may use these details to respond to my appointment request. <a href="/privacy" target="_blank" rel="noreferrer">Privacy notice</a>.</span></label>
+                <div className="honeypot" aria-hidden="true"><label>Leave this field empty<input tabIndex={-1} autoComplete="off" value={form.website} onChange={event => change("website", event.target.value)} /></label></div>
+                {error && <p className="formError" role="alert">{error}</p>}
+                <button className="button buttonDark submitButton" type="submit" disabled={submitting}>{submitting ? "Sending request…" : "Send appointment request"} <ArrowRight size={17} aria-hidden="true" /></button><p className="formFineprint">No payment is taken. No appointment is confirmed by this form.</p>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="locationSection sectionPad" id="location">
+        <div className="wrap locationGrid">
+          <div className="locationCopy"><span className="kicker">COME FIND US</span><h2>We’ll see you<br /><em>at the door.</em></h2><p>Look for Padre Pio Medical Centre in Gaborone West Phase 1. The entrance film above helps you recognise the place when you arrive.</p><div className="addressLine"><MapPin size={19} aria-hidden="true" /><span><strong>Plot 16739</strong><small>Gaborone West Phase 1, Gaborone, Botswana</small></span></div><div className="locationActions"><a className="button buttonDark" href="https://www.google.com/maps/search/?api=1&query=Padre%20Pio%20Medical%20Centre%20Plot%2016739%20Gaborone%20West%20Phase%201" target="_blank" rel="noreferrer">Directions <ArrowUpRight size={16} aria-hidden="true" /></a><a className="textLink" href="tel:+2673164811"><Phone size={16} aria-hidden="true" /> +267 316 4811</a></div><p className="contactCaveat">Please confirm contact details and opening hours with the clinic before travelling.</p></div>
+          <div className="locationArtwork"><img src="/clinic-illustration.svg" alt="Illustration of a welcoming clinic entrance with a medical cross" loading="lazy" /><div className="artworkCaption"><Sparkles size={16} aria-hidden="true" /><span>A familiar place. A simpler first step.</span></div></div>
+        </div>
+      </section>
+
+      <footer className="siteFooter"><div className="wrap footerTop"><a className="brand footerBrand" href="#top"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a><p>Digital reception for Plot 16739, Gaborone West Phase 1.</p><div className="footerLinks"><a href="#request-appointment">Request appointment</a><a href="#location">Directions</a><a href="/privacy">Privacy</a><a href="/admin">Staff access</a><button type="button" onClick={install}>Install app</button></div></div><div className="wrap footerBottom"><span>PADRE PIO MEDICAL CENTRE · BOTSWANA</span><span>Requests are reviewed by reception; confirmation follows separately.</span></div></footer>
+    </main>
+  );
+}
