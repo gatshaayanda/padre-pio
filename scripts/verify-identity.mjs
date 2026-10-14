@@ -94,7 +94,7 @@ if (!appManifest.includes('theme_color: "' + config.themeColor + '"')) failures.
 if (!appManifest.includes('src: "' + config.canonicalIcon + '"')) failures.push("src/app/manifest.ts: canonical icon missing");
 if (!layout.includes('default: "' + config.manifestName + '"')) failures.push("src/app/layout.tsx: metadata title does not match identity.config.json");
 if (!layout.includes('applicationName: "' + config.shortName + '"')) failures.push("src/app/layout.tsx: applicationName does not match identity.config.json");
-if (!layout.includes('icon: "' + config.canonicalIcon + '"') || !layout.includes('apple: "' + config.canonicalIcon + '"')) failures.push("src/app/layout.tsx: browser/Apple icon references do not match identity.config.json");
+if (!layout.includes('icon: "' + config.canonicalIcon + '"') || !layout.includes('apple: "/padre-pio-icon-192.png"')) failures.push("src/app/layout.tsx: browser icon or Apple touch icon reference is incorrect");
 if (!layout.includes('manifest: "/manifest.webmanifest"')) failures.push("src/app/layout.tsx: manifest link is missing");
 const iconPath = path.join(root, "public", String(config.canonicalIcon ?? "").replace(/^\/+/, ""));
 if (!config.canonicalIcon?.startsWith("/") || !fs.existsSync(iconPath)) failures.push("identity.config.json: canonical icon must be an existing public asset path");
