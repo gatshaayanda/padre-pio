@@ -89,7 +89,7 @@ export async function POST(request: Request) {
   try {
     const services = getClinicServices();
     const allowed = await consumeRateLimit(services.db, clientAddress(request), services.rateLimitKey);
-    if (!allowed) return fail("We have received several requests from this connection. Please wait a little before trying again, or call reception.", 429);
+    if (!allowed) return fail("We have received several requests from this connection. Please wait 15 minutes before trying again.", 429);
     const docRef = services.db.collection("appointments").doc(requestId);
     const eventRef = services.db.collection("appointmentEvents").doc(requestId + "-created");
     const result = await services.db.runTransaction(async tx => {
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: result.duplicate ? 200 : 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Appointment request could not be stored.", error instanceof Error ? error.message : "unknown error");
-    return fail("Appointment requests are temporarily unavailable. Please call reception and try again later.", 503);
+    return fail("Appointment requests are temporarily unavailable. Please try again later.", 503);
   }
 }
 
