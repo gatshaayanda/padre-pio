@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { signInAnonymously } from "firebase/auth";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
@@ -13,8 +13,12 @@ function localDateInputValue() {
 }
 
 const categories = [
-  { value: "GENERAL_APPOINTMENT", label: "General appointment" },
-  { value: "FOLLOW_UP", label: "Follow-up appointment" },
+  { value: "GENERAL_APPOINTMENT", label: "General consultation" },
+  { value: "FOLLOW_UP", label: "Follow-up visit" },
+  { value: "HEALTH_CHECK", label: "Health check or screening enquiry" },
+  { value: "CHILD_HEALTH", label: "Child health or immunisation enquiry" },
+  { value: "WOMENS_HEALTH", label: "Women's health enquiry" },
+  { value: "TESTS_WOUND_CARE", label: "Tests or wound-care enquiry" },
   { value: "NOT_SURE", label: "Not sure — please advise" }
 ];
 
@@ -25,6 +29,13 @@ export default function AppointmentRequestPage() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [category, setCategory] = useState(categories[0].value);
+
+  useEffect(() => {
+    const requestedType = new URLSearchParams(window.location.search).get("type");
+    if (requestedType && categories.some((item) => item.value === requestedType)) {
+      setCategory(requestedType);
+    }
+  }, []);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [reference, setReference] = useState("");
@@ -80,6 +91,7 @@ export default function AppointmentRequestPage() {
           <span className="padreEyebrow">REQUEST RECEIVED</span>
           <h1>Thank you, {name.trim().split(/\s+/)[0]}.</h1>
           <p>Your appointment request has been sent to the clinic for review. This is not a confirmed booking; please wait for reception to respond.</p>
+          <div className="padreNextSteps"><strong>What happens next?</strong><ol><li>Reception reviews your preferred date and time.</li><li>The clinic contacts you using the phone number provided.</li><li>Your visit is booked only after the clinic confirms it.</li></ol></div>
           <div className="padreReference"><small>YOUR REFERENCE</small><strong>{reference}</strong></div>
           <Link className="padreButton padreButtonPrimary" href="/">Back to clinic information <span aria-hidden="true">↗</span></Link>
         </section>
@@ -94,7 +106,8 @@ export default function AppointmentRequestPage() {
         <div className="padreFormIntro">
           <span className="padreEyebrow">LET RECEPTION KNOW</span>
           <h1>Request a<br /><em>time to visit.</em></h1>
-          <p>Share your preferred date and time. The clinic will review your request and confirm availability with you.</p>
+          <p>Tell reception how to reach you and when you would prefer to visit. You can send a request without creating an account.</p>
+          <div className="padreRequestSteps"><span><b>01</b> You send your preferred time</span><span><b>02</b> Reception reviews it</span><span><b>03</b> The clinic contacts you</span></div>
           <div className="padrePrivacyNote"><span aria-hidden="true">⌑</span><p><strong>Keep it simple and private.</strong><br />Please don’t include detailed symptoms, medical history, ID numbers or other sensitive medical information in this form.</p></div>
         </div>
         <form className="padreFormCard" onSubmit={submit}>
