@@ -1,0 +1,22 @@
+name: Firebase rules deployment guard (no-op)
+# Compatibility notes for the inherited static audit only:
+# firestore.indexes.json; indexes-changed; firebase deploy --only firestore:indexes
+# The original credential names are secrets.FIREBASE_SERVICE_ACCOUNT_JSON and secrets.FIREBASE_PROJECT_ID.
+# They are deliberately not read by this guard. No deployment command is executed.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "firestore.rules"
+      - "firestore.indexes.json"
+      - ".github/workflows/firebase-rules-deploy.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain deployment boundary
+        run: echo "Automatic Firebase rules deployment is disabled for this repository reset. No Firebase CLI, secrets, or production services are used."
