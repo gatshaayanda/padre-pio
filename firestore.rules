@@ -12,6 +12,12 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['owner', 'staff'];
     }
 
+    function isOwner() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'owner';
+    }
+
     function validAppointmentCreate() {
       return request.resource.data.keys().hasOnly([
           'patientUid', 'patientName', 'phone', 'preferredDate', 'preferredTime',
@@ -38,15 +44,28 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
     }
 
+    function validStatusTransition() {
+      let current = resource.data.status;
+      let next = request.resource.data.status;
+      return current == next
+        || (current == 'NEW' && next in ['REVIEWING', 'CANCELLED'])
+        || (current == 'REVIEWING' && next in ['APPROVED', 'RESCHEDULE_REQUESTED', 'CANCELLED'])
+        || (current == 'APPROVED' && next in ['CONFIRMED', 'RESCHEDULE_REQUESTED', 'CANCELLED'])
+        || (current == 'CONFIRMED' && next in ['COMPLETED', 'RESCHEDULE_REQUESTED', 'CANCELLED'])
+        || (current == 'RESCHEDULE_REQUESTED' && next in ['REVIEWING', 'APPROVED', 'CONFIRMED', 'CANCELLED'])
+        || (current in ['COMPLETED', 'CANCELLED'] && next == current);
+    }
+
     match /admins/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow write: if false;
     }
 
     match /appointments/{appointmentId} {
+      // Patients can submit requests but cannot read the private reception record,
+      // which may contain an internal note. The form shows a reference after write success.
       allow create: if signedIn() && validAppointmentCreate();
-      allow read: if isAdmin()
-        || (signedIn() && resource.data.patientUid == request.auth.uid);
+      allow read: if isAdmin();
       allow update: if isAdmin()
         && request.resource.data.patientUid == resource.data.patientUid
         && request.resource.data.patientName == resource.data.patientName
@@ -64,11 +83,12 @@ service cloud.firestore {
           'NEW', 'REVIEWING', 'APPROVED', 'CONFIRMED',
           'RESCHEDULE_REQUESTED', 'COMPLETED', 'CANCELLED'
         ]
+        && validStatusTransition()
         && request.resource.data.updatedAt == request.time
         && (!request.resource.data.keys().hasAny(['adminNote']) || (
           request.resource.data.adminNote is string && request.resource.data.adminNote.size() <= 500
         ));
-      allow delete: if isAdmin();
+      allow delete: if isOwner();
     }
 
     match /{document=**} {
