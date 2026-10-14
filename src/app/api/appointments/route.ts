@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
+import type { Firestore } from "firebase-admin/firestore";
 import { getClinicServices, hashClientAddress, requireClinicAdmin, serverTimestamp } from "@/lib/server/firebase-admin";
 
 export const runtime = "nodejs";
@@ -37,10 +38,11 @@ function makeReference() {
   return "PP-" + part("year") + part("month") + part("day") + "-" + randomBytes(2).toString("hex").toUpperCase();
 }
 function clientAddress(request: Request) {
+  const trusted = request.headers.get("x-real-ip")?.trim();
   const forwarded = request.headers.get("x-forwarded-for") || "";
-  return (forwarded.split(",")[0]?.trim() || request.headers.get("x-real-ip")?.trim() || "unknown").slice(0, 128);
+  return (trusted || forwarded.split(",").at(-1)?.trim() || "unknown").slice(0, 128);
 }
-async function consumeRateLimit(db: FirebaseFirestore.Firestore, address: string, secret: string) {
+async function consumeRateLimit(db: Firestore, address: string, secret: string) {
   const ref = db.collection("appointmentRateLimits").doc(hashClientAddress(address, secret));
   const now = Date.now();
   const allowed = await db.runTransaction(async tx => {

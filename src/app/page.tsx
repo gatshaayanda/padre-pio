@@ -47,6 +47,8 @@ export default function HomePage() {
   const [receipt, setReceipt] = useState<{ reference: string; duplicate?: boolean } | null>(null);
   const [error, setError] = useState("");
   const [today, setToday] = useState("");
+  const [installed, setInstalled] = useState(false);
+  const [requestId, setRequestId] = useState("");
 
   useEffect(() => {
     setToday(botswanaToday());
@@ -66,6 +68,14 @@ export default function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    const nav = navigator as Navigator & { standalone?: boolean };
+    setInstalled(window.matchMedia("(display-mode: standalone)").matches || nav.standalone === true);
+    const onInstalled = () => setInstalled(true);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => window.removeEventListener("appinstalled", onInstalled);
+  }, []);
+
   function change<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm(current => ({ ...current, [key]: value }));
   }
@@ -80,11 +90,13 @@ export default function HomePage() {
     }
     setSubmitting(true);
     try {
+      const id = requestId || window.crypto.randomUUID();
+      setRequestId(id);
       const response = await fetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          requestId: window.crypto.randomUUID(),
+          requestId: id,
           name: form.name,
           phone: form.phone,
           preferredDate: form.preferredDate,
@@ -100,6 +112,7 @@ export default function HomePage() {
         throw new Error(payload.error || "Your request could not be sent. Please check your connection and try again.");
       }
       setReceipt({ reference: payload.reference, duplicate: payload.duplicate });
+      setRequestId("");
       setForm(initialForm);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Your request could not be sent. Please try again.");
@@ -115,7 +128,7 @@ export default function HomePage() {
         <div className="wrap navInner">
           <a className="brand" href="#top" aria-label="Padre Pio Medical Centre home"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a>
           <nav className="mainNav" aria-label="Main navigation"><a href="#your-visit">Your visit</a><a href="#location">Find us</a></nav>
-          <div className="navActions"><button className="installLink" type="button" onClick={install}>Install app <ArrowDown size={15} aria-hidden="true" /></button><a className="button buttonSmall" href="#request-appointment">Request appointment <ArrowUpRight size={15} aria-hidden="true" /></a></div>
+          <div className="navActions">{!installed && <button className="installLink" type="button" onClick={install}>Install app <ArrowDown size={15} aria-hidden="true" /></button>}<a className="button buttonSmall" href="#request-appointment">Request appointment <ArrowUpRight size={15} aria-hidden="true" /></a></div>
         </div>
       </header>
 
@@ -171,7 +184,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="siteFooter"><div className="wrap footerTop"><a className="brand footerBrand" href="#top"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a><p>Digital reception for Plot 16739, Gaborone West Phase 1.</p><div className="footerLinks"><a href="#request-appointment">Request appointment</a><a href="#location">Directions</a><a href="/privacy">Privacy</a><a href="/admin">Staff access</a><button type="button" onClick={install}>Install app</button></div></div><div className="wrap footerBottom"><span>PADRE PIO MEDICAL CENTRE · BOTSWANA</span><span>Requests are reviewed by reception; confirmation follows separately.</span></div></footer>
+      <footer className="siteFooter"><div className="wrap footerTop"><a className="brand footerBrand" href="#top"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a><p>Digital reception for Plot 16739, Gaborone West Phase 1.</p><div className="footerLinks"><a href="#request-appointment">Request appointment</a><a href="#location">Directions</a><a href="/privacy">Privacy</a><a href="/admin">Staff access</a>{!installed && <button type="button" onClick={install}>Install app</button>}</div></div><div className="wrap footerBottom"><span>PADRE PIO MEDICAL CENTRE · BOTSWANA</span><span>Requests are reviewed by reception; confirmation follows separately.</span></div></footer>
     </main>
   );
 }
