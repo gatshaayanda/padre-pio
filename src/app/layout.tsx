@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/padre-pio-mark.svg",
-    apple: "/padre-pio-mark.svg"
+    apple: "/padre-pio-icon-192.png"
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
