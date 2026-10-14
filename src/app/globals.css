@@ -237,3 +237,27 @@ button, input, select, textarea { font: inherit; }
 .padreFormNotice { padding:12px; background:#e3efe3; color:#174c3c; font-size:12px; }
 @media(max-width:760px) { .padreAdminUpdate { grid-template-columns:1fr; } .padreAdminUpdate .padreButton { width:100%; } }
 @media(max-width:520px) { .padreQueueHeading { align-items:start; } .padreQueueCount { padding:10px; } .padreAppointmentCard { padding:16px; } .padreAppointmentDetails { grid-template-columns:1fr; } .padreAppointmentHead { flex-direction:column; } }
+
+
+/* Patient-first care enquiry cards and clearer request confirmation */
+.padreServicesSection { padding:clamp(62px,8vw,104px) clamp(20px,7.5vw,116px); background:var(--padre-paper); }
+.padreServicesIntro { display:grid; grid-template-columns:minmax(0,.85fr) minmax(260px,1fr); column-gap:clamp(24px,6vw,90px); align-items:end; margin-bottom:32px; }
+.padreServicesIntro .padreEyebrow { grid-column:1/-1; }
+.padreServicesIntro h2 { margin:15px 0 0; font-family:Georgia,'Times New Roman',serif; font-size:clamp(38px,5.3vw,64px); font-weight:500; line-height:1; letter-spacing:-.045em; }
+.padreServicesIntro h2 em { color:var(--padre-forest); font-weight:500; }
+.padreServicesIntro p { margin:0; color:var(--padre-muted); font-size:14px; line-height:1.8; }
+.padreServicesGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.padreServiceCard { display:flex; min-height:220px; flex-direction:column; align-items:flex-start; padding:22px; border:1px solid var(--padre-line); background:#faf8f1; }
+.padreServiceCard>span { display:grid; place-items:center; width:38px; height:38px; border:1px solid var(--padre-line); border-radius:50%; color:var(--padre-forest); font-size:19px; }
+.padreServiceCard h3 { margin:18px 0 8px; font-family:Georgia,'Times New Roman',serif; font-size:20px; font-weight:500; }
+.padreServiceCard p { margin:0 0 16px; color:var(--padre-muted); font-size:12px; line-height:1.7; }
+.padreServiceCard a { display:inline-flex; gap:10px; margin-top:auto; color:var(--padre-forest); font-size:11px; font-weight:800; text-decoration:underline; text-underline-offset:4px; }
+.padreServicesDisclaimer { margin:22px 0 0; padding:13px 16px; border-left:3px solid var(--padre-gold); background:#f5f0e4; color:#52655b; font-size:11px; line-height:1.7; }
+.padreRequestSteps { display:grid; gap:10px; margin-top:28px; }
+.padreRequestSteps span { display:flex; align-items:center; gap:12px; color:var(--padre-muted); font-size:12px; }
+.padreRequestSteps b { display:grid; place-items:center; width:30px; height:30px; border:1px solid var(--padre-line); border-radius:50%; color:var(--padre-forest); font-size:10px; }
+.padreNextSteps { margin:20px 0; padding:18px; background:#eef2e9; color:var(--padre-ink); }
+.padreNextSteps strong { font-family:Georgia,serif; font-size:17px; font-weight:500; }
+.padreNextSteps ol { margin:12px 0 0; padding-left:20px; color:var(--padre-muted); font-size:12px; line-height:1.8; }
+@media(max-width:850px) { .padreServicesIntro { grid-template-columns:1fr; gap:16px; } .padreServicesGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:560px) { .padreServicesGrid { grid-template-columns:1fr; } .padreServiceCard { min-height:190px; } .padreServicesSection { padding-top:58px; padding-bottom:64px; } }
