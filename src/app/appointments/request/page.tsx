@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { signInAnonymously } from "firebase/auth";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, db, hasFirebaseWebConfig } from "@/lib/firebase/client";
 
-const categories = [
+function localDateInputValue() {\n  const now = new Date();\n  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;\n}\n\nconst categories = [
   { value: "GENERAL_APPOINTMENT", label: "General appointment" },
   { value: "FOLLOW_UP", label: "Follow-up appointment" },
   { value: "NOT_SURE", label: "Not sure — please advise" }
 ];
 
-export default function AppointmentRequestPage() {
+export default function AppointmentRequestPage() {\n  const today = localDateInputValue();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
@@ -27,7 +28,7 @@ export default function AppointmentRequestPage() {
     event.preventDefault();
     setError("");
     if (!hasFirebaseWebConfig) {
-      setError("Appointment requests are not connected yet. Nothing has been sent. Please contact the clinic directly using its verified contact details.");
+      setError("Appointment requests are not connected yet. Nothing has been sent. Please use a reception contact channel verified by the clinic.");
       return;
     }
     const digits = phone.replace(/\D/g, "");
@@ -35,7 +36,7 @@ export default function AppointmentRequestPage() {
       setError("Enter a valid phone number, including your country code if needed.");
       return;
     }
-    if (date < new Date().toLocaleDateString("en-CA")) {
+    if (date < today) {
       setError("Choose today or a future date.");
       return;
     }
@@ -95,7 +96,7 @@ export default function AppointmentRequestPage() {
             <label>Full name<input autoComplete="name" value={name} onChange={e=>setName(e.target.value)} required maxLength={100} placeholder="Your name" /></label>
             <label>Phone number<input autoComplete="tel" inputMode="tel" value={phone} onChange={e=>setPhone(e.target.value)} required maxLength={30} placeholder="+267 ..." /></label>
             <div className="padreFormRow">
-              <label>Preferred date<input type="date" value={date} onChange={e=>setDate(e.target.value)} min={new Date().toLocaleDateString("en-CA")} required /></label>
+              <label>Preferred date<input type="date" value={date} onChange={e=>setDate(e.target.value)} min={today} required /></label>
               <label>Preferred time<select value={time} onChange={e=>setTime(e.target.value)} required><option value="">Choose a time</option><option value="MORNING">Morning</option><option value="AFTERNOON">Afternoon</option><option value="FLEXIBLE">Flexible</option></select></label>
             </div>
             <label>What is this appointment for?<select value={category} onChange={e=>setCategory(e.target.value)} required>{categories.map(item=><option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
