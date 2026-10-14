@@ -833,3 +833,146 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugDisclaimerActions span{color:#333;font-size:.8rem;font-weight:650}
 .plugStudioPanel>form>p{color:#333;font-size:.82rem;line-height:1.55}
 @media(max-width:680px){.plugDisclaimerActions{align-items:stretch;flex-direction:column}.plugDisclaimerActions button{width:100%;min-height:44px}.plugDisclaimerActions span{text-align:left}}
+
+
+/* Padre Pio Digital Reception — scoped visual system */
+:root {
+  --padre-forest: #174c3c;
+  --padre-forest-dark: #10372d;
+  --padre-cream: #f8f5ec;
+  --padre-paper: #fffdf7;
+  --padre-ink: #17251f;
+  --padre-muted: #52655b;
+  --padre-gold: #d8a35d;
+  --padre-line: rgba(23, 76, 60, .18);
+}
+.padreSite { min-height:100vh; overflow:hidden; background:var(--padre-cream); color:var(--padre-ink); font-family:Arial, Helvetica, sans-serif; }
+.padreSite a { color:inherit; text-decoration:none; }
+.padreSite button { font:inherit; }
+.padreTopline { display:flex; justify-content:space-between; gap:16px; padding:10px clamp(20px,5vw,76px); background:var(--padre-forest-dark); color:#f8f5ec; font-size:10px; font-weight:800; letter-spacing:.14em; }
+.padreToplineLocation { color:#e9d6b9; }
+.padreToplineLocation span { color:#d8a35d; margin-right:7px; font-size:8px; }
+.padreHeader { min-height:84px; padding:14px clamp(20px,5vw,76px); display:flex; align-items:center; justify-content:space-between; gap:24px; border-bottom:1px solid var(--padre-line); }
+.padreBrand { display:inline-flex; align-items:center; gap:11px; flex-shrink:0; }
+.padreBrandMark { display:grid; place-items:center; width:42px; height:42px; border-radius:50% 50% 50% 12px; background:var(--padre-forest); color:#fffdf7; font-size:23px; transform:rotate(-4deg); }
+.padreBrand strong,.padreBrand small { display:block; }
+.padreBrand strong { font-family:Georgia,serif; font-size:15px; letter-spacing:.11em; }
+.padreBrand small { margin-top:4px; color:var(--padre-muted); font-size:9px; font-weight:700; letter-spacing:.17em; }
+.padreNav { display:flex; gap:clamp(16px,3vw,42px); font-size:12px; font-weight:700; color:#3f5148; }
+.padreNav a:hover,.padreTextLink:hover { color:var(--padre-forest); text-decoration:underline; text-underline-offset:4px; }
+.padreInstallLink { border:1px solid var(--padre-line); background:transparent; padding:12px 15px; border-radius:999px; color:var(--padre-forest); font-size:11px!important; font-weight:800!important; cursor:pointer; }
+.padreInstallLink span { margin-left:8px; }
+.padreHero { position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.92fr); align-items:center; gap:clamp(32px,6vw,94px); padding:clamp(46px,7vw,96px) clamp(20px,7.5vw,116px) 76px; }
+.padreHeroCopy { position:relative; z-index:1; max-width:600px; }
+.padreEyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--padre-forest); font-size:10px; font-weight:800; letter-spacing:.16em; line-height:1.5; }
+.padreEyebrow span { color:#bd8541; font-size:14px; }
+.padreHero h1,.padreVisitHeading h2,.padreCareSection h2,.padreOfflinePage h1 { margin:22px 0 20px; font-family:Georgia,'Times New Roman',serif; font-size:clamp(52px,7.4vw,98px); font-weight:500; line-height:.96; letter-spacing:-.055em; }
+.padreHero h1 em,.padreVisitHeading h2 em,.padreOfflinePage h1 em { color:var(--padre-forest); font-weight:500; }
+.padreHeroIntro { max-width:465px; color:#4f6157; font-size:16px; line-height:1.75; }
+.padreHeroActions { display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+.padreButton { display:inline-flex; align-items:center; justify-content:center; gap:18px; min-height:48px; padding:14px 18px; border:1px solid transparent; border-radius:4px; font-size:12px; font-weight:800; transition:transform .18s ease,background .18s ease; }
+.padreButton:hover { transform:translateY(-2px); }
+.padreButtonPrimary { background:var(--padre-forest); color:#fffdf7!important; }
+.padreButtonPrimary:hover { background:var(--padre-forest-dark); }
+.padreButtonSecondary { border-color:var(--padre-line); color:var(--padre-forest)!important; }
+.padreHeroFineprint { max-width:440px; margin-top:16px; color:#5e6d63; font-size:11px; line-height:1.6; }
+.padreEntranceFrame { position:relative; z-index:1; padding:13px; background:var(--padre-paper); border:1px solid var(--padre-line); box-shadow:0 24px 65px rgba(24,54,42,.12); transform:rotate(1deg); }
+.padreEntranceFrameTop,.padreEntranceFrameBottom { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 2px 11px; color:var(--padre-muted); font-size:9px; font-weight:800; letter-spacing:.15em; }
+.padreEntranceFrameBottom { padding:11px 2px 1px; }
+.padreEntranceFrameBottom span:last-child { color:var(--padre-gold); font-size:17px; }
+.padreEntranceVideo { position:relative; min-height:280px; aspect-ratio:4/4.4; overflow:hidden; background:radial-gradient(ellipse at 65% 25%,rgba(216,163,93,.3),transparent 38%),linear-gradient(140deg,#d9e0d5,#9eafa1 45%,#315a49); }
+.padreEntranceVideo video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.padreVideoShade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(8,26,19,.02) 35%,rgba(8,26,19,.68)); pointer-events:none; }
+.padreVideoCaption { position:absolute; right:16px; bottom:16px; left:16px; display:flex; align-items:center; gap:10px; color:#fffdf7; }
+.padreLiveDot { width:7px; height:7px; flex-shrink:0; border-radius:50%; background:#e9c78c; box-shadow:0 0 0 5px rgba(233,199,140,.2); }
+.padreVideoCaption strong,.padreVideoCaption small { display:block; }
+.padreVideoCaption strong { font-family:Georgia,serif; font-size:17px; font-weight:500; }
+.padreVideoCaption small { margin-top:4px; color:#f3eee4; font-size:10px; }
+.padreHeroOrnament { position:absolute; right:41%; bottom:-55px; color:rgba(23,76,60,.045); font-family:Georgia,serif; font-size:300px; font-style:italic; pointer-events:none; }
+.padreQuickStrip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; margin:0 clamp(20px,7.5vw,116px); background:var(--padre-line); border:1px solid var(--padre-line); }
+.padreQuickStrip>div { display:flex; align-items:center; gap:13px; padding:20px clamp(14px,2.5vw,30px); background:#f0ede3; }
+.padreQuickIcon { display:grid; place-items:center; width:36px; height:36px; border:1px solid var(--padre-line); border-radius:50%; color:var(--padre-forest); font-size:19px; }
+.padreQuickStrip small,.padreQuickStrip strong { display:block; }
+.padreQuickStrip small { margin-bottom:5px; color:var(--padre-muted); font-size:9px; font-weight:800; letter-spacing:.12em; }
+.padreQuickStrip strong { font-size:12px; line-height:1.4; }
+.padreVisitSection { display:grid; grid-template-columns:1fr .9fr; align-items:center; gap:clamp(32px,8vw,120px); padding:clamp(76px,10vw,130px) clamp(20px,10vw,150px); }
+.padreVisitHeading h2 { margin:17px 0; font-size:clamp(42px,5.5vw,68px); }
+.padreVisitHeading p { max-width:380px; color:var(--padre-muted); font-size:15px; line-height:1.75; }
+.padreTextLink { display:inline-flex; gap:18px; margin-top:18px; color:var(--padre-forest)!important; font-size:12px; font-weight:800; text-underline-offset:4px; }
+.padreVisitCard { background:var(--padre-paper); border:1px solid var(--padre-line); }
+.padreVisitCardArt { position:relative; min-height:235px; overflow:hidden; background:#e4e7dc; }
+.padreVisitCardArt:before,.padreVisitCardArt:after { position:absolute; content:""; background:#f9f6ec; opacity:.9; transform:rotate(-24deg); }
+.padreVisitCardArt:before { width:140%; height:27px; top:34%; left:-20%; }
+.padreVisitCardArt:after { width:140%; height:22px; top:70%; left:-10%; transform:rotate(19deg); }
+.padreMapPath { position:absolute; z-index:1; width:140%; height:13px; background:#c6d3c5; transform:rotate(51deg); }
+.padreMapPathOne { top:32%; left:-12%; }
+.padreMapPathTwo { top:45%; left:-14%; transform:rotate(-39deg); }
+.padreMapPin { position:absolute; z-index:2; top:43%; left:53%; display:grid; place-items:center; width:52px; height:52px; border:5px solid #e4e7dc; border-radius:50% 50% 50% 8px; background:var(--padre-forest); color:#fffdf7; font-size:18px; transform:translate(-50%,-50%) rotate(-45deg); box-shadow:0 8px 20px rgba(16,55,45,.2); }
+.padreMapPin span { transform:rotate(45deg); }
+.padreMapLabel { position:absolute; z-index:2; right:18px; bottom:16px; color:var(--padre-forest); font-size:9px; font-weight:900; letter-spacing:.17em; }
+.padreVisitCardFooter { display:flex; justify-content:space-between; align-items:center; padding:18px 20px; }
+.padreVisitCardFooter small,.padreVisitCardFooter strong { display:block; }
+.padreVisitCardFooter small { margin-bottom:6px; color:var(--padre-muted); font-size:9px; font-weight:800; letter-spacing:.12em; }
+.padreVisitCardFooter strong { font-size:13px; }
+.padreVisitCardArrow { color:var(--padre-forest); font-size:20px; }
+.padreCareSection { padding:clamp(58px,8vw,100px) clamp(20px,7.5vw,116px); background:#e9eee5; }
+.padreCareSection h2 { margin:14px 0 34px; font-size:clamp(38px,5vw,58px); }
+.padreCareGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.padreCareGrid article { min-height:220px; padding:24px; border:1px solid rgba(23,76,60,.17); background:rgba(255,253,247,.72); }
+.padreCareNumber { color:#9c7a4c; font-family:Georgia,serif; font-size:14px; }
+.padreCareGrid h3 { margin:24px 0 10px; font-family:Georgia,serif; font-size:21px; font-weight:500; }
+.padreCareGrid p { color:#52655b; font-size:13px; line-height:1.7; }
+.padreCareGrid article>a,.padreCarePending { display:inline-flex; gap:10px; margin-top:14px; color:var(--padre-forest); font-size:11px; font-weight:800; }
+.padreCarePending { color:#6d5b43; }
+.padreFooter { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:20px 32px; padding:28px clamp(20px,7.5vw,116px); background:var(--padre-forest-dark); color:#f8f5ec; }
+.padreFooter .padreBrand small { color:#c4d3c7; }
+.padreFooter p { margin:0; justify-self:end; color:#e0e8df; font-size:12px; }
+.padreFooterNote { grid-column:1/-1; max-width:780px; color:#d0ddd2; font-size:10px; line-height:1.7; }
+.padreInstallBackdrop { position:fixed; z-index:9999; inset:0; display:grid; place-items:center; padding:20px; background:rgba(10,28,21,.55); }
+.padreInstallDialog { position:relative; width:min(100%,440px); padding:28px; border:1px solid var(--padre-line); background:var(--padre-paper); box-shadow:0 24px 70px rgba(0,0,0,.24); }
+.padreInstallDialog h2 { margin:14px 0; font-family:Georgia,serif; font-size:30px; font-weight:500; line-height:1.08; }
+.padreInstallDialog p { color:var(--padre-muted); font-size:14px; line-height:1.65; }
+.padreInstallDialog strong { color:var(--padre-ink); }
+.padreInstallNote { padding-top:10px; border-top:1px solid var(--padre-line); font-size:12px!important; }
+.padreInstallClose { position:absolute; top:10px; right:12px; border:0; background:transparent; color:var(--padre-ink); font-size:26px!important; cursor:pointer; }
+.padreOfflinePage { display:flex; min-height:100vh; flex-direction:column; align-items:flex-start; justify-content:center; gap:16px; padding:40px max(24px,10vw); }
+.padreOfflinePage h1 { max-width:650px; font-size:clamp(52px,8vw,84px); }
+.padreOfflinePage p { max-width:560px; color:var(--padre-muted); font-size:16px; line-height:1.75; }
+.padreSite a:focus-visible,.padreSite button:focus-visible { outline:3px solid #b67c36; outline-offset:4px; }
+@media(max-width:850px) {
+  .padreHero { grid-template-columns:1fr; gap:34px; padding-top:50px; }
+  .padreHeroCopy { max-width:680px; }
+  .padreEntranceFrame { width:min(100%,560px); margin:0 auto; transform:none; }
+  .padreEntranceVideo { aspect-ratio:16/11; }
+  .padreHeroOrnament { right:0; bottom:30%; font-size:220px; }
+  .padreQuickStrip { grid-template-columns:1fr; }
+  .padreQuickStrip>div { padding:15px 18px; }
+  .padreVisitSection { grid-template-columns:1fr; }
+  .padreCareGrid { grid-template-columns:1fr; }
+  .padreCareGrid article { min-height:unset; }
+}
+@media(max-width:560px) {
+  .padreTopline { font-size:8px; letter-spacing:.09em; }
+  .padreToplineLocation { text-align:right; }
+  .padreHeader { min-height:70px; gap:10px; }
+  .padreBrandMark { width:36px; height:36px; font-size:20px; }
+  .padreBrand strong { font-size:12px; }
+  .padreBrand small { font-size:7px; }
+  .padreNav { display:none; }
+  .padreInstallLink { padding:10px 11px; font-size:10px!important; }
+  .padreHero h1 { font-size:clamp(52px,15vw,76px); }
+  .padreHeroIntro { font-size:14px; }
+  .padreHeroActions { flex-direction:column; align-items:stretch; }
+  .padreButton { width:100%; }
+  .padreEntranceFrame { padding:9px; }
+  .padreEntranceVideo { aspect-ratio:4/4.1; }
+  .padreHeroOrnament { display:none; }
+  .padreVisitSection { padding-top:66px; padding-bottom:70px; }
+  .padreVisitHeading h2 { font-size:48px; }
+  .padreVisitCardArt { min-height:190px; }
+  .padreFooter { grid-template-columns:1fr; gap:15px; }
+  .padreFooter p { justify-self:start; line-height:1.6; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .padreSite *, .padreSite *::before, .padreSite *::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; }
+}
