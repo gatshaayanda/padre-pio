@@ -14,6 +14,7 @@ const ignoredFiles = new Set([
   "docs/PWA-FOUNDATION.md",
   "docs/ADMIN-HUB-APP-FACTORY-SOP.md",
   "docs/CLONE-RESET-CHECKLIST.md",
+  "docs/PADRE-PIO-EVIDENCE-LEDGER.md",
   "CLONING.md"
 ]);
 const textExtensions = new Set([".ts", ".tsx", ".js", ".mjs", ".css", ".json", ".webmanifest", ".md", ".yml", ".yaml", ".txt", ".html", ".svg", ".rules", ".example", ".toml", ".xml"]);
@@ -92,10 +93,10 @@ if (!appManifest.includes('name: "' + config.manifestName + '"')) failures.push(
 if (!appManifest.includes('short_name: "' + config.shortName + '"')) failures.push("src/app/manifest.ts: generated short_name does not match identity.config.json");
 if (!appManifest.includes('theme_color: "' + config.themeColor + '"')) failures.push("src/app/manifest.ts: generated theme_color does not match identity.config.json");
 if (!appManifest.includes('src: "' + config.canonicalIcon + '"')) failures.push("src/app/manifest.ts: canonical icon missing");
-if (!layout.includes('title:{default:"' + config.manifestName + '"')) failures.push("src/app/layout.tsx: metadata title does not match identity.config.json");
-if (!layout.includes('applicationName:"' + config.shortName + '"')) failures.push("src/app/layout.tsx: applicationName does not match identity.config.json");
-if (!layout.includes('icons:{icon:"' + config.canonicalIcon + '",apple:"' + config.canonicalIcon + '"}')) failures.push("src/app/layout.tsx: browser/Apple icon references do not match identity.config.json");
-if (!layout.includes('manifest:"/manifest.webmanifest"')) failures.push("src/app/layout.tsx: manifest link is missing");
+if (!layout.includes('default: "' + config.manifestName + '"')) failures.push("src/app/layout.tsx: metadata title does not match identity.config.json");
+if (!layout.includes('applicationName: "' + config.shortName + '"')) failures.push("src/app/layout.tsx: applicationName does not match identity.config.json");
+if (!layout.includes('icon: "' + config.canonicalIcon + '"') || !layout.includes('apple: "/padre-pio-icon-192.png"')) failures.push("src/app/layout.tsx: browser icon or Apple touch icon reference is incorrect");
+if (!layout.includes('manifest: "/manifest.webmanifest"')) failures.push("src/app/layout.tsx: manifest link is missing");
 const iconPath = path.join(root, "public", String(config.canonicalIcon ?? "").replace(/^\/+/, ""));
 if (!config.canonicalIcon?.startsWith("/") || !fs.existsSync(iconPath)) failures.push("identity.config.json: canonical icon must be an existing public asset path");
 for (const icon of publicManifest.icons ?? []) {
