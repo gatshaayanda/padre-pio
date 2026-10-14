@@ -71,6 +71,16 @@ export default function HomePage() {
         <div className="padreHeroOrnament" aria-hidden="true">P.</div>
       </section>
 
+      <section className="padreInstallCallout" aria-labelledby="padre-install-callout-title">
+        <span className="padreInstallCalloutMark" aria-hidden="true">✚</span>
+        <div className="padreInstallCalloutCopy">
+          <span className="padreInstallCalloutEyebrow">OPTIONAL · QUICK ACCESS</span>
+          <h2 id="padre-install-callout-title">Keep the clinic close.</h2>
+          <p>Add Padre Pio Medical Centre to your home screen for an easy way back to the clinic’s location and reception request page. You can always keep using this website without installing it.</p>
+        </div>
+        <button className="padreInstallCalloutButton" type="button" onClick={requestInstall}>Add to home screen <span aria-hidden="true">↗</span></button>
+      </section>
+
       <section className="padreQuickStrip" aria-label="Patient essentials">
         <div><span className="padreQuickIcon" aria-hidden="true">⌖</span><span><small>LOCATION</small><strong>Gaborone West Phase 1</strong></span></div>
         <div><span className="padreQuickIcon" aria-hidden="true">↗</span><span><small>YOUR NEXT STEP</small><strong>Request, then await a reply</strong></span></div>
@@ -125,7 +135,6 @@ export default function HomePage() {
         <Link href="/" className="padreBrand"><span className="padreBrandMark" aria-hidden="true">✚</span><span><strong>PADRE PIO</strong><small>MEDICAL CENTRE</small></span></Link>
         <p>Plot 16739, Gaborone West Phase 1, Gaborone, Botswana</p>
         <span className="padreFooterNote">This website is not an emergency service. If you may be experiencing a medical emergency, seek urgent local medical help.</span>
-        <button className="padreInstallLink" type="button" onClick={requestInstall}>Add this site to your home screen <span aria-hidden="true">↗</span></button>
       </footer>
     </main>
   );
