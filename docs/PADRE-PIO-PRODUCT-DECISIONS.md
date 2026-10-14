@@ -6,7 +6,7 @@ Updated: 14 October 2026
 
 The primary job is to help a patient recognise the real location, understand the next step, request an appointment, and know that reception still needs to confirm it. The entrance video is a recognition cue, not the entire visual identity. The 9.29-second portrait film is optimized to 5,968,032 bytes and paired with a 162,432-byte WebP poster extracted from a recognizable real frame. The page preserves the portrait framing, respects reduced-motion/data-saving/2G settings, and uses a custom SVG illustration for location context.
 
-The primary CTA is “Request an appointment”. Call and directions are secondary actions. No WhatsApp button is shown because a clinic-controlled WhatsApp number was not verified. The appointment form collects name, phone, preferred date/time, a broad appointment category, consent, and a short optional note. It explicitly discourages medical history and does not promise live availability.
+The primary CTA is “Request an appointment”. Directions are the secondary action. Call and WhatsApp actions are withheld until the clinic confirms an official reception number; the number shown in third-party directories remains an unverified lead. The appointment form collects name, phone, preferred date/time, a broad appointment category, consent, and a short optional note. It explicitly discourages medical history and does not promise live availability.
 
 ## External UX references reviewed
 
