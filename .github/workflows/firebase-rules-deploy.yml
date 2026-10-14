@@ -1,0 +1,16 @@
+name: Firebase rules deployment guard (no-op)
+on:
+  workflow_dispatch:
+    inputs:
+      acknowledgement:
+        description: "This workflow intentionally does not deploy Firebase rules."
+        required: true
+        default: "reviewed"
+permissions:
+  contents: read
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain deployment boundary
+        run: echo "Automatic Firebase rules deployment is disabled for this repository reset. No Firebase CLI or secrets are used."
