@@ -1,4 +1,4 @@
-name: The Plug quality
+name: Padre Pio quality
 on:
   push:
     branches: [main]
@@ -9,12 +9,22 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      - name: Diff whitespace check
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git diff --check origin/main...HEAD
+          else
+            git diff --check HEAD^ HEAD
+          fi
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -22,7 +32,7 @@ jobs:
         run: npm ci
       - name: Identity verification
         run: npm run verify:identity
-      - name: Clone readiness (static, no Firebase calls)
+      - name: Padre Pio readiness
         run: npm run verify:clone-readiness
       - name: TypeScript
         run: npx tsc --noEmit
@@ -30,3 +40,9 @@ jobs:
         run: npm run lint
       - name: Production build
         run: npm run build
+      - name: Dependency audit summary
+        run: |
+          npm audit --json > /tmp/padre-pio-audit.json || true
+          node -e 'const a=require("/tmp/padre-pio-audit.json"); const v=a.metadata?.vulnerabilities||{}; console.log("npm audit counts:", JSON.stringify(v)); for (const [name,item] of Object.entries(a.vulnerabilities||{})) if (["critical","high"].includes(item.severity)) { const via=(item.via||[]).map(x=>typeof x==="string"?x:{title:x.title,range:x.range,url:x.url}); console.log(JSON.stringify({severity:item.severity,name,direct:item.isDirect,range:item.range,via,fixAvailable:item.fixAvailable})); }'
+      - name: Block high or critical production vulnerabilities
+        run: npm audit --omit=dev --audit-level=high

@@ -1,69 +1,37 @@
-# The Plug
+# Padre Pio Medical Centre — Digital Reception
 
-**The Plug — Sneakers & Apparel Sourcing**
+A mobile-first patient reception website and installable PWA for Padre Pio Medical Centre, Plot 16739, Gaborone West Phase 1, Gaborone, Botswana.
 
-Mobile-first sourcing and customer operations PWA for sneaker and apparel requests in Botswana.
+## Product boundary
 
-## Customer flow
-Home → Catalogue → Request a product → Request tracking → Customer account
+Patients can understand the visit-request process, find the clinic, and submit an appointment request. A request is not a booked or confirmed appointment; reception must review it and contact the patient. This app is not an electronic medical record, diagnostic tool, prescription system, or emergency service.
 
-Customers can browse available products, ask The Plug to source a specific sneaker or apparel item, follow request progress, and message the business.
+The optimized portrait entrance video in public/videos/padre.mp4 is 5,968,032 bytes, with a 162,432-byte WebP poster extracted from the real entrance. Playback is skipped for reduced-motion, save-data, and 2G connections. A custom SVG illustration supports the location section.
 
 ## Operations
-/admin is protected by Firebase Authentication plus admins/{uid} with role owner/staff.
 
-## Repository map and clone workflow
+The admin queue uses Firebase Authentication and a server-verified role document at admins/{uid}. Allowed roles are owner, staff, doctor, and reception. Every appointment read or status change is verified server-side. Firestore client rules are default-deny; the server uses a dedicated Firebase Admin service account.
 
-- **[AGENTS.md](./AGENTS.md)** — required product contract and starting rules for every implementation chat.
-- **[AGENTS_REPO_LABELED.md](./AGENTS_REPO_LABELED.md)** — labelled source map, customer/admin/API/data/PWA traces, clone runbook and verification matrix.
-- **[Admin Hub App Factory SOP](./docs/ADMIN-HUB-APP-FACTORY-SOP.md)** — reusable inspect → select foundation → clone/reset → prove → build → verify → checkpoint algorithm.
-- **[Clone and Reset Checklist](./docs/CLONE-RESET-CHECKLIST.md)** — ordered gates, exact commands, expected results and stop conditions for a fresh clone.
-- **[CLONING.md](./CLONING.md)** — mandatory end-to-end procedure for converting a clean clone into a separately branded and independently configured Admin Hub app.
-- **Identity contract:** `scripts/identity.config.json` drives `npm run verify:identity`; update its expected identity and source-residue patterns for every new app.
-- **Static foundation audit:** run `npm run verify:clone-readiness` after `npm ci`; it checks this repository's wiring without connecting to Firebase or consuming database reads. It is not a universal verifier for a different business.
+## Local setup
 
-The Plug is the flagship clone candidate, not automatically a certified production-ready template. Follow the labelled map and record real evidence for runtime, Firebase rules deployment, PWA/offline, upload, notifications and complete customer/admin journeys before claiming those areas verified.
+Use Node 22, install from the lockfile with npm ci, and copy .env.example to .env.local. Configure a dedicated Firebase project before expecting appointment submissions or admin sign-in to work.
 
-## Development
-npm install
-npm run dev
+Required server configuration:
+- FIREBASE_PROJECT_ID — the dedicated clinic Firebase project ID.
+- FIREBASE_ADMIN_KEY — service-account JSON for that same project.
 
-Quality gates:
-npx tsc --noEmit
-npm run lint
-npm run verify:identity
-npm run build
+Required browser configuration for admin sign-in:
+- NEXT_PUBLIC_FIREBASE_API_KEY
+- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+- NEXT_PUBLIC_FIREBASE_PROJECT_ID
+- NEXT_PUBLIC_FIREBASE_APP_ID
 
-See AGENTS.md for the implementation contract.
+Set NEXT_PUBLIC_BASE_URL only when the canonical domain is known. Never reuse another app's credentials or production data. Create authorized Firebase Authentication users and their admins/{uid} role documents through a trusted administrative process.
 
-## Notifications
-Customer and operations notifications use Firebase Cloud Messaging. Notification permission is requested only from the user's explicit settings action.
+## Verification
 
-## Customer journey analytics
+Run npm run verify:identity, npm run verify:clone-readiness, npx tsc --noEmit, npm run lint, npm run build, and git diff --check. These are code checks only; they do not prove Firebase is configured, appointments persist in a live project, rules are deployed, or the PWA works on physical devices.
 
-The admin dashboard records server-side journey events for request-flow entry, account confirmation, request submission, sharing and invites, notification choices, and external catalogue/Instagram visits. Admin activity is excluded from customer journey counts. Event access is governed by Firestore rules; review the rules and analytics route together when changing event names or payloads.
+## Launch checks still required
 
-## Storefront launch QA
-
-Run this checklist against the exact preview commit before merging or announcing a public launch.
-
-### Customer
-- [ ] Open the home page on mobile and desktop; confirm published, in-date public finds/offers render with their images and prices.
-- [ ] Save a find or offer, open Saved Finds, refresh, and confirm the snapshot remains available.
-- [ ] Remove a saved item and confirm it disappears from Saved Finds; confirm saving it again works.
-- [ ] Start a request from a product card and confirm the product title, listed-price snapshot, and item type carry into the form and submitted private request.
-- [ ] Confirm request copy makes clear that submitting is not payment, a stock reservation, or a confirmed sale.
-- [ ] Confirm a request is visible in the customer tracking flow and the admin queue after submission.
-- [ ] Test source-request entry, navigation, install/PWA behavior, and browser back on a phone-sized viewport.
-
-### Admin
-- [ ] Sign in as an authorized admin; confirm a non-admin account cannot access admin data or write storefront content.
-- [ ] Create a draft find and a draft offer with category, price, image, and display order; confirm drafts do not appear publicly.
-- [ ] Edit the title, price, category, image, audience, status, and active dates; verify each saved value after refresh.
-- [ ] Publish an in-date public item and confirm it appears on the storefront; pause/archive/delete it and verify the expected public behavior.
-- [ ] Confirm image upload, saved image URL, preview, replacement, and removal work with the configured Firebase Storage rules.
-- [ ] Open journey analytics and compare 7/30/90-day and all-time views; verify product interest, bookmarks, and monthly demand signals.
-- [ ] Treat analytics as interaction signals, not unique people, paid orders, confirmed sales, or proof of stock.
-
-### Release boundary
-Saved Finds are stored in the current browser/device and are not synced across devices. Product requests are purchase intent only; Frank confirms availability, final price, and payment directly. Do not describe this release as online payment checkout.
+Clinic approval is needed for the contact number, official service categories, opening hours, privacy/retention contact, appointment handling process, canonical domain, and administrator accounts. The phone number currently shown is from public directory listings and has not been verified directly with the clinic. The 23 MB entrance video has not yet been transcoded; data-saving and reduced-motion visitors receive the illustration fallback.

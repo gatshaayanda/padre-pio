@@ -1,25 +1,20 @@
 {
-  "manifestName": "The Plug | Sneakers & Apparel",
-  "shortName": "The Plug",
-  "themeColor": "#0866FF",
-  "canonicalIcon": "/plug-icon.svg",
-  "serviceWorkerCachePrefix": "theplug-",
+  "manifestName": "Padre Pio Medical Centre",
+  "shortName": "Padre Pio",
+  "themeColor": "#21483D",
+  "canonicalIcon": "/padre-pio-icon.svg",
+  "serviceWorkerCachePrefix": "padre-pio-",
   "forbiddenPatterns": [
-    "\\bboemo\\b",
+    "\\bthe[ -]?plug\\b",
+    "theplug-",
+    "the-plug",
+    "plug-icon",
+    "boemo",
     "meating[ -]?place",
     "namane[ -]?tyres",
-    "atlas[ -]?service[ -]?centre",
-    "tutorme",
-    "namane-tyres\\.vercel\\.app",
-    "boemo-joos-food-deals",
-    "boemoMedia",
-    "#FFC800",
-    "#FF7B00",
-    "#FF2A85",
-    "#00E5FF"
-  ],
-  "allowedLegacyStrings": [
+    "the-plug-pearl\\.vercel\\.app",
     "BOEMO_REMINDER_CRON_SECRET",
-    "boemoMedia"
-  ]
+    "THE_PLUG_OPERATIONS_WORD"
+  ],
+  "allowedLegacyStrings": []
 }
