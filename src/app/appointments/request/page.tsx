@@ -7,13 +7,19 @@ import { signInAnonymously } from "firebase/auth";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, db, hasFirebaseWebConfig } from "@/lib/firebase/client";
 
-function localDateInputValue() {\n  const now = new Date();\n  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;\n}\n\nconst categories = [
+function localDateInputValue() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+const categories = [
   { value: "GENERAL_APPOINTMENT", label: "General appointment" },
   { value: "FOLLOW_UP", label: "Follow-up appointment" },
   { value: "NOT_SURE", label: "Not sure — please advise" }
 ];
 
-export default function AppointmentRequestPage() {\n  const today = localDateInputValue();
+export default function AppointmentRequestPage() {
+  const today = localDateInputValue();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
