@@ -33,6 +33,10 @@ function labelFor(value: string) {
     GENERAL_APPOINTMENT: "General appointment",
     FOLLOW_UP: "Follow-up appointment",
     NOT_SURE: "Not sure — advise patient",
+    HEALTH_CHECK: "Health check or screening enquiry",
+    CHILD_HEALTH: "Child health or immunisation enquiry",
+    WOMENS_HEALTH: "Women's health enquiry",
+    TESTS_WOUND_CARE: "Tests or wound-care enquiry",
     MORNING: "Morning",
     AFTERNOON: "Afternoon",
     FLEXIBLE: "Flexible"
