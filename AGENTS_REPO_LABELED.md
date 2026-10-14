@@ -6,7 +6,7 @@
 - Target repository: gatshaayanda/padre-pio.
 - Target branch baseline: main.
 - First target checkpoint includes public/videos/padre.mp4 (23,440,877 bytes).
-- The initial foundation's retail routes, scheduled reminders, shared-word operations login, messaging, and automatic Firebase rules deployment were not target requirements. The inherited reminder and Firebase deployment workflows were removed before feature work.
+- The initial foundation's retail routes, scheduled reminders, shared-word operations login, messaging, and automatic Firebase rules deployment were not target requirements. The inherited scheduled reminder workflow was removed from main; the automatic Firebase rules deployment workflow was replaced on main by a manual-only no-op guard, and neither workflow is included in the Padre Pio feature branch.
 
 ## Product scope
 Patient: home → understand appointment request → enter minimal contact/preference details → consent → submit → receive request reference and non-confirmation notice → wait for reception.
@@ -32,7 +32,7 @@ Admin: Firebase email/password authentication → server verifies ID token and a
 ## Verification ledger
 - PASS — The target repository is pushed to GitHub main; initial commit ca237b650709ab25d42bf0e5632d1a86f34f8eb3 contains public/videos/padre.mp4.
 - PASS — Removed inherited scheduled pickup-reminder workflow from main (commit e79662d1095b14afa5d1fcd13529e319f25f2b16).
-- PASS — Removed inherited Firebase rules deployment workflow from main (commit 0427f441719d593f9d6d9fc2bb9c8598b1123d68).
+- PASS — Neutralized inherited automatic Firebase rules deployment on main with a manual-only no-op guard (commit e8fc609a3018aca5904ad0b937c958c47512b1ba); the feature branch excludes the guard and has no Firebase deploy workflow.
 - PASS — GitHub Actions quality run 38554693993 on commit 5625a55bd6bd04c79aef16b078afe56b1d78a8b9: npm ci, identity verification, target readiness, TypeScript, lint, and production build all passed.
 - PASS — The subsequent commits fb36a25f2b3797b72c40d4652a67dc3c25ee4f1c and f7d9c1d8cbf857f9f8bd62af164dde11d42cbedf change only product research/continuity documentation; application source remains as tested in 5625a55.
 - BLOCKED — live request persistence/admin workflow until the clinic's dedicated Firebase project, service account, Firebase Auth users, and role documents are configured.
