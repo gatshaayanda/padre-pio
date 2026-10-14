@@ -40,6 +40,7 @@ Authorized staff can sign in, review requests, and persist truthful status chang
 
 ## Current checkpoint
 - Initial clone/video commit: `ca237b650709ab25d42bf0e5632d1a86f34f8eb3`.
-- Working branch: `work/padre-pio-identity-reset`.
-- Current branch includes the first identity reset and early appointment/reception source work; no local command, build, Firebase integration, real-device test, or deployment has been performed by the assistant.
-- Dedicated Firebase project, canonical domain, verified clinic contacts/services/hours, and real-device PWA/icon checks remain unresolved.
+- Current implementation branch: `fix/padre-pio-native-install-prompt` (PR #4 to `main`); latest code checkpoint before documentation updates: `210f870e8368f3de31e7c3ff8c64db5784d0bf34`.
+- The branch captures `beforeinstallprompt` before hydration, invokes the native prompt from the header action when available, and provides embedded-browser handoff/fallback instructions. The home page now offers common care-enquiry categories, explicitly labelled as enquiries rather than verified Padre Pio services; the request form preselects the chosen category, explains reception follow-up, and Firestore rules/admin labels accept the same categories.
+- GitHub Actions quality workflow and Vercel preview are running for the latest code commit. No live Firebase request/read/update, Firebase rules deployment, real-device installation, or production deployment has been performed by the assistant.
+- Dedicated Firebase project configuration, canonical domain, verified clinic contacts/services/hours, and real-device PWA/icon checks remain unresolved.
