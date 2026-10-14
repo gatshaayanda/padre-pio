@@ -1,11 +1,10 @@
 import type { MetadataRoute } from "next";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://the-plug-pearl.vercel.app";
-
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL?.trim();
+  if (!baseUrl) return [];
   return [
-    { url: baseUrl, changeFrequency: "weekly", priority: 1 },
-    { url: baseUrl + "/request", changeFrequency: "weekly", priority: 0.9 },
-    { url: baseUrl + "/account", changeFrequency: "weekly", priority: 0.7 }
+    { url: new URL("/", baseUrl).toString(), changeFrequency: "monthly", priority: 1 },
+    { url: new URL("/privacy", baseUrl).toString(), changeFrequency: "yearly", priority: 0.3 }
   ];
 }
