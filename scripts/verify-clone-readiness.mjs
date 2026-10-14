@@ -68,7 +68,7 @@ check("CI invokes both static gates", /run: npm run verify:identity/.test(qualit
 check("Public manifest identity matches config", manifest.name === config.manifestName && manifest.short_name === config.shortName && manifest.theme_color === config.themeColor);
 check("Generated manifest matches public identity", generatedManifest.includes('name: "' + manifest.name + '"') && generatedManifest.includes('short_name: "' + manifest.short_name + '"') && generatedManifest.includes('theme_color: "' + manifest.theme_color + '"'));
 check("Metadata identity matches config", layout.includes('default: "' + config.manifestName + '"') && layout.includes('applicationName: "' + config.shortName + '"'));
-check("Metadata icon and manifest references match", layout.includes('icon: "' + config.canonicalIcon + '"') && layout.includes('apple: "' + config.canonicalIcon + '"') && layout.includes('manifest: "/manifest.webmanifest"'));
+check("Metadata icon and manifest references match", layout.includes('icon: "' + config.canonicalIcon + '"') && layout.includes('apple: "/padre-pio-icon-192.png"') && layout.includes('manifest: "/manifest.webmanifest"'));
 check("Canonical icon exists in public assets and both manifests", exists(path.join("public", config.canonicalIcon.replace(/^\/+/, ""))) && manifest.icons?.some(icon => icon.src === config.canonicalIcon) && generatedManifest.includes('src: "' + config.canonicalIcon + '"'));
 
 const icon192 = pngDimensions("public/padre-pio-icon-192.png");
