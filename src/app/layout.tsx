@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import PwaRegister from "@/app/pwa-register";
 import "./globals.css";
-import "./pwa.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
