@@ -1,4 +1,4 @@
-name: The Plug quality
+name: Padre Pio quality
 on:
   push:
     branches: [main]
@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       - name: Identity verification
         run: npm run verify:identity
-      - name: Clone readiness (static, no Firebase calls)
+      - name: Padre Pio readiness
         run: npm run verify:clone-readiness
       - name: TypeScript
         run: npx tsc --noEmit
