@@ -1,4 +1,5 @@
 const CACHE_VERSION = "padre-pio-shell-v1";
+const MEDIA_CACHE = "padre-pio-media-v1";
 const SHELL_URLS = ["/", "/offline", "/padre-pio-mark.svg"];
 
 self.addEventListener("install", (event) => {
@@ -20,7 +21,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys
-      .filter((key) => key.startsWith("padre-pio-") && key !== CACHE_VERSION)
+      .filter((key) => key.startsWith("padre-pio-") && key !== CACHE_VERSION && key !== MEDIA_CACHE)
       .map((key) => caches.delete(key)));
     await self.clients.claim();
   })());
