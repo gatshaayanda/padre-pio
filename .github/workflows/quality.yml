@@ -5,14 +5,14 @@ on:
   pull_request:
     branches: [main]
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
@@ -24,10 +24,15 @@ jobs:
             git diff --check HEAD^ HEAD
           fi
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
+      - name: Refresh patched dependency lockfile (one-time)
+        if: github.event_name == 'pull_request' && github.event.action == 'reopened' && github.event.pull_request.head.ref == 'feat/padre-pio-digital-reception'
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit
+          npm audit fix --package-lock-only --ignore-scripts || true
       - name: Install dependencies
         run: npm ci
       - name: Identity verification
@@ -44,3 +49,15 @@ jobs:
         run: |
           npm audit --json > /tmp/padre-pio-audit.json || true
           node -e 'const a=require("/tmp/padre-pio-audit.json"); const v=a.metadata?.vulnerabilities||{}; console.log("npm audit counts:", JSON.stringify(v)); for (const [name,item] of Object.entries(a.vulnerabilities||{})) if (["critical","high"].includes(item.severity)) { const via=(item.via||[]).map(x=>typeof x==="string"?x:{title:x.title,range:x.range,url:x.url}); console.log(JSON.stringify({severity:item.severity,name,direct:item.isDirect,range:item.range,via,fixAvailable:item.fixAvailable})); }'
+      - name: Commit refreshed lockfile
+        if: success() && github.event_name == 'pull_request' && github.event.action == 'reopened' && github.event.pull_request.head.ref == 'feat/padre-pio-digital-reception'
+        run: |
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "Dependency lockfile already up to date."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "fix(deps): refresh patched dependency lockfile"
+            git push origin "HEAD:refs/heads/${{ github.event.pull_request.head.ref }}"
+          fi

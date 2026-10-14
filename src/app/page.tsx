@@ -127,7 +127,7 @@ export default function HomePage() {
       <header className="siteHeader">
         <div className="wrap navInner">
           <a className="brand" href="#top" aria-label="Padre Pio Medical Centre home"><span className="brandMark" aria-hidden="true"><span /></span><span className="brandWords"><strong>Padre Pio</strong><small>MEDICAL CENTRE</small></span></a>
-          <nav className="mainNav" aria-label="Main navigation"><a href="#your-visit">Your visit</a><a href="#location">Find us</a></nav>
+          <nav className="mainNav" aria-label="Main navigation"><a href="#your-visit">Your visit</a><a href="#before-you-visit">Before you visit</a><a href="#location">Find us</a></nav>
           <div className="navActions">{!installed && <button className="installLink" type="button" onClick={install}>Install app <ArrowDown size={15} aria-hidden="true" /></button>}<a className="button buttonSmall" href="#request-appointment">Request appointment <ArrowUpRight size={15} aria-hidden="true" /></a></div>
         </div>
       </header>
@@ -157,7 +157,7 @@ export default function HomePage() {
 
       <section className="requestSection sectionPad" id="request-appointment">
         <div className="wrap requestGrid">
-          <div className="requestAside"><span className="kicker">APPOINTMENT REQUEST</span><h2>Let’s find<br /><em>a time that works.</em></h2><p>Complete the short form and reception can follow up with you directly.</p><div className="privacyNote"><ShieldCheck size={19} aria-hidden="true" /><div><strong>Just the essentials</strong><span>Please do not include symptoms, diagnoses, medication details or other sensitive medical information in this form.</span></div></div><div className="asideContact"><Clock3 size={17} aria-hidden="true" /><span>Preferred times are requests, not live availability.</span></div></div>
+          <div className="requestAside"><span className="kicker">APPOINTMENT REQUEST</span><h2>Let’s find<br /><em>a time that works.</em></h2><p>Complete the short form and reception can follow up with you directly.</p><div className="privacyNote"><ShieldCheck size={19} aria-hidden="true" /><div><strong>Just the essentials</strong><span>Please do not include symptoms, diagnoses, medication details or other sensitive medical information in this form.</span></div></div><div className="asideContact"><Clock3 size={17} aria-hidden="true" /><span>Preferred times are requests, not live availability.</span></div><div className="emergencyNotice"><strong>Need urgent medical help?</strong><span>Do not use this form for emergencies. Seek urgent in-person medical care or contact local emergency services.</span></div></div>
           <div className="formCard">
             {receipt ? <div className="receiptState" role="status" aria-live="polite"><div className="receiptIcon"><CheckCircle2 size={28} aria-hidden="true" /></div><span className="kicker">REQUEST RECEIVED</span><h3>Thank you. Reception has your request.</h3><p>Your reference is <strong>{receipt.reference}</strong>. This is not an appointment confirmation. Please wait for reception to contact you.</p><button className="button buttonDark" type="button" onClick={() => { setReceipt(null); setError(""); }}>Make another request <ArrowRight size={16} aria-hidden="true" /></button></div> : (
               <form onSubmit={submit} className="appointmentForm">
@@ -173,6 +173,19 @@ export default function HomePage() {
                 <button className="button buttonDark submitButton" type="submit" disabled={submitting}>{submitting ? "Sending request…" : "Send appointment request"} <ArrowRight size={17} aria-hidden="true" /></button><p className="formFineprint">No payment is taken. No appointment is confirmed by this form.</p>
               </form>
             )}
+          </div>
+        </div>
+      </section>
+
+      <section className="faqSection sectionPad" id="before-you-visit">
+        <div className="wrap faqGrid">
+          <div><span className="kicker">BEFORE YOU VISIT</span><h2 className="faqTitle">A few quick<br /><em>answers.</em></h2><p className="faqIntro">We keep the guidance simple and avoid promising hours, services, or availability that the clinic has not yet confirmed for this website.</p></div>
+          <div className="faqList">
+            <details className="faqItem"><summary>Is my appointment confirmed when I submit?</summary><p>No. This form sends a request for reception to review. Your appointment is confirmed only after the clinic contacts you.</p></details>
+            <details className="faqItem"><summary>What if I need urgent medical help?</summary><p>Do not use this form for emergencies; it is not an emergency channel. Seek urgent in-person medical care or contact local emergency services.</p></details>
+            <details className="faqItem"><summary>Can I walk in?</summary><p>Please contact reception before travelling to confirm current opening hours and walk-in arrangements.</p></details>
+            <details className="faqItem"><summary>Which services are available?</summary><p>The clinic’s approved public service list has not yet been verified for this website. If you are unsure, choose “Not sure — please guide me” and reception can advise on the next step.</p></details>
+            <details className="faqItem"><summary>What should I write in the note?</summary><p>Keep it to a short logistical message. Please do not include symptoms, diagnoses, medication details, or medical history.</p></details>
           </div>
         </div>
       </section>
