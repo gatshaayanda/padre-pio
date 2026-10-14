@@ -6,7 +6,7 @@ A mobile-first patient reception website and installable PWA for Padre Pio Medic
 
 Patients can understand the visit-request process, find the clinic, and submit an appointment request. A request is not a booked or confirmed appointment; reception must review it and contact the patient. This app is not an electronic medical record, diagnostic tool, prescription system, or emergency service.
 
-The entrance video in public/videos/padre.mp4 shows the real place and is loaded only when motion preferences and data-saving settings allow it. A lightweight illustration remains as the fallback.
+The optimized portrait entrance video in public/videos/padre.mp4 is 5,968,032 bytes, with a 162,432-byte WebP poster extracted from the real entrance. Playback is skipped for reduced-motion, save-data, and 2G connections. A custom SVG illustration supports the location section.
 
 ## Operations
 

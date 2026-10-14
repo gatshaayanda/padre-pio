@@ -4,7 +4,7 @@ Updated: 14 October 2026
 
 ## Product direction
 
-The primary job is to help a patient recognise the real location, understand the next step, request an appointment, and know that reception still needs to confirm it. The entrance video is a recognition cue, not the entire visual identity. The page therefore pairs the real entrance film with a custom illustrated fallback and a short three-step explanation.
+The primary job is to help a patient recognise the real location, understand the next step, request an appointment, and know that reception still needs to confirm it. The entrance video is a recognition cue, not the entire visual identity. The 9.29-second portrait film is optimized to 5,968,032 bytes and paired with a 162,432-byte WebP poster extracted from a recognizable real frame. The page preserves the portrait framing, respects reduced-motion/data-saving/2G settings, and uses a custom SVG illustration for location context.
 
 The primary CTA is “Request an appointment”. Call and directions are secondary actions. No WhatsApp button is shown because a clinic-controlled WhatsApp number was not verified. The appointment form collects name, phone, preferred date/time, a broad appointment category, consent, and a short optional note. It explicitly discourages medical history and does not promise live availability.
 
@@ -28,6 +28,14 @@ No verified official logo or clinic-controlled website was identified in the sou
 - Browser Firestore and Storage access are default-deny; the server Admin SDK bypasses those client rules.
 - No patient history, diagnosis, medication, test result, or file upload is part of this product.
 - Privacy copy is a draft. The clinic must approve the lawful basis/consent wording, retention period, privacy contact, access/correction/deletion process, and operational response before launch.
+
+## Verified implementation checkpoint
+
+- Patient homepage includes appointment request, location actions, concise FAQ, and clear emergency guidance: the form is not an emergency channel and does not confirm a booking.
+- Admin queue uses Firebase Authentication plus server-side role verification and writes audit events for status changes.
+- Current dependency versions are Next.js 15.5.27, Firebase JS SDK 12.19.0, and Firebase Admin SDK 14.5.0. The production audit gate reports zero high/critical vulnerabilities.
+- Full audit still reports five high findings in the development-only ESLint dependency chain via braces/fast-glob/micromatch. No compatible patched braces release was available in the reviewed registry at checkpoint; the audit's suggested eslint-config-next downgrade conflicts with the Next.js 15 line.
+- CI passed on source commit fe1f99b56f8b130f5244f78bb62ee6b6d6dda716. Live Firebase integration and physical-device PWA tests remain unrun until project credentials/roles and test devices are available.
 
 ## Still requiring clinic confirmation
 

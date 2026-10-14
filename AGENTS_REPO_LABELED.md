@@ -5,7 +5,8 @@
 - Source branch: docs/flagship-repo-audit-2026-10-12.
 - Target repository: gatshaayanda/padre-pio.
 - Target branch baseline: main.
-- First target checkpoint includes public/videos/padre.mp4 (23,440,877 bytes).
+- Initial target checkpoint included public/videos/padre.mp4 (23,440,877 bytes).
+- Current public/videos/padre.mp4 is 5,968,032 bytes (9.291667 seconds, H.264, 1080×1920, 24 fps); public/videos/padre-poster.webp is 162,432 bytes and was extracted from the real entrance video. The video is 74.5% smaller than the original.
 - The initial foundation's retail routes, scheduled reminders, shared-word operations login, messaging, and automatic Firebase rules deployment were not target requirements. The inherited scheduled reminder workflow was removed from main; the automatic Firebase rules deployment workflow was replaced on main by a manual-only no-op guard, and neither workflow is included in the Padre Pio feature branch.
 
 ## Product scope
@@ -30,10 +31,13 @@ Admin: Firebase email/password authentication → server verifies ID token and a
 - scripts/identity.config.json, scripts/verify-identity.mjs, scripts/verify-clone-readiness.mjs: target-specific identity and static readiness checks.
 
 ## Verification ledger
-- PASS — The target repository is pushed to GitHub main; initial commit ca237b650709ab25d42bf0e5632d1a86f34f8eb3 contains public/videos/padre.mp4.
-- PASS — Removed inherited scheduled pickup-reminder workflow from main (commit e79662d1095b14afa5d1fcd13529e319f25f2b16).
-- PASS — Neutralized inherited automatic Firebase rules deployment on main with a manual-only no-op guard (commit e8fc609a3018aca5904ad0b937c958c47512b1ba); the feature branch excludes the guard and has no Firebase deploy workflow.
-- PASS — GitHub Actions quality run 38554693993 on commit 5625a55bd6bd04c79aef16b078afe56b1d78a8b9: npm ci, identity verification, target readiness, TypeScript, lint, and production build all passed.
-- PASS — The subsequent commits fb36a25f2b3797b72c40d4652a67dc3c25ee4f1c and f7d9c1d8cbf857f9f8bd62af164dde11d42cbedf change only product research/continuity documentation; application source remains as tested in 5625a55.
-- BLOCKED — live request persistence/admin workflow until the clinic's dedicated Firebase project, service account, Firebase Auth users, and role documents are configured.
-- NOT RUN — video transcode, Android/iOS physical-device PWA, offline/reconnect, deployed behavior.
+- PASS — The target repository was initialized from the mandatory The Plug audited branch and pushed to GitHub; the original entrance video was included in the initial target commit.
+- PASS — Removed the inherited scheduled pickup-reminder workflow from main (commit e79662d1095b14afa5d1fcd13529e319f25f2b16).
+- PASS — Main's automatic Firebase rules deployment was neutralized with a manual-only no-op guard; no Firebase deployment is performed by that workflow.
+- PASS — GitHub Actions runs 38557095071 and 38557094346 on source commit fe1f99b56f8b130f5244f78bb62ee6b6d6dda716 passed: diff whitespace check, npm ci, identity verification, target readiness, TypeScript, lint, production build, dependency audit summary, and the high/critical production audit gate.
+- PASS — Production dependency audit: `npm audit --omit=dev --audit-level=high` reports zero vulnerabilities. Full dependency audit reports five high findings in the development-only ESLint dependency chain (braces/fast-glob/micromatch); no critical or moderate findings remain. The currently suggested remediation downgrades eslint-config-next to an incompatible major, so this remains a documented dev-tooling risk until a compatible patch is available.
+- PASS — Entrance video optimized from 23,440,877 bytes to 5,968,032 bytes (74.5% reduction); generated a 162,432-byte WebP poster from the actual entrance frame. Portrait rendering preserves the full frame instead of cropping it into a landscape hero.
+- BLOCKED — Live request persistence/admin workflow until the clinic's dedicated Firebase project, service-account credentials, Firebase Authentication users, and role documents are configured.
+- BLOCKED — Clinic confirmation of the current phone number, official services, practitioners/credentials, opening hours/walk-in policy, privacy contact/retention policy, and canonical domain.
+- NOT RUN — Firebase emulator/integration tests, real patient/admin workflow against a configured project, Android/iOS physical-device PWA installation, offline/reconnect recovery, and deployed behavior.
+- NOT DEPLOYED — No Vercel deployment, production service change, or Firebase rules deployment has been performed. The feature branch is still a draft PR for product-owner review.
