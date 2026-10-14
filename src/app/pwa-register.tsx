@@ -59,40 +59,6 @@ export default function PwaRegister() {
       setHelpOpen(false);
       setEmbedded(false);
     };
-    const onInstallClick = () => {
-      setPlatform(detectPlatform());
-      if (isStandalone()) {
-        setInstalled(true);
-        setHelpOpen(true);
-        return;
-      }
-      if (isEmbeddedBrowser()) {
-        setEmbedded(true);
-        setHelpOpen(true);
-        return;
-      }
-      setEmbedded(false);
-      const prompt = promptRef.current;
-      if (prompt) {
-        // Call prompt() directly during the user's click gesture.
-        promptRef.current = null;
-        setNativePromptAvailable(false);
-        void prompt.prompt().then(() => prompt.userChoice).then((choice) => {
-          if (choice.outcome === "accepted") {
-            setInstalled(true);
-            setDismissed(true);
-            setHelpOpen(false);
-          } else {
-            setHelpOpen(true);
-          }
-        }).catch(() => {
-          setHelpOpen(true);
-        });
-        return;
-      }
-      // The native event is browser-controlled; use guidance only when unavailable.
-      setHelpOpen(true);
-    };
     const register = async () => {
       if (!("serviceWorker" in navigator)) return;
       try {
@@ -117,15 +83,45 @@ export default function PwaRegister() {
     installWindow.__padrePioPwaListenerReady = true;
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
     window.addEventListener("appinstalled", onInstalled);
-    window.addEventListener("padre-pio-install", onInstallClick);
     void register();
 
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       window.removeEventListener("appinstalled", onInstalled);
-      window.removeEventListener("padre-pio-install", onInstallClick);
     };
   }, []);
+
+  function installOrExplain() {
+    setPlatform(detectPlatform());
+    if (isStandalone()) {
+      setInstalled(true);
+      setHelpOpen(true);
+      return;
+    }
+    if (isEmbeddedBrowser()) {
+      setEmbedded(true);
+      setHelpOpen(true);
+      return;
+    }
+    setEmbedded(false);
+    const prompt = promptRef.current;
+    if (prompt) {
+      // Call prompt() directly in this button's click handler.
+      promptRef.current = null;
+      setNativePromptAvailable(false);
+      void prompt.prompt().then(() => prompt.userChoice).then((choice) => {
+        if (choice.outcome === "accepted") {
+          setInstalled(true);
+          setDismissed(true);
+          setHelpOpen(false);
+        } else {
+          setHelpOpen(true);
+        }
+      }).catch(() => setHelpOpen(true));
+      return;
+    }
+    setHelpOpen(true);
+  }
 
   function openInBrowser() {
     const url = window.location.href;
@@ -152,7 +148,7 @@ export default function PwaRegister() {
               <small>{nativePromptAvailable ? "Tap Install to open the browser prompt." : "Optional quick access to the clinic."}</small>
             </span>
           </div>
-          <button className="padreFloatingInstallAction" type="button" onClick={() => window.dispatchEvent(new Event("padre-pio-install"))}>
+          <button className="padreFloatingInstallAction" type="button" onClick={installOrExplain}>
             {nativePromptAvailable ? "Install" : platform === "ios" ? "How to add" : embedded ? "Open in browser" : "Install options"}
           </button>
           <button className="padreFloatingInstallDismiss" type="button" aria-label="Dismiss install prompt" onClick={() => setDismissed(true)}>×</button>
