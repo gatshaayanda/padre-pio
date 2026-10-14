@@ -71,16 +71,6 @@ export default function HomePage() {
         <div className="padreHeroOrnament" aria-hidden="true">P.</div>
       </section>
 
-      <section className="padreInstallCallout" aria-labelledby="padre-install-callout-title">
-        <span className="padreInstallCalloutMark" aria-hidden="true">✚</span>
-        <div className="padreInstallCalloutCopy">
-          <span className="padreInstallCalloutEyebrow">OPTIONAL · QUICK ACCESS</span>
-          <h2 id="padre-install-callout-title">Keep the clinic close.</h2>
-          <p>Add Padre Pio Medical Centre to your home screen for an easy way back to the clinic’s location and reception request page. You can always keep using this website without installing it.</p>
-        </div>
-        <button className="padreInstallCalloutButton" type="button" onClick={requestInstall}>Add to home screen <span aria-hidden="true">↗</span></button>
-      </section>
-
       <section className="padreQuickStrip" aria-label="Patient essentials">
         <div><span className="padreQuickIcon" aria-hidden="true">⌖</span><span><small>LOCATION</small><strong>Gaborone West Phase 1</strong></span></div>
         <div><span className="padreQuickIcon" aria-hidden="true">↗</span><span><small>YOUR NEXT STEP</small><strong>Request, then await a reply</strong></span></div>
