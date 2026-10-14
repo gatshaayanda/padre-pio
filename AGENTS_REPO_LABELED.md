@@ -33,6 +33,7 @@ Admin: Firebase email/password authentication → server verifies ID token and a
 - PASS — The target repository is pushed to GitHub main; initial commit ca237b650709ab25d42bf0e5632d1a86f34f8eb3 contains public/videos/padre.mp4.
 - PASS — Removed inherited scheduled pickup-reminder workflow from main (commit e79662d1095b14afa5d1fcd13529e319f25f2b16).
 - PASS — Removed inherited Firebase rules deployment workflow from main (commit 0427f441719d593f9d6d9fc2bb9c8598b1123d68).
-- NOT RUN — dependency install, identity/readiness scripts, typecheck, lint, build.
+- PASS — GitHub Actions quality run 38554407397 on commit e50d0d5e924a4e4423cc91e51faf71af2969bcbf: npm ci, identity verification, target readiness, TypeScript, lint, and production build all passed.
+- NOT RUN — follow-up hardening in commit 5625a55bd6bd04c79aef16b078afe56b1d78a8b9 requires a fresh CI run.
 - BLOCKED — live request persistence/admin workflow until the clinic's dedicated Firebase project, service account, Firebase Auth users, and role documents are configured.
 - NOT RUN — video transcode, Android/iOS physical-device PWA, offline/reconnect, deployed behavior.
