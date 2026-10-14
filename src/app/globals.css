@@ -265,69 +265,22 @@ button, input, select, textarea { font: inherit; }
 @media(max-width:560px) { .padreServicesGrid { grid-template-columns:1fr; } .padreServiceCard { min-height:190px; } .padreServicesSection { padding-top:58px; padding-bottom:64px; } }
 
 
-/* Visible, patient-first installation card inspired by PurePress's contextual install surface */
-.padreInstallCallout {
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:center;
-  gap:20px;
-  margin:0 clamp(20px,7.5vw,116px) 0;
-  padding:22px clamp(18px,3vw,34px);
-  border:1px solid rgba(23,76,60,.22);
-  background:#e9eee5;
-  color:var(--padre-ink);
-}
-.padreInstallCalloutMark {
-  display:grid;
-  place-items:center;
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  background:var(--padre-forest);
-  color:var(--padre-paper);
-  font-size:23px;
-}
-.padreInstallCalloutCopy { max-width:690px; }
-.padreInstallCalloutEyebrow {
-  color:var(--padre-forest);
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.15em;
-}
-.padreInstallCallout h2 {
-  margin:5px 0 6px;
-  font-family:Georgia,'Times New Roman',serif;
-  font-size:clamp(23px,3vw,32px);
-  font-weight:500;
-  line-height:1.1;
-}
-.padreInstallCallout p {
-  margin:0;
-  max-width:680px;
-  color:var(--padre-muted);
-  font-size:12px;
-  line-height:1.7;
-}
-.padreInstallCalloutButton {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  min-height:46px;
-  padding:12px 17px;
-  border:1px solid var(--padre-forest);
-  border-radius:3px;
-  background:var(--padre-forest);
-  color:var(--padre-paper);
-  font-size:11px;
-  font-weight:800;
-  white-space:nowrap;
-  cursor:pointer;
-}
-.padreInstallCalloutButton:hover { background:var(--padre-forest-dark); }
-.padreInstallCalloutButton:focus-visible { outline:3px solid #b67c36; outline-offset:4px; }
-@media(max-width:650px) {
-  .padreInstallCallout { grid-template-columns:auto minmax(0,1fr); gap:14px; margin-bottom:0; }
-  .padreInstallCalloutMark { width:40px; height:40px; font-size:20px; }
-  .padreInstallCalloutButton { grid-column:1/-1; width:100%; }
+/* Compact floating install prompt in Padre Pio's forest-green and gold palette */
+.padreFloatingInstall { position:fixed; z-index:9000; right:16px; bottom:18px; display:flex; align-items:center; gap:14px; width:min(520px,calc(100vw - 32px)); padding:13px 44px 13px 14px; border:1px solid var(--padre-gold); background:var(--padre-forest-dark); color:var(--padre-paper); box-shadow:0 16px 42px rgba(16,35,27,.28); }
+.padreFloatingInstallCopy { display:flex; align-items:center; gap:11px; min-width:0; flex:1; }
+.padreFloatingInstallMark { display:grid; place-items:center; flex:0 0 38px; width:38px; height:38px; border-radius:50%; background:var(--padre-gold); color:var(--padre-forest-dark); font-size:19px; }
+.padreFloatingInstallCopy strong,.padreFloatingInstallCopy small { display:block; }
+.padreFloatingInstallCopy strong { font-family:Georgia,'Times New Roman',serif; font-size:15px; font-weight:500; line-height:1.2; }
+.padreFloatingInstallCopy small { margin-top:4px; color:#e4e8df; font-size:10px; line-height:1.4; }
+.padreFloatingInstallAction { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:10px 14px; border:1px solid var(--padre-gold); background:var(--padre-gold); color:var(--padre-forest-dark); font-size:11px; font-weight:900; cursor:pointer; white-space:nowrap; }
+.padreFloatingInstallAction:hover { filter:brightness(1.06); }
+.padreFloatingInstallAction:focus-visible,.padreFloatingInstallDismiss:focus-visible { outline:3px solid #fff; outline-offset:3px; }
+.padreFloatingInstallDismiss { position:absolute; top:5px; right:7px; display:grid; place-items:center; width:28px; height:28px; border:0; background:transparent; color:var(--padre-paper); font-size:21px; cursor:pointer; }
+@media(max-width:560px) {
+  .padreFloatingInstall { right:10px; bottom:10px; width:calc(100vw - 20px); gap:9px; padding:12px 36px 12px 10px; }
+  .padreFloatingInstallMark { flex-basis:32px; width:32px; height:32px; font-size:16px; }
+  .padreFloatingInstallCopy { gap:8px; }
+  .padreFloatingInstallCopy strong { font-size:13px; }
+  .padreFloatingInstallCopy small { font-size:9px; }
+  .padreFloatingInstallAction { min-height:40px; padding:9px 10px; font-size:10px; }
 }
