@@ -263,3 +263,71 @@ button, input, select, textarea { font: inherit; }
 .padreNextSteps ol { margin:12px 0 0; padding-left:20px; color:var(--padre-muted); font-size:12px; line-height:1.8; }
 @media(max-width:850px) { .padreServicesIntro { grid-template-columns:1fr; gap:16px; } .padreServicesGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:560px) { .padreServicesGrid { grid-template-columns:1fr; } .padreServiceCard { min-height:190px; } .padreServicesSection { padding-top:58px; padding-bottom:64px; } }
+
+
+/* Visible, patient-first installation card inspired by PurePress's contextual install surface */
+.padreInstallCallout {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:20px;
+  margin:0 clamp(20px,7.5vw,116px) 0;
+  padding:22px clamp(18px,3vw,34px);
+  border:1px solid rgba(23,76,60,.22);
+  background:#e9eee5;
+  color:var(--padre-ink);
+}
+.padreInstallCalloutMark {
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:var(--padre-forest);
+  color:var(--padre-paper);
+  font-size:23px;
+}
+.padreInstallCalloutCopy { max-width:690px; }
+.padreInstallCalloutEyebrow {
+  color:var(--padre-forest);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.15em;
+}
+.padreInstallCallout h2 {
+  margin:5px 0 6px;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:clamp(23px,3vw,32px);
+  font-weight:500;
+  line-height:1.1;
+}
+.padreInstallCallout p {
+  margin:0;
+  max-width:680px;
+  color:var(--padre-muted);
+  font-size:12px;
+  line-height:1.7;
+}
+.padreInstallCalloutButton {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  min-height:46px;
+  padding:12px 17px;
+  border:1px solid var(--padre-forest);
+  border-radius:3px;
+  background:var(--padre-forest);
+  color:var(--padre-paper);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.padreInstallCalloutButton:hover { background:var(--padre-forest-dark); }
+.padreInstallCalloutButton:focus-visible { outline:3px solid #b67c36; outline-offset:4px; }
+@media(max-width:650px) {
+  .padreInstallCallout { grid-template-columns:auto minmax(0,1fr); gap:14px; margin-bottom:0; }
+  .padreInstallCalloutMark { width:40px; height:40px; font-size:20px; }
+  .padreInstallCalloutButton { grid-column:1/-1; width:100%; }
+}
