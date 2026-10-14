@@ -40,7 +40,6 @@ export default function HomePage() {
           <a href="#services">Care enquiries</a>
           <a href="#care">How it works</a>
         </nav>
-        <button className="padreInstallLink" type="button" onClick={requestInstall}>Add to home screen <span aria-hidden="true">↗</span></button>
       </header>
 
       <section className="padreHero" aria-labelledby="padre-hero-title">
@@ -126,6 +125,7 @@ export default function HomePage() {
         <Link href="/" className="padreBrand"><span className="padreBrandMark" aria-hidden="true">✚</span><span><strong>PADRE PIO</strong><small>MEDICAL CENTRE</small></span></Link>
         <p>Plot 16739, Gaborone West Phase 1, Gaborone, Botswana</p>
         <span className="padreFooterNote">This website is not an emergency service. If you may be experiencing a medical emergency, seek urgent local medical help.</span>
+        <button className="padreInstallLink" type="button" onClick={requestInstall}>Add this site to your home screen <span aria-hidden="true">↗</span></button>
       </footer>
     </main>
   );
