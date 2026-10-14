@@ -15,7 +15,7 @@ A concise patient-facing site/PWA plus private reception queue. The public exper
 - **A07** `src/app/pwa-register.tsx` — native install prompt and platform fallback; website remains usable without installation.
 - **A08** `src/app/offline/page.tsx` — truthful offline message.
 - **B01** `src/app/appointments/request/page.tsx` — appointment request form; validates minimal admin details and writes only when dedicated Firebase web config exists.
-- **B02** `firestore.rules` — default-deny rules; patient can create/read own request, authorized staff can read/update queue.
+- **B02** `firestore.rules` — default-deny rules; patient can create a request; only authorized staff can read/update the private record so internal notes remain private.
 - **B03** `firestore.indexes.json` — currently empty; queue query is ordered by creation time only.
 - **C01** `src/app/admin/page.tsx` — staff sign-in and private reception queue; role gate plus Firestore rules.
 - **C02** `src/lib/firebase/client.ts` — inherited Firebase initialization; placeholder config remains build-only and must never be treated as a connected service.
