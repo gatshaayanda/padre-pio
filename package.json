@@ -35,8 +35,6 @@
   "overrides": {
     "@grpc/grpc-js": "^1.13.6",
     "braces": "^3.0.4",
-    "fast-glob": "^3.3.3",
-    "micromatch": "^4.0.9",
     "postcss": "^8.5.28"
   }
 }
