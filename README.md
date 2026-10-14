@@ -12,13 +12,13 @@ Help visitors recognise the clinic, find verified information, request an appoin
 - Do not invent opening hours, services, practitioner credentials, prices, medical-aid acceptance, or contact channels. Verify them with the clinic before publishing.
 - Do not collect detailed medical history or use this application as an EMR, diagnostic tool, prescription system, or AI doctor.
 - Keep patient information private. Admin access must be enforced by server and database authorization, not just hidden links.
-- Use a dedicated Firebase project and independent credentials. Never reuse The Plug's backend, customer data, or secrets.
+- Use a dedicated Firebase project and independent credentials. Never reuse source-project backends, customer data, or secrets.
 - The entrance video at `public/videos/padre.mp4` is a recognisable location cue, not a substitute for accessible text or a still fallback.
 - Installation is optional; the website must remain usable without installing the PWA.
 
 ## Architecture
 
-Next.js App Router, React, TypeScript, Tailwind CSS, and Firebase SDKs inherited from the mandatory The Plug foundation. The application identity has been reset; clinic-specific workflows and isolated infrastructure remain to be implemented and verified.
+Next.js App Router, React, TypeScript, Tailwind CSS, and Firebase SDKs retained from the approved application foundation. The application identity has been reset; clinic-specific workflows and isolated infrastructure remain to be implemented and verified.
 
 ## Verification status
 
