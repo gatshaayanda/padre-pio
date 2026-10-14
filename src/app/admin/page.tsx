@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import {
   collection, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc
