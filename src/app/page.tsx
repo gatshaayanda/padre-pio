@@ -57,9 +57,9 @@ export default function HomePage() {
         <div className="padreEntranceFrame">
           <div className="padreEntranceFrameTop"><span>THE WAY IN</span><span>01 / ARRIVAL</span></div>
           <div className="padreEntranceVideo">
-            <video autoPlay muted loop playsInline preload="metadata" aria-hidden="true" disablePictureInPicture>
+            {showEntranceVideo && <video ref={entranceVideoRef} muted loop playsInline preload="metadata" aria-hidden="true" disablePictureInPicture>
               <source src="/videos/padre.mp4" type="video/mp4" />
-            </video>
+            </video>}
             <div className="padreVideoShade" />
             <div className="padreVideoCaption">
               <span className="padreLiveDot" aria-hidden="true" />
