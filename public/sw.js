@@ -1,187 +1,58 @@
-importScripts(
-  "https://www.gstatic.com/firebasejs/11.9.0/firebase-app-compat.js",
-  "https://www.gstatic.com/firebasejs/11.9.0/firebase-messaging-compat.js",
-  "/api/firebase/messaging-sw-config"
-);
+const CACHE_VERSION = "padre-pio-shell-v1";
+const SHELL_URLS = ["/", "/offline", "/padre-pio-mark.svg"];
 
-let thePlugMessaging = null;
-try {
-  const config = self.__THE_PLUG_FIREBASE_CONFIG__;
-  if (config && config.apiKey && config.projectId && config.messagingSenderId && config.appId) {
-    firebase.initializeApp(config);
-    thePlugMessaging = firebase.messaging();
-    thePlugMessaging.onBackgroundMessage((payload) => {
-      // Notification payloads are displayed automatically by Firebase. Only render
-      // data-only pushes here to avoid showing the same notification twice.
-      if (payload.notification) return;
-      const title = payload.data?.title || "The Plug update";
-      const options = {
-        body: payload.data?.body || "Open The Plug to check your latest account information.",
-        icon: "/plug-icon.svg",
-        badge: "/plug-icon.svg",
-        data: { link: payload.data?.link || "/account" },
-      };
-      self.registration.showNotification(title, options);
-    });
-  } else {
-    console.error("The Plug Firebase Messaging web config is incomplete.");
-  }
-} catch (error) {
-  console.error("The Plug Firebase Messaging service worker could not initialize.", error);
-}
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  const rawLink = event.notification.data?.link || "/account";
-  const link = rawLink.startsWith("/") ? rawLink : "/account";
-  event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-    for (const client of list) {
-      if ("focus" in client) {
-        void client.navigate(link);
-        return client.focus();
-      }
-    }
-    return clients.openWindow(link);
-  }));
-});
-
-const CACHE_VERSION = "theplug-shell-v15";
-const MEDIA_CACHE = "theplug-media-v1";
-const MEDIA_LIMIT = 80;
-const SHELL_CACHE = CACHE_VERSION;
-const STATIC_LIMIT = 100;
-const PUBLIC_PAGE_LIMIT = 12;
-const APP_SHELL = ["/", "/request", "/offline", "/plug-icon.svg", "/manifest.webmanifest"];
-
-self.addEventListener("install", event => {
+self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
-    await precacheShell();
-    // Install the new routing/cache policy immediately; the page is not force-reloaded.
+    const cache = await caches.open(CACHE_VERSION);
+    await Promise.all(SHELL_URLS.map(async (url) => {
+      try {
+        const response = await fetch(url, { cache: "reload" });
+        if (response.ok) await cache.put(url, response);
+      } catch {
+        // A failed precache must not prevent the website from opening online.
+      }
+    }));
     await self.skipWaiting();
   })());
 });
 
-async function precacheShell() {
-  const shell = await caches.open(SHELL_CACHE);
-  const discovered = new Set();
-  for (const path of APP_SHELL) {
-    try {
-      const request = new Request(path, { cache: "reload" });
-      const response = await fetch(request);
-      if (!response.ok) continue;
-      await shell.put(request, response.clone());
-      if (!(response.headers.get("content-type") || "").includes("text/html")) continue;
-      const html = await response.text();
-      for (const match of html.matchAll(/(?:src|href)=["'](\/_next\/static\/[^"']+)["']/g)) discovered.add(match[1]);
-    } catch {}
-  }
-  await Promise.all([...discovered].map(async path => {
-    try {
-      const request = new Request(path, { cache: "reload" });
-      const response = await fetch(request);
-      if (response.ok) await shell.put(request, response);
-    } catch {}
-  }));
-  await trimCache(SHELL_CACHE, STATIC_LIMIT);
-}
-
-self.addEventListener("message", event => {
-  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
-});
-
-self.addEventListener("activate", event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => (key.startsWith("theplug-shell-") && key !== SHELL_CACHE) || (key.startsWith("theplug-media-") && key !== MEDIA_CACHE)).map(key => caches.delete(key)));
+    await Promise.all(keys
+      .filter((key) => key.startsWith("padre-pio-") && key !== CACHE_VERSION)
+      .map((key) => caches.delete(key)));
     await self.clients.claim();
   })());
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
+  if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
 
-  // Public storefront cards use Firebase Storage download URLs. Cache only image
-  // requests from this app's configured bucket; never cache arbitrary third-party
-  // media or API responses. This makes already-viewed catalogue images available offline.
-  if (isConfiguredStorefrontImage(request, url)) {
-    event.respondWith(cacheStorefrontImage(request));
-    return;
-  }
-  if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith("/api/")) return;
-
-  const isNavigation = request.mode === "navigate" || request.headers.get("accept")?.includes("text/html");
-  const isPrivate = /^\/(?:account|requests|orders|admin|invite)(?:\/|$)/.test(url.pathname);
-
-  // Private/member routes are network-only. Never serve a cached account/request page as
-  // a substitute for a different route or when the authenticated page cannot be fetched.
-  if (isNavigation && isPrivate) {
-    event.respondWith(fetch(request).catch(() => caches.open(SHELL_CACHE).then(cache => cache.match("/offline")).then(response => response || Response.error())));
+  const isPrivateOrForm = /^\/(admin|appointments|appointment|account|requests)(\/|$)/.test(url.pathname);
+  if (isPrivateOrForm) {
+    event.respondWith(fetch(request).catch(() => caches.match("/offline").then((response) => response || Response.error())));
     return;
   }
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname === "/manifest.webmanifest" || /\.(?:css|js|woff2?|ttf|otf|png|jpe?g|webp|svg|ico|avif)$/i.test(url.pathname)) {
-    event.respondWith(cacheFirst(request));
-    return;
-  }
-
-  if (isNavigation) {
-    event.respondWith(fetch(request).then(response => {
-      if (response.ok) void caches.open(SHELL_CACHE).then(async cache => {
-        await cache.put(request, response.clone());
-        await trimCache(SHELL_CACHE, PUBLIC_PAGE_LIMIT + STATIC_LIMIT);
-      });
+  if (request.mode === "navigate") {
+    event.respondWith(fetch(request).then((response) => {
+      if (response.ok) {
+        const copy = response.clone();
+        void caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy));
+      }
       return response;
     }).catch(async () => {
-      const cache = await caches.open(SHELL_CACHE);
-      return await cache.match(request) || await cache.match("/") || await cache.match("/offline") || Response.error();
+      const cache = await caches.open(CACHE_VERSION);
+      return (await cache.match(request)) || (await cache.match("/offline")) || Response.error();
     }));
+    return;
+  }
+
+  if (url.pathname.startsWith("/_next/static/") || url.pathname === "/padre-pio-mark.svg") {
+    event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
   }
 });
-
-function isConfiguredStorefrontImage(request, url) {
-  const bucket = self.__THE_PLUG_FIREBASE_CONFIG__?.storageBucket;
-  if (request.destination !== "image" || url.hostname !== "firebasestorage.googleapis.com") return false;
-  if (typeof bucket !== "string" || !bucket.trim()) return false;
-  return url.pathname.startsWith("/v0/b/" + bucket + "/o/");
-}
-
-async function cacheStorefrontImage(request) {
-  const cache = await caches.open(MEDIA_CACHE);
-  try {
-    const response = await fetch(request);
-    if (response.ok || response.type === "opaque") {
-      await cache.put(request, response.clone());
-      await trimCache(MEDIA_CACHE, MEDIA_LIMIT);
-      return response;
-    }
-    return await cache.match(request) || response;
-  } catch {
-    return await cache.match(request) || Response.error();
-  }
-}
-
-async function cacheFirst(request) {
-  const cache = await caches.open(SHELL_CACHE);
-  const cached = await cache.match(request);
-  if (cached) return cached;
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      await cache.put(request, response.clone());
-      await trimCache(SHELL_CACHE, STATIC_LIMIT + PUBLIC_PAGE_LIMIT);
-    }
-    return response;
-  } catch {
-    return Response.error();
-  }
-}
-
-async function trimCache(cacheName, maxEntries) {
-  const cache = await caches.open(cacheName);
-  const keys = await cache.keys();
-  if (keys.length <= maxEntries) return;
-  await Promise.all(keys.slice(0, keys.length - maxEntries).map(request => cache.delete(request)));
-}
