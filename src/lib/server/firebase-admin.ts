@@ -28,7 +28,12 @@ export async function requireClinicAdmin(request: Request): Promise<{ uid: strin
   const header = request.headers.get("authorization") || "";
   if (!header.startsWith("Bearer ")) return null;
   const services = getClinicServices();
-  const decoded = await services.auth.verifyIdToken(header.slice(7));
+  let decoded;
+  try {
+    decoded = await services.auth.verifyIdToken(header.slice(7));
+  } catch {
+    return null;
+  }
   const roleSnapshot = await services.db.collection("admins").doc(decoded.uid).get();
   const role = String(roleSnapshot.data()?.role ?? "").toLowerCase();
   if (!roleSnapshot.exists || !ALLOWED_ROLES.has(role)) return null;
