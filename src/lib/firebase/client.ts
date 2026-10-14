@@ -1,11 +1,10 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  // Public Firebase web config is injected by the deployment environment.
-  // Build/CI must also be able to prerender client routes when those env vars are absent.
+  // Public Firebase web config is injected by the dedicated clinic environment.
+  // Build fallbacks allow static prerendering only; guarded actions must not use them.
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "build-placeholder",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "build-placeholder.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "build-placeholder",
@@ -15,8 +14,6 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Production must supply real web config. Empty Vercel variables are treated as missing too;
-// build fallbacks keep prerender safe while hasFirebaseWebConfig prevents auth actions.
 export const hasFirebaseWebConfig = Boolean(
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
   process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
@@ -26,10 +23,9 @@ export const hasFirebaseWebConfig = Boolean(
 );
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-});
-export const storage = getStorage(app);
+
+// Use the SDK's default in-memory cache. Patient and reception data must not
+// persist in IndexedDB on shared family or clinic devices.
+export const db = getFirestore(app);
 export { app };
