@@ -109,6 +109,8 @@ button, input, select, textarea { font: inherit; }
 .padreFooter .padreBrand small { color:#c4d3c7; }
 .padreFooter p { margin:0; justify-self:end; color:#e0e8df; font-size:12px; }
 .padreFooterNote { grid-column:1/-1; max-width:780px; color:#d0ddd2; font-size:10px; line-height:1.7; }
+.padreFooter .padreInstallLink { grid-column:1/-1; justify-self:start; border-color:rgba(248,245,236,.32); color:#f8f5ec; }
+.padreFooter .padreInstallLink:hover { border-color:#e9c78c; color:#e9c78c; }
 .padreInstallBackdrop { position:fixed; z-index:9999; inset:0; display:grid; place-items:center; padding:20px; background:rgba(10,28,21,.55); }
 .padreInstallDialog { position:relative; width:min(100%,440px); padding:28px; border:1px solid var(--padre-line); background:var(--padre-paper); box-shadow:0 24px 70px rgba(0,0,0,.24); }
 .padreInstallDialog h2 { margin:14px 0; font-family:Georgia,serif; font-size:30px; font-weight:500; line-height:1.08; }
