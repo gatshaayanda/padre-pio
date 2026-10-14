@@ -22,15 +22,22 @@ function fail(message: string, status = 400) {
 function text(value: unknown, max: number) {
   return typeof value === "string" ? value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, max) : "";
 }
-function validDate(value: string) {
+function validDate(value: string, preferredTime: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(value + "T12:00:00Z");
   if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) return false;
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Gaborone", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
   const part = (type: string) => parts.find(item => item.type === type)?.value ?? "";
   const today = part("year") + "-" + part("month") + "-" + part("day");
-  const max = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  return value >= today && value <= max;
+  const future = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000);
+  const futureParts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Gaborone", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(future);
+  const futurePart = (type: string) => futureParts.find(item => item.type === type)?.value ?? "";
+  const max = futurePart("year") + "-" + futurePart("month") + "-" + futurePart("day");
+  if (value < today || value > max) return false;
+  if (value > today) return true;
+  const timeParts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Gaborone", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+  const timePart = (type: string) => timeParts.find(item => item.type === type)?.value ?? "";
+  return preferredTime > timePart("hour") + ":" + timePart("minute");
 }
 function makeReference() {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Gaborone", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
@@ -64,7 +71,9 @@ export async function POST(request: Request) {
   const contentLength = Number(request.headers.get("content-length") || "0");
   if (Number.isFinite(contentLength) && contentLength > 8192) return fail("The form is too large.", 413);
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
-  if (!body) return fail("Please check the form and try again.");
+  if (!body || JSON.stringify(body).length > 8192) return fail("Please check the form and try again.", 413);
+  const allowedKeys = new Set(["requestId", "name", "phone", "preferredDate", "preferredTime", "category", "note", "privacyConsent", "website"]);
+  if (Object.keys(body).some(key => !allowedKeys.has(key))) return fail("Please refresh the form and try again.");
   if (text(body.website, 200)) return fail("Please check the form and try again.");
   const requestId = text(body.requestId, 64);
   const name = text(body.name, 80);
@@ -74,7 +83,7 @@ export async function POST(request: Request) {
   const category = text(body.category, 24);
   const note = text(body.note, 300);
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) return fail("Please refresh the page and try again.");
-  if (name.length < 2 || !/^[+()\d\s.-]{7,24}$/.test(phone) || !validDate(preferredDate) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(preferredTime) || !CATEGORIES.has(category) || body.privacyConsent !== true) {
+  if (name.length < 2 || !/^[+()\d\s.-]{7,24}$/.test(phone) || phone.replace(/\D/g, "").length < 7 || !validDate(preferredDate, preferredTime) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(preferredTime) || !CATEGORIES.has(category) || body.privacyConsent !== true) {
     return fail("Please check your name, phone number, preferred date and time, appointment type, and consent.");
   }
   try {

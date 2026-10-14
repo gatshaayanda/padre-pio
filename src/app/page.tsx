@@ -54,9 +54,9 @@ export default function HomePage() {
     setToday(botswanaToday());
     const video = videoRef.current;
     if (!video) return;
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (connection?.saveData || reducedMotion) return;
+    if (connection?.saveData || ["slow-2g", "2g"].includes(connection?.effectiveType || "") || reducedMotion) return;
     video.src = "/videos/padre.mp4";
     video.load();
     const playback = video.play();
