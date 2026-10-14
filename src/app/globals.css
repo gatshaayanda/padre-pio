@@ -1013,3 +1013,46 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .padreReference strong { color:var(--padre-forest); font-size:13px; }
 @media(max-width:760px) { .padreFormLayout { grid-template-columns:1fr; } .padreFormIntro h1 { font-size:58px; } }
 @media(max-width:480px) { .padreFormPage { padding:20px 16px; } .padreFormRow { grid-template-columns:1fr; } .padreFormStep { max-width:110px; text-align:right; line-height:1.5; } .padreFormFooter { flex-direction:column; } }
+
+
+/* Private reception workspace */
+.padreAdminPage { min-height:100vh; padding:24px clamp(18px,6vw,88px) 60px; }
+.padreAdminHeader { display:flex; justify-content:space-between; align-items:center; gap:18px; padding-bottom:20px; border-bottom:1px solid var(--padre-line); }
+.padreAdminLogin { max-width:620px; margin:clamp(55px,9vw,110px) auto; }
+.padreAdminLogin h1,.padreAdminNotice h1,.padreQueueHeading h1 { margin:18px 0; font-family:Georgia,serif; font-size:clamp(48px,6vw,72px); font-weight:500; line-height:.98; letter-spacing:-.05em; }
+.padreAdminLogin h1 em,.padreQueueHeading h1 em { color:var(--padre-forest); font-weight:500; }
+.padreAdminLogin>p,.padreAdminNotice p,.padreQueueIntro { max-width:580px; color:var(--padre-muted); font-size:14px; line-height:1.75; }
+.padreAdminLogin .padreFormCard { display:grid; gap:16px; margin:25px 0; }
+.padreAdminLogin label,.padreAdminUpdate label { display:grid; gap:7px; color:var(--padre-ink); font-size:11px; font-weight:800; }
+.padreAdminLogin input,.padreAdminUpdate select,.padreAdminUpdate textarea { width:100%; min-height:44px; padding:11px 12px; border:1px solid #cbd5ca; border-radius:3px; background:#fffefa; color:var(--padre-ink); font:inherit; font-size:13px; }
+.padreAdminNotice { max-width:620px; margin:clamp(60px,10vw,120px) auto; }
+.padreAdminNotice .padreButton { margin-top:15px; }
+.padreQueue { max-width:1050px; margin:50px auto 0; }
+.padreQueueHeading { display:flex; align-items:end; justify-content:space-between; gap:20px; }
+.padreQueueHeading h1 { margin-bottom:10px; }
+.padreQueueCount { display:grid; gap:4px; padding:14px 18px; border:1px solid var(--padre-line); background:var(--padre-paper); text-align:right; }
+.padreQueueCount strong { color:var(--padre-forest); font-family:Georgia,serif; font-size:30px; font-weight:500; }
+.padreQueueCount span { color:var(--padre-muted); font-size:10px; }
+.padreQueueIntro { margin:10px 0 28px; }
+.padreQueueState { padding:32px; border:1px dashed #b8c9b8; color:var(--padre-muted); text-align:center; }
+.padreQueueState strong { color:var(--padre-ink); }
+.padreAppointmentList { display:grid; gap:14px; }
+.padreAppointmentCard { padding:22px; border:1px solid var(--padre-line); background:var(--padre-paper); }
+.padreAppointmentHead { display:flex; align-items:start; justify-content:space-between; gap:16px; }
+.padreAppointmentDate { color:var(--padre-muted); font-size:9px; font-weight:800; letter-spacing:.12em; }
+.padreAppointmentHead h2 { margin:10px 0 5px; font-family:Georgia,serif; font-size:24px; font-weight:500; }
+.padreAppointmentHead a { color:var(--padre-forest); font-size:13px; font-weight:700; }
+.padreStatus { display:inline-block; max-width:170px; padding:7px 9px; border-radius:99px; background:#e8eee7; color:var(--padre-forest); font-size:9px; font-weight:900; letter-spacing:.04em; text-align:center; }
+.padreStatusCONFIRMED { background:#dcece1; }
+.padreStatusCANCELLED { background:#f8e4df; color:#7d3027; }
+.padreStatusNEW { background:#f2e8d7; color:#77582d; }
+.padreAppointmentDetails { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:20px 0; padding:15px; background:#f2f0e8; }
+.padreAppointmentDetails small,.padreAppointmentDetails strong { display:block; }
+.padreAppointmentDetails small,.padrePatientNote small { margin-bottom:6px; color:var(--padre-muted); font-size:9px; font-weight:800; letter-spacing:.1em; }
+.padreAppointmentDetails strong { font-size:12px; line-height:1.4; }
+.padrePatientNote { display:grid; gap:4px; margin:0 0 18px; color:var(--padre-ink); font-size:12px; line-height:1.6; }
+.padreAdminUpdate { display:grid; grid-template-columns:1fr 1.4fr auto; align-items:end; gap:12px; padding-top:18px; border-top:1px solid var(--padre-line); }
+.padreAdminUpdate .padreButton { min-height:44px; padding:12px; white-space:nowrap; }
+.padreFormNotice { padding:12px; background:#e3efe3; color:#174c3c; font-size:12px; }
+@media(max-width:760px) { .padreAdminUpdate { grid-template-columns:1fr; } .padreAdminUpdate .padreButton { width:100%; } }
+@media(max-width:520px) { .padreQueueHeading { align-items:start; } .padreQueueCount { padding:10px; } .padreAppointmentCard { padding:16px; } .padreAppointmentDetails { grid-template-columns:1fr; } .padreAppointmentHead { flex-direction:column; } }
