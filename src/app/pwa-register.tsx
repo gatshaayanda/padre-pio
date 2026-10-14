@@ -18,6 +18,13 @@ export default function PwaRegister() {
       window.matchMedia("(display-mode: standalone)").matches ||
       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
 
+    function detectPlatform(): "ios" | "android" | "desktop" {
+      const ua = navigator.userAgent || "";
+      if (/iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return "ios";
+      if (/Android/i.test(ua)) return "android";
+      return "desktop";
+    }
+
     const onBeforeInstall = (event: Event) => {
       if (isStandalone()) return;
       event.preventDefault();
@@ -29,19 +36,22 @@ export default function PwaRegister() {
       setHelpOpen(false);
     };
     const onInstallClick = () => {
-      if (isStandalone()) return;
+      setPlatform(detectPlatform());
+      if (isStandalone()) {
+        setInstalled(true);
+        setHelpOpen(true);
+        return;
+      }
       const prompt = promptRef.current;
       if (prompt) {
         promptRef.current = null;
         void prompt.prompt().then(() => prompt.userChoice).then(() => {
           setHelpOpen(false);
         }).catch(() => {
-          setPlatform(detectPlatform());
           setHelpOpen(true);
         });
         return;
       }
-      setPlatform(detectPlatform());
       setHelpOpen(true);
     };
     const register = async () => {
@@ -52,13 +62,6 @@ export default function PwaRegister() {
         // The website remains usable if service-worker registration is unavailable.
       }
     };
-
-    function detectPlatform(): "ios" | "android" | "desktop" {
-      const ua = navigator.userAgent || "";
-      if (/iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) return "ios";
-      if (/Android/i.test(ua)) return "android";
-      return "desktop";
-    }
 
     if (isStandalone()) setInstalled(true);
     window.addEventListener("beforeinstallprompt", onBeforeInstall);
@@ -73,7 +76,7 @@ export default function PwaRegister() {
     };
   }, []);
 
-  if (installed || !helpOpen) return null;
+  if (!helpOpen) return null;
 
   return (
     <div className="padreInstallBackdrop" role="presentation" onMouseDown={(event) => {
@@ -82,15 +85,17 @@ export default function PwaRegister() {
       <section className="padreInstallDialog" role="dialog" aria-modal="true" aria-labelledby="padre-install-title">
         <button className="padreInstallClose" type="button" aria-label="Close installation help" onClick={() => setHelpOpen(false)}>×</button>
         <span className="padreEyebrow">OPTIONAL · KEEP IT CLOSE</span>
-        <h2 id="padre-install-title">Add Padre Pio to your home screen</h2>
-        {platform === "ios" ? (
+        <h2 id="padre-install-title">{installed ? "Padre Pio is already installed" : "Add Padre Pio to your home screen"}</h2>
+        {installed ? (
+          <p>Open Padre Pio from your device’s home screen or app list. You can also continue using this website here.</p>
+        ) : platform === "ios" ? (
           <p>In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong>.</p>
         ) : platform === "android" ? (
           <p>In Chrome, open the browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>, if offered.</p>
         ) : (
           <p>In Chrome or Edge, use the browser’s <strong>Install app</strong> option when it is available.</p>
         )}
-        <p className="padreInstallNote">You can keep using this website without installing it.</p>
+        {!installed && <p className="padreInstallNote">You can keep using this website without installing it.</p>}
         <button className="padreButton padreButtonPrimary" type="button" onClick={() => setHelpOpen(false)}>Continue on website</button>
       </section>
     </div>
