@@ -138,7 +138,7 @@ export default function HomePage() {
           <div className="heroEyebrow"><span className="eyebrowDot" /> A clearer way to reach reception</div>
           <h1>Care starts<br /><em>with a welcome.</em></h1>
           <p>Find your way to Padre Pio, request an appointment, and let reception take it from there.</p>
-          <div className="heroActions"><a className="button buttonLight" href="#request-appointment">Request an appointment <ArrowRight size={17} aria-hidden="true" /></a><a className="heroCall" href="tel:+2673164811"><Phone size={17} aria-hidden="true" /><span><small>Call reception</small><strong>+267 316 4811</strong></span></a></div>
+          <div className="heroActions"><a className="button buttonLight" href="#request-appointment">Request an appointment <ArrowRight size={17} aria-hidden="true" /></a><a className="heroCall" href="#visit"><MapPin size={17} aria-hidden="true" /><span><small>Find the clinic</small><strong>Gaborone West · Phase 1</strong></span></a></div>
           <div className="heroFoot"><span><ShieldCheck size={15} aria-hidden="true" /> Your request stays a request until reception confirms</span><a href="#your-visit">How it works <ArrowDown size={14} aria-hidden="true" /></a></div>
         </div>
         <div className="heroIndex" aria-hidden="true"><span>01</span><i /><span>WELCOME</span></div>
