@@ -1,12 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 function requestInstall() {
   window.dispatchEvent(new Event("padre-pio-install"));
 }
 
 export default function HomePage() {
+  const entranceVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [showEntranceVideo, setShowEntranceVideo] = useState(false);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const dataSaver = Boolean(connection?.saveData) || connection?.effectiveType === "slow-2g" || connection?.effectiveType === "2g";
+    if (!reducedMotion && !dataSaver) setShowEntranceVideo(true);
+  }, []);
+
+  useEffect(() => {
+    if (!showEntranceVideo) return;
+    const video = entranceVideoRef.current;
+    if (video) void video.play().catch(() => setShowEntranceVideo(false));
+  }, [showEntranceVideo]);
   return (
     <main className="padreSite">
       <div className="padreTopline">
@@ -47,7 +63,7 @@ export default function HomePage() {
             <div className="padreVideoShade" />
             <div className="padreVideoCaption">
               <span className="padreLiveDot" aria-hidden="true" />
-              <span><strong>Recognise the entrance</strong><small>A familiar landmark before you arrive.</small></span>
+              <span><strong>{showEntranceVideo ? "Recognise the entrance" : "Your visit starts here"}</strong><small>{showEntranceVideo ? "A familiar landmark before you arrive." : "Video paused to respect motion or data settings."}</small></span>
             </div>
           </div>
           <div className="padreEntranceFrameBottom"><span>PADRE PIO · GABORONE WEST</span><span aria-hidden="true">✳</span></div>
