@@ -14,7 +14,7 @@ function read(relative) { return fs.readFileSync(path.join(root, relative), "utf
 for (const file of ["AGENTS.md", "AGENTS_REPO_LABELED.md", "CLONING.md", "docs/ADMIN-HUB-APP-FACTORY-SOP.md", "docs/CLONE-RESET-CHECKLIST.md", "docs/PWA-FOUNDATION.md", "scripts/identity.config.json", "scripts/verify-identity.mjs", "scripts/verify-clone-readiness.mjs"]) {
   check("Project instructions exist: " + file, exists(file));
 }
-for (const file of ["src/app/page.tsx", "src/app/layout.tsx", "src/app/manifest.ts", "src/app/pwa-register.tsx", "src/app/admin/page.tsx", "src/app/api/appointments/route.ts", "src/lib/server/firebase-admin.ts", "public/sw.js", "public/manifest.webmanifest", "public/padre-pio-icon.svg", "public/padre-pio-icon-192.png", "public/padre-pio-icon-512.png", "public/videos/padre.mp4", "firestore.rules", "storage.rules", "firestore.indexes.json"]) {
+for (const file of ["src/app/page.tsx", "src/app/layout.tsx", "src/app/manifest.ts", "src/app/pwa-register.tsx", "src/app/admin/page.tsx", "src/app/api/appointments/route.ts", "src/lib/server/firebase-admin.ts", "public/sw.js", "public/manifest.webmanifest", "public/padre-pio-icon.svg", "public/padre-pio-icon-192.png", "public/padre-pio-icon-512.png", "public/videos/padre.mp4", "public/videos/padre-poster.webp", "firestore.rules", "storage.rules", "firestore.indexes.json"]) {
   check("Required target file exists: " + file, exists(file));
 }
 const pkg = JSON.parse(read("package.json"));

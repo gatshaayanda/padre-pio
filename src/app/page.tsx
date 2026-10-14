@@ -133,7 +133,7 @@ export default function HomePage() {
       </header>
 
       <section className="hero" id="top">
-        <div className="heroMedia" aria-hidden="true"><img className="heroPoster" src="/clinic-entrance-poster.svg" alt="" /><video ref={videoRef} className="heroVideo" muted loop playsInline preload="none" poster="/clinic-entrance-poster.svg" aria-hidden="true" /><div className="heroShade" /></div>
+        <div className="heroMedia" aria-hidden="true"><img className="heroPoster" src="/videos/padre-poster.webp" alt="" /><video ref={videoRef} className="heroVideo" muted loop playsInline preload="none" poster="/videos/padre-poster.webp" aria-hidden="true" /><div className="heroShade" /></div>
         <div className="wrap heroContent">
           <div className="heroEyebrow"><span className="eyebrowDot" /> A clearer way to reach reception</div>
           <h1>Care starts<br /><em>with a welcome.</em></h1>

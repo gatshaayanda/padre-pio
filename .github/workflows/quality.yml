@@ -5,11 +5,11 @@ on:
   pull_request:
     branches: [main]
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -28,6 +28,26 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Refresh patched dependency lockfile (one-time)
+        if: github.event_name == 'pull_request' && github.event.action == 'reopened' && github.event.pull_request.head.ref == 'feat/padre-pio-digital-reception'
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit
+          npm audit fix --package-lock-only --ignore-scripts || true
+      - name: Optimize entrance video and generate real-frame poster (one-time)
+        if: github.event_name == 'pull_request' && github.event.action == 'reopened' && github.event.pull_request.head.ref == 'feat/padre-pio-digital-reception'
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          ffmpeg -y -ss 1 -i public/videos/padre.mp4 -frames:v 1 -vf "scale='min(1400,iw)':-2" -c:v libwebp -quality 82 /tmp/padre-pio-poster.webp
+          ffmpeg -y -i public/videos/padre.mp4 -vf "scale='min(1280,iw)':-2,fps=24" -an -c:v libx264 -preset medium -crf 29 -pix_fmt yuv420p -movflags +faststart /tmp/padre-pio-optimized.mp4
+          before=$(stat -c%s public/videos/padre.mp4)
+          after=$(stat -c%s /tmp/padre-pio-optimized.mp4)
+          if [ "$after" -ge "$before" ]; then echo "Optimized video was not smaller; keeping the original and failing safely."; exit 1; fi
+          mv /tmp/padre-pio-optimized.mp4 public/videos/padre.mp4
+          mv /tmp/padre-pio-poster.webp public/videos/padre-poster.webp
+          echo "Original bytes: $before"
+          echo "Optimized bytes: $after"
+          echo "Poster bytes: $(stat -c%s public/videos/padre-poster.webp)"
+          ffprobe -v error -show_entries format=duration,size -show_entries stream=codec_name,width,height,r_frame_rate -of json public/videos/padre.mp4
       - name: Install dependencies
         run: npm ci
       - name: Identity verification
@@ -46,3 +66,15 @@ jobs:
           node -e 'const a=require("/tmp/padre-pio-audit.json"); const v=a.metadata?.vulnerabilities||{}; console.log("npm audit counts:", JSON.stringify(v)); for (const [name,item] of Object.entries(a.vulnerabilities||{})) if (["critical","high"].includes(item.severity)) { const via=(item.via||[]).map(x=>typeof x==="string"?x:{title:x.title,range:x.range,url:x.url}); console.log(JSON.stringify({severity:item.severity,name,direct:item.isDirect,range:item.range,via,fixAvailable:item.fixAvailable})); }'
       - name: Block high or critical production vulnerabilities
         run: npm audit --omit=dev --audit-level=high
+      - name: Commit refreshed lockfile and optimized media
+        if: success() && github.event_name == 'pull_request' && github.event.action == 'reopened' && github.event.pull_request.head.ref == 'feat/padre-pio-digital-reception'
+        run: |
+          git add package-lock.json public/videos/padre.mp4 public/videos/padre-poster.webp
+          if git diff --cached --quiet; then
+            echo "Dependency lockfile and entrance media are already up to date."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "fix: refresh secure dependencies and optimize entrance media"
+            git push origin "HEAD:refs/heads/${{ github.event.pull_request.head.ref }}"
+          fi
