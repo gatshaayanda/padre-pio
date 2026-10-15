@@ -78,7 +78,17 @@ export default function PatientAccountPage() {
         startingAnonymousSession.current = true;
         try {
           await setPersistence(auth, browserLocalPersistence);
-          await signInAnonymously(auth);
+          const credential = await signInAnonymously(auth);
+          if (alive) {
+            setUser(credential.user);
+            try {
+              await loadRequests(credential.user);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Your request history could not be loaded.");
+            } finally {
+              setLoading(false);
+            }
+          }
         } catch {
           if (alive) {
             setError("We could not open a private patient session. You can still request an appointment without creating an account.");
