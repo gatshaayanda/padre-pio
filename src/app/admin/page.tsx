@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { onAuthStateChanged, signInWithCustomToken, signOut } from "firebase/auth";
 import {
@@ -27,6 +27,16 @@ const statuses = [
   "NEW", "REVIEWING", "APPROVED", "CONFIRMED",
   "RESCHEDULE_REQUESTED", "COMPLETED", "CANCELLED"
 ];
+
+const nextStatuses: Record<string, string[]> = {
+  NEW: ["NEW", "REVIEWING", "CANCELLED"],
+  REVIEWING: ["REVIEWING", "APPROVED", "RESCHEDULE_REQUESTED", "CANCELLED"],
+  APPROVED: ["APPROVED", "CONFIRMED", "RESCHEDULE_REQUESTED", "CANCELLED"],
+  CONFIRMED: ["CONFIRMED", "COMPLETED", "RESCHEDULE_REQUESTED", "CANCELLED"],
+  RESCHEDULE_REQUESTED: ["RESCHEDULE_REQUESTED", "REVIEWING", "APPROVED", "CONFIRMED", "CANCELLED"],
+  COMPLETED: ["COMPLETED"],
+  CANCELLED: ["CANCELLED"],
+};
 
 function labelFor(value: string) {
   return ({
@@ -62,6 +72,8 @@ export default function AdminPage() {
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   useEffect(() => {
     if (!hasFirebaseWebConfig) return;
@@ -98,6 +110,18 @@ export default function AdminPage() {
       setLoading(false);
     });
   }, [authorized, userUid]);
+
+  const filteredAppointments = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase();
+    return appointments.filter((item) => {
+      const matchesSearch = !term || [item.patientName, item.phone, item.id]
+        .some((value) => String(value ?? "").toLocaleLowerCase().includes(term));
+      const matchesStatus = statusFilter === "ALL"
+        || (statusFilter === "NEEDS_REVIEW" && ["NEW", "REVIEWING", "APPROVED", "RESCHEDULE_REQUESTED"].includes(item.status))
+        || item.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [appointments, search, statusFilter]);
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,19 +205,26 @@ export default function AdminPage() {
         </section>
       ) : (
         <section className="padreQueue">
-          <div className="padreQueueHeading"><div><span className="padreEyebrow">PRIVATE · AUTHORISED STAFF</span><h1>Appointment<br /><em>requests.</em></h1></div><div className="padreQueueCount"><strong>{appointments.length}</strong><span>records loaded</span></div></div>
-          <p className="padreQueueIntro">Review requests and record the clinic’s actual response. Only mark a booking CONFIRMED after reception has confirmed it with the patient.</p>
+          <div className="padreQueueHeading"><div><span className="padreEyebrow">PRIVATE · AUTHORISED STAFF</span><h1>Appointment<br /><em>requests.</em></h1></div><div className="padreQueueCount"><strong>{filteredAppointments.length}</strong><span>shown · {appointments.length} loaded</span></div></div>
+          <p className="padreQueueIntro">Review requests and record the clinic’s actual response. A saved status is an internal record update, not a message to the patient. Only mark a booking CONFIRMED after reception has confirmed it with the patient.</p>
           {error && <p className="padreFormError" role="alert">{error}</p>}
           {notice && <p className="padreFormNotice" role="status">{notice}</p>}
-          {loading ? <p className="padreQueueState">Loading the private queue…</p> : appointments.length === 0 ? <div className="padreQueueState"><strong>No appointment requests yet.</strong><p>New requests will appear here after they are successfully submitted.</p></div> : (
+          <div className="padreQueueTools">
+            <label>Find a request<input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Patient, phone or reference" /></label>
+            <label>Show<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="ALL">All statuses</option><option value="NEEDS_REVIEW">Needs review</option>
+              {statuses.filter((status) => status !== "NEW" && status !== "REVIEWING" && status !== "APPROVED" && status !== "RESCHEDULE_REQUESTED").map((status) => <option key={status} value={status}>{labelFor(status)}</option>)}
+            </select></label>
+          </div>
+          {loading ? <p className="padreQueueState">Loading the private queue…</p> : appointments.length === 0 ? <div className="padreQueueState"><strong>No appointment requests yet.</strong><p>New requests will appear here after they are successfully submitted.</p></div> : filteredAppointments.length === 0 ? <div className="padreQueueState"><strong>No matching requests.</strong><p>Try another name, phone number, reference or status filter.</p></div> : (
             <div className="padreAppointmentList">
-              {appointments.map((item) => (
+              {filteredAppointments.map((item) => (
                 <article className="padreAppointmentCard" key={item.id}>
-                  <div className="padreAppointmentHead"><div><span className="padreAppointmentDate">RECEIVED · {formatDate(item.createdAt)}</span><h2>{item.patientName}</h2><a href={"tel:" + item.phone}>{item.phone}</a></div><span className={"padreStatus padreStatus" + item.status}>{labelFor(item.status)}</span></div>
+                  <div className="padreAppointmentHead"><div><span className="padreAppointmentDate">RECEIVED · {formatDate(item.createdAt)}</span><h2>{item.patientName}</h2><a href={"tel:" + item.phone}>{item.phone}</a><small className="padreAppointmentReference">REFERENCE · {item.id}</small></div><span className={"padreStatus padreStatus" + item.status}>{labelFor(item.status)}</span></div>
                   <div className="padreAppointmentDetails"><div><small>PREFERRED DATE</small><strong>{item.preferredDate}</strong></div><div><small>TIME</small><strong>{labelFor(item.preferredTime)}</strong></div><div><small>REQUEST TYPE</small><strong>{labelFor(item.category)}</strong></div></div>
                   {item.patientNote && <p className="padrePatientNote"><small>PATIENT NOTE</small>{item.patientNote}</p>}
                   <form className="padreAdminUpdate" onSubmit={(event) => void saveAppointment(event, item.id)}>
-                    <label>Record status<select name="status" defaultValue={item.status}>{statuses.map(status=><option key={status} value={status}>{labelFor(status)}</option>)}</select></label>
+                    <label>Record status<select name="status" defaultValue={item.status}>{(nextStatuses[item.status] || [item.status]).map(status=><option key={status} value={status}>{labelFor(status)}</option>)}</select></label>
                     <label>Internal note<textarea name="adminNote" defaultValue={item.adminNote || ""} rows={2} maxLength={500} placeholder="Reception-only note. Do not record clinical history." /></label>
                     <button className="padreButton padreButtonPrimary" type="submit" disabled={busyId === item.id}>{busyId === item.id ? "Saving…" : "Save update"} <span aria-hidden="true">↗</span></button>
                   </form>

@@ -116,7 +116,7 @@ export default function AppointmentRequestPage() {
           <span className="padreSuccessMark" aria-hidden="true">✓</span>
           <span className="padreEyebrow">THANK YOU — WE HAVE YOUR REQUEST</span>
           <h1>We’ll take it from here, {name.trim().split(/\s+/)[0]}.</h1>
-          <p>Your request has been recorded for reception to review. Your preferred date and time are a request, not a confirmed booking.</p>
+          <p>Your request has been recorded for reception to review.</p><div className="padreBookingRequestNotice padreBookingRequestNoticeSuccess" role="status"><span className="padreBookingRequestNoticeIcon" aria-hidden="true">!</span><div><strong>Your preferred timing is not reserved.</strong><p>Please wait for reception to contact you and confirm a suitable appointment. This request alone does not book a visit.</p></div></div>
           <div className="padreReference"><small>YOUR REQUEST REFERENCE</small><strong>{reference}</strong></div>
           <div className="padreNextSteps"><strong>What happens next?</strong><ol><li>Reception reviews your request and preferred timing.</li><li>The clinic contacts you using the phone number you provided.</li><li>Your appointment is confirmed only when the clinic confirms it with you.</li></ol></div>
           <Link className="padreButton padreButtonPrimary" href="/account">Keep track of my request <span aria-hidden="true">↗</span></Link>
@@ -187,7 +187,7 @@ export default function AppointmentRequestPage() {
                 <label className={time === "AFTERNOON" ? "padreBookingTimeOption isSelected" : "padreBookingTimeOption"}><input type="radio" name="time" value="AFTERNOON" checked={time === "AFTERNOON"} onChange={() => setTime("AFTERNOON")} /><span aria-hidden="true">◒</span><strong>Afternoon</strong><small>Later in the day</small></label>
                 <label className={time === "FLEXIBLE" ? "padreBookingTimeOption isSelected" : "padreBookingTimeOption"}><input type="radio" name="time" value="FLEXIBLE" checked={time === "FLEXIBLE"} onChange={() => setTime("FLEXIBLE")} /><span aria-hidden="true">↔</span><strong>I’m flexible</strong><small>Reception can advise</small></label>
               </fieldset>
-              <p className="padreBookingHint"><span aria-hidden="true">◷</span> This is a preferred time, not a reserved slot. The clinic will contact you to confirm a suitable appointment.</p>
+              <div className="padreBookingRequestNotice" role="note" aria-label="Important appointment information"><span className="padreBookingRequestNoticeIcon" aria-hidden="true">!</span><div><strong>Important: this is a request, not a booking.</strong><p>Your preferred date and time are not reserved. Reception will contact you to confirm a suitable appointment.</p></div></div>
             </div>}
 
             {step === 3 && <div className="padreBookingContactFields">
