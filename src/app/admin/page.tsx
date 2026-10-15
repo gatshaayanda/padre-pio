@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { onAuthStateChanged, signInWithCustomToken, signOut } from "firebase/auth";
 import {
   collection, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc
 } from "firebase/firestore";
@@ -54,8 +54,7 @@ function formatDate(value?: Appointment["createdAt"]) {
 }
 
 export default function AdminPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [accessWord, setAccessWord] = useState("");
   const [userUid, setUserUid] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -109,10 +108,18 @@ export default function AdminPage() {
       return;
     }
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      setPassword("");
-    } catch {
-      setError("Sign-in failed. Check the credentials and whether Email/Password sign-in is enabled for the clinic’s Firebase project.");
+      const response = await fetch("/api/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ word: accessWord }),
+      });
+      const result = await response.json() as { token?: string; error?: string };
+      if (!response.ok || !result.token) throw new Error(result.error || "Access denied. Check the access word and try again.");
+      await signInWithCustomToken(auth, result.token);
+      setAccessWord("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Reception sign-in is temporarily unavailable.");
     }
   }
 
@@ -164,12 +171,11 @@ export default function AdminPage() {
         <section className="padreAdminLogin">
           <span className="padreEyebrow">STAFF ACCESS</span>
           <h1>Reception<br /><em>workspace.</em></h1>
-          <p>Sign in with an authorised clinic staff account to review appointment requests.</p>
+          <p>Enter the clinic’s authorised reception access word to review appointment requests.</p>
           <form className="padreFormCard" onSubmit={login}>
-            <label>Email address<input type="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)} required /></label>
-            <label>Password<input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required /></label>
+            <label>Reception access word<input type="password" autoComplete="current-password" value={accessWord} onChange={e=>setAccessWord(e.target.value)} required /></label>
             {error && <p className="padreFormError" role="alert">{error}</p>}
-            <button className="padreButton padreButtonPrimary padreSubmitButton" type="submit">Sign in securely <span aria-hidden="true">↗</span></button>
+            <button className="padreButton padreButtonPrimary padreSubmitButton" type="submit">Enter reception <span aria-hidden="true">↗</span></button>
           </form>
           <Link className="padreTextLink" href="/">← Return to clinic website</Link>
         </section>
