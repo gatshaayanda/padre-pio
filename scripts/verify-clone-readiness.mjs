@@ -36,7 +36,7 @@ for (const file of [
   "scripts/identity.config.json", "scripts/verify-identity.mjs",
   "scripts/verify-clone-readiness.mjs", "package.json", "package-lock.json",
   "src/app/page.tsx", "src/app/layout.tsx", "src/app/manifest.ts",
-  "src/app/appointments/request/page.tsx", "src/app/admin/page.tsx",
+  "src/app/appointments/request/page.tsx", "src/app/admin/page.tsx", "src/app/api/admin-login/route.ts",
   "src/app/offline/page.tsx", "src/lib/firebase/client.ts",
   "public/manifest.webmanifest", "public/padre-pio-mark.svg",
   "public/padre-pio-icon-192.png", "public/padre-pio-icon-512.png",
@@ -57,6 +57,7 @@ const rules = read("firestore.rules");
 const storageRules = read("storage.rules");
 const quality = read(".github/workflows/quality.yml");
 const envExample = read(".env.example");
+const adminLogin = read("src/app/api/admin-login/route.ts");
 
 check("Package and lockfile names match", packageJson.name === lockJson.name && packageJson.name === lockJson.packages?.[""]?.name);
 check("Lockfile root dependencies match package.json", JSON.stringify(packageJson.dependencies ?? {}) === JSON.stringify(lockJson.packages?.[""]?.dependencies ?? {}), "Run npm install to reconcile if this fails.");
@@ -96,6 +97,7 @@ check("Legacy retail dashboard and integrations are removed", !exists("src/compo
 check("No inherited source icon assets remain", !exists("public/plug-icon.svg") && !exists("public/plug-icon-192.png") && !exists("public/plug-icon-512.png"));
 check("Entrance video is present and is not an empty placeholder", exists("public/videos/padre.mp4") && fs.statSync(path.join(root, "public/videos/padre.mp4")).size > 1000000);
 check("No Firebase project IDs or secrets are prefilled in .env.example", !/^NEXT_PUBLIC_FIREBASE_(?:API_KEY|AUTH_DOMAIN|PROJECT_ID|STORAGE_BUCKET|MESSAGING_SENDER_ID|APP_ID)=.+$/m.test(envExample) && !/^FIREBASE_ADMIN_KEY=.+$/m.test(envExample));
+check("One-word reception login needs no separately configured UID", !envExample.includes("PADRE_PIO_ADMIN_UID") && !adminLogin.includes("process.env.PADRE_PIO_ADMIN_UID") && adminLogin.includes('const RECEPTION_UID = "padre-pio-reception"') && /collection\("admins"\)\.doc\(RECEPTION_UID\)\.set/.test(adminLogin));
 
 if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) warn("Dedicated Firebase configuration is not present in this static environment", "This is expected before a clinic-owned project is configured; runtime requests must remain disabled.");
 if (!process.env.NEXT_PUBLIC_BASE_URL) warn("Canonical production domain is not configured", "Do not invent a domain or publish canonical metadata until it is confirmed.");
