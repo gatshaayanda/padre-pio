@@ -93,7 +93,9 @@ export default function AppointmentRequestPage() {
           <p>Your appointment request has been sent to the clinic for review. This is not a confirmed booking; please wait for reception to respond.</p>
           <div className="padreNextSteps"><strong>What happens next?</strong><ol><li>Reception reviews your preferred date and time.</li><li>The clinic contacts you using the phone number provided.</li><li>Your visit is booked only after the clinic confirms it.</li></ol></div>
           <div className="padreReference"><small>YOUR REFERENCE</small><strong>{reference}</strong></div>
-          <Link className="padreButton padreButtonPrimary" href="/">Back to clinic information <span aria-hidden="true">↗</span></Link>
+          <Link className="padreButton padreButtonPrimary" href="/account">Keep my request with me <span aria-hidden="true">↗</span></Link>
+          <p className="padreAccountHint">Optional: save access to your request history. You do not need an account to request a visit.</p>
+          <Link className="padreButton padreButtonSecondary" href="/">Back to clinic information <span aria-hidden="true">↗</span></Link>
         </section>
       </main>
     );
@@ -126,7 +128,7 @@ export default function AppointmentRequestPage() {
           <p className="padreFormFineprint">Your request is only sent after you select “Send”. A booking is confirmed only when the clinic confirms it.</p>
         </form>
       </section>
-      <footer className="padreFormFooter"><Link href="/">← Back to clinic information</Link><span>Not an emergency service</span></footer>
+      <footer className="padreFormFooter"><Link href="/">← Back to clinic information</Link><span>Not an emergency service</span><Link className="padreFormAdmin" href="/admin">Admin access ↗</Link></footer>
     </main>
   );
 }
