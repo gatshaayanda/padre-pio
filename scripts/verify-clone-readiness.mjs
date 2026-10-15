@@ -36,7 +36,7 @@ for (const file of [
   "scripts/identity.config.json", "scripts/verify-identity.mjs",
   "scripts/verify-clone-readiness.mjs", "package.json", "package-lock.json",
   "src/app/page.tsx", "src/app/layout.tsx", "src/app/manifest.ts",
-  "src/app/appointments/request/page.tsx", "src/app/admin/page.tsx", "src/app/api/admin-login/route.ts",
+  "src/app/appointments/request/page.tsx", "src/app/admin/page.tsx", "src/app/api/admin-login/route.ts", "src/app/api/customer/appointments/claim/route.ts",
   "src/app/offline/page.tsx", "src/lib/firebase/client.ts",
   "public/manifest.webmanifest", "public/padre-pio-mark.svg",
   "public/padre-pio-icon-192.png", "public/padre-pio-icon-512.png",
@@ -58,6 +58,8 @@ const storageRules = read("storage.rules");
 const quality = read(".github/workflows/quality.yml");
 const envExample = read(".env.example");
 const adminLogin = read("src/app/api/admin-login/route.ts");
+const accountClaim = read("src/app/api/customer/appointments/claim/route.ts");
+const accountPage = read("src/app/account/page.tsx");
 
 check("Package and lockfile names match", packageJson.name === lockJson.name && packageJson.name === lockJson.packages?.[""]?.name);
 check("Lockfile root dependencies match package.json", JSON.stringify(packageJson.dependencies ?? {}) === JSON.stringify(lockJson.packages?.[""]?.dependencies ?? {}), "Run npm install to reconcile if this fails.");
@@ -93,6 +95,8 @@ check("Inherited scheduled retail workflow is absent", !exists(".github/workflow
 
 check("Legacy retail routes and APIs are removed", !exists("src/app/request/page.tsx") && !exists("src/app/saved/page.tsx") && !exists("src/app/api/sourcing-request/route.ts"));
 check("Account route is the clinic-specific Padre Pio patient space", exists("src/app/account/page.tsx") && read("src/app/account/page.tsx").includes("YOUR PATIENT SPACE") && read("src/app/account/page.tsx").includes("/api/customer/appointments"));
+check("Patient account explains real value and can refresh saved status", accountPage.includes("change phones or browsers") && accountPage.includes("Refresh request status") && accountPage.includes("not push notifications"));
+check("Existing Google account flow connects only verified guest requests", accountPage.includes("/api/customer/appointments/claim") && accountClaim.includes('accountProvider !== "google.com"') && accountClaim.includes('guestProvider !== "anonymous"') && accountClaim.includes('where("patientUid", "==", guest.uid)'));
 check("Legacy retail dashboard and integrations are removed", !exists("src/components/PlugAdminDashboard.tsx") && !exists("src/lib/uploadthing.ts") && !exists("src/lib/firebase/plug-data.ts"));
 check("No inherited source icon assets remain", !exists("public/plug-icon.svg") && !exists("public/plug-icon-192.png") && !exists("public/plug-icon-512.png"));
 check("Entrance video is present and is not an empty placeholder", exists("public/videos/padre.mp4") && fs.statSync(path.join(root, "public/videos/padre.mp4")).size > 1000000);

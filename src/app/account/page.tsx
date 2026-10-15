@@ -48,6 +48,7 @@ export default function PatientAccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<PatientRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -111,6 +112,21 @@ export default function PatientAccountPage() {
     return () => { alive = false; unsubscribe(); };
   }, [loadRequests]);
 
+  async function refreshRequests() {
+    if (!user) return;
+    setRefreshing(true);
+    setError("");
+    setMessage("");
+    try {
+      await loadRequests(user);
+      setMessage("Your request statuses have been refreshed from the clinic’s latest saved updates.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Your request history could not be refreshed.");
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   async function secureAccount() {
     if (!user) return;
     setBusy(true);
@@ -130,7 +146,7 @@ export default function PatientAccountPage() {
       const code = typeof err === "object" && err && "code" in err ? String((err as { code?: unknown }).code) : "";
       if (["auth/credential-already-in-use", "auth/email-already-in-use", "auth/account-exists-with-different-credential"].includes(code)) {
         setShowExistingAccount(true);
-        setMessage("That Google account already has a separate identity. You can sign in to it, but this guest request will not be merged automatically.");
+        setMessage("That Google account already exists. Sign in to it and we will securely connect the requests from this guest session to that account.");
       } else if (code === "auth/popup-closed-by-user") {
         setMessage("Account setup was cancelled. Your guest request remains saved.");
       } else if (["auth/operation-not-allowed", "auth/unauthorized-domain", "auth/configuration-not-found"].includes(code)) {
@@ -144,17 +160,31 @@ export default function PatientAccountPage() {
   }
 
   async function signIntoExistingAccount() {
+    if (!user?.isAnonymous) return;
     setBusy(true);
     setError("");
+    setMessage("");
     try {
       await setPersistence(auth, browserLocalPersistence);
+      const guestIdToken = await user.getIdToken();
       const credential = await signInWithPopup(auth, new GoogleAuthProvider());
+      const accountIdToken = await credential.user.getIdToken();
+      const claimResponse = await fetch("/api/customer/appointments/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + accountIdToken },
+        cache: "no-store",
+        body: JSON.stringify({ guestIdToken }),
+      });
+      const claimResult = await claimResponse.json() as { moved?: number; error?: string };
+      if (!claimResponse.ok) throw new Error(claimResult.error || "Your earlier request could not be connected to this account.");
       setUser(credential.user);
       setShowExistingAccount(false);
       await loadRequests(credential.user);
-      setMessage("You are signed into your existing account. The earlier guest-session request was not merged; keep its reference for reception if you need help finding it.");
-    } catch {
-      setError("We could not open that Google account. Your guest request has not been cancelled.");
+      setMessage(claimResult.moved
+        ? `Your existing Google account is connected. ${claimResult.moved} request(s) from this guest session are now available in your patient history.`
+        : "Your existing Google account is connected. There were no requests in the guest session to move.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We could not connect this patient history. Your original request remains saved.");
     } finally {
       setBusy(false);
     }
@@ -169,19 +199,19 @@ export default function PatientAccountPage() {
       <section className="padreAccountIntro">
         <span className="padreEyebrow">YOUR PATIENT SPACE</span>
         <h1>Keep your next<br /><em>step close.</em></h1>
-        <p>Save access to your request history on this device and, if you choose, connect a Google account so you can return more easily next time.</p>
+        <p>Use this space to check whether reception has reviewed your request and keep your references together. Connect Google after your first request so you can return to the same history if you change phones or browsers.</p>
       </section>
       <section className="padreFormCard padreAccountCard">
         <div className="padreAccountSectionHead"><span className="padreEyebrow">ACCOUNT ACCESS</span><h2>{user && !user.isAnonymous ? "Your account is connected." : "Start without another form."}</h2></div>
         {user && !user.isAnonymous
-          ? <p>Your patient identity is connected. Request history below is loaded privately for this signed-in account.</p>
-          : <><p>You can continue as a guest. Connecting Google is optional and helps keep this browser session attached to the same patient identity on future visits.</p><button className="padreButton padreButtonPrimary" type="button" onClick={() => void secureAccount()} disabled={busy || !user}>{busy ? "Connecting…" : "Secure my patient access with Google"} <span aria-hidden="true">↗</span></button></>}
+          ? <><p>Your Google account is connected. When you sign in with it on another device, this same patient identity can retrieve its request history.</p><button className="padreButton padreButtonSecondary" type="button" onClick={() => void refreshRequests()} disabled={refreshing || loading}>{refreshing ? "Refreshing…" : "Refresh request status"} <span aria-hidden="true">↻</span></button></>
+          : <><p>You can leave this page and still request care without an account. We recommend securing this patient session with Google if you want to return to this same request history on another device. Account setup does not confirm or change an appointment.</p><button className="padreButton padreButtonPrimary" type="button" onClick={() => void secureAccount()} disabled={busy || !user}>{busy ? "Connecting…" : "Secure my patient account with Google"} <span aria-hidden="true">↗</span></button></>}
         {showExistingAccount && <button className="padreButton padreButtonSecondary" type="button" onClick={() => void signIntoExistingAccount()} disabled={busy}>Sign in to existing Google account</button>}
         {error && <p className="padreFormError" role="alert">{error}</p>}
         {message && <p className="padreFormNotice" role="status">{message}</p>}
       </section>
       <section className="padreAccountRequests">
-        <div className="padreAccountSectionHead"><span className="padreEyebrow">YOUR REQUESTS</span><h2>Appointment history.</h2></div>
+        <div className="padreAccountSectionHead"><span className="padreEyebrow">YOUR REQUESTS</span><h2>Appointment history.</h2><p>Check the latest status saved by reception. Status changes are not push notifications; return here or refresh this list to check again.</p></div>
         {loading ? <p className="padreQueueState">Loading your private request history…</p>
           : requests.length === 0 ? <div className="padreAccountEmpty"><strong>No requests found in this patient session.</strong><p>If you submitted a request in another browser or used a separate account, the histories are not merged automatically. Your reference can help reception locate a request.</p><Link className="padreButton padreButtonPrimary" href="/appointments/request">Request an appointment <span aria-hidden="true">↗</span></Link></div>
           : <div className="padreAccountRequestList">{requests.map((item) => <article className="padreAccountRequest" key={item.id}><div><span className="padreEyebrow">REFERENCE · {item.reference}</span><h3>{categoryCopy[item.category] || "Appointment request"}</h3><p>{item.preferredDate || "Date not provided"} · {({ MORNING: "Morning", AFTERNOON: "Afternoon", FLEXIBLE: "Flexible" } as Record<string, string>)[item.preferredTime] || item.preferredTime}</p></div><span className={"padreStatus padreStatus" + item.status}>{statusCopy[item.status] || item.status.replaceAll("_", " ")}</span></article>)}</div>}
