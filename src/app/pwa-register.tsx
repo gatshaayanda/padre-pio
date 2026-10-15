@@ -98,15 +98,9 @@ export default function PwaRegister() {
       setHelpOpen(true);
       return;
     }
-    if (isEmbeddedBrowser()) {
-      setEmbedded(true);
-      setHelpOpen(true);
-      return;
-    }
-    setEmbedded(false);
     const prompt = promptRef.current;
     if (prompt) {
-      // Call prompt() directly in this button's click handler.
+      // The native prompt must be invoked directly from this user click whenever available.
       promptRef.current = null;
       setNativePromptAvailable(false);
       void prompt.prompt().then(() => prompt.userChoice).then((choice) => {
@@ -120,6 +114,12 @@ export default function PwaRegister() {
       }).catch(() => setHelpOpen(true));
       return;
     }
+    if (isEmbeddedBrowser()) {
+      setEmbedded(true);
+      setHelpOpen(true);
+      return;
+    }
+    setEmbedded(false);
     setHelpOpen(true);
   }
 
@@ -139,7 +139,7 @@ export default function PwaRegister() {
 
   return (
     <>
-      {!installed && !dismissed && (
+      {!installed && !dismissed && (nativePromptAvailable || platform === "ios" || embedded) && (
         <aside className="padreFloatingInstall" aria-label="Install Padre Pio Medical Centre">
           <div className="padreFloatingInstallCopy">
             <span className="padreFloatingInstallMark" aria-hidden="true">✚</span>
@@ -149,7 +149,7 @@ export default function PwaRegister() {
             </span>
           </div>
           <button className="padreFloatingInstallAction" type="button" onClick={installOrExplain}>
-            {nativePromptAvailable ? "Install" : platform === "ios" ? "How to add" : embedded ? "Open in browser" : "Install options"}
+            {nativePromptAvailable ? "Install" : platform === "ios" ? "Add to Home Screen" : "Open in browser"}
           </button>
           <button className="padreFloatingInstallDismiss" type="button" aria-label="Dismiss install prompt" onClick={() => setDismissed(true)}>×</button>
         </aside>
