@@ -144,8 +144,8 @@ export default function PwaRegister() {
           <div className="padreFloatingInstallCopy">
             <span className="padreFloatingInstallMark" aria-hidden="true">✚</span>
             <span>
-              <strong>{nativePromptAvailable ? "Install Padre Pio" : platform === "ios" ? "Add Padre Pio to Home Screen" : "Keep Padre Pio close"}</strong>
-              <small>{nativePromptAvailable ? "Tap Install to open the browser prompt." : "Optional quick access to the clinic."}</small>
+              <strong>"Install Padre Pio Medical Centre"</strong>
+              <small>"Keep the clinic one tap away."</small>
             </span>
           </div>
           <button className="padreFloatingInstallAction" type="button" onClick={installOrExplain}>
