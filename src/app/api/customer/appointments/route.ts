@@ -17,7 +17,6 @@ export async function GET(request: Request) {
     const snapshot = await getAdminDb()
       .collection("appointments")
       .where("patientUid", "==", patient.uid)
-      .limit(50)
       .get();
 
     const items = snapshot.docs.map((document) => {
@@ -34,7 +33,7 @@ export async function GET(request: Request) {
         category: String(data.category ?? "NOT_SURE"),
         status: String(data.status ?? "NEW"),
       };
-    }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 50);
 
     return NextResponse.json({ items }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
