@@ -313,3 +313,95 @@ button, input, select, textarea { font: inherit; }
   .padreAccountIntro { margin-top:42px; }
   .padreFormFooter .padreFormAdmin { margin-left:0; }
 }
+
+
+/* Editorial, guided appointment-request journey — scoped to the booking page. */
+.padreBookingEditorial { padding-top:24px; }
+.padreBookingIntro { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr); align-items:end; gap:clamp(28px,6vw,86px); max-width:1120px; margin:clamp(38px,6vw,72px) auto 38px; }
+.padreBookingIntroCopy h1 { margin:18px 0 18px; font-family:Georgia,'Times New Roman',serif; font-size:clamp(46px,6.1vw,76px); font-weight:500; line-height:.98; letter-spacing:-.055em; }
+.padreBookingIntroCopy h1 em { color:var(--padre-forest); font-weight:500; }
+.padreBookingIntroCopy>p { max-width:620px; margin:0; color:var(--padre-muted); font-size:15px; line-height:1.8; }
+.padreBookingProgress { display:grid; gap:0; padding:8px 0; }
+.padreBookingProgress>span { display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid var(--padre-line); }
+.padreBookingProgress>span:last-child { border-bottom:0; }
+.padreBookingProgress b { display:grid; place-items:center; flex:0 0 36px; width:36px; height:36px; border:1px solid var(--padre-line); border-radius:50%; color:var(--padre-forest); font-size:10px; }
+.padreBookingProgress strong,.padreBookingProgress small { display:block; }
+.padreBookingProgress strong { font-size:12px; }
+.padreBookingProgress small { margin-top:4px; color:var(--padre-muted); font-size:10px; }
+.padreBookingLayout { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(245px,.6fr); align-items:start; gap:20px; max-width:1120px; margin:0 auto 56px; }
+.padreBookingForm { padding:0; overflow:hidden; }
+.padreBookingSection { padding:clamp(22px,3.3vw,34px); border-bottom:1px solid var(--padre-line); }
+.padreBookingSectionHeading { display:flex; align-items:flex-start; gap:14px; margin-bottom:23px; }
+.padreBookingSectionHeading>span { display:grid; place-items:center; flex:0 0 34px; width:34px; height:34px; border-radius:50%; background:#e8eee5; color:var(--padre-forest); font-size:10px; font-weight:900; }
+.padreBookingSectionHeading h2 { margin:2px 0 7px; font-family:Georgia,'Times New Roman',serif; font-size:clamp(23px,3vw,31px); font-weight:500; line-height:1.1; letter-spacing:-.025em; }
+.padreBookingSectionHeading p { margin:0; color:var(--padre-muted); font-size:12px; line-height:1.7; }
+.padreCategoryGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.padreCategoryOption { position:relative; display:flex!important; flex-direction:row!important; align-items:flex-start; gap:10px!important; min-height:84px; padding:14px; border:1px solid var(--padre-line); background:#fffefa; cursor:pointer; transition:border-color .16s,background .16s; }
+.padreCategoryOption:hover { border-color:#8ca795; }
+.padreCategoryOption.isSelected { border-color:var(--padre-forest); background:#edf2e9; box-shadow:inset 0 0 0 1px var(--padre-forest); }
+.padreCategoryOption input { position:absolute; width:1px!important; height:1px!important; min-height:1px!important; opacity:0; }
+.padreCategoryOption input:focus-visible + .padreCategoryRadio { outline:2px solid var(--padre-forest); outline-offset:3px; }
+.padreCategoryRadio { display:grid; place-items:center; flex:0 0 19px; width:19px; height:19px; margin-top:1px; border:1px solid #9caf9d; border-radius:50%; color:white; background:white; font-size:11px; }
+.padreCategoryOption.isSelected .padreCategoryRadio { border-color:var(--padre-forest); background:var(--padre-forest); }
+.padreCategoryText { min-width:0; }
+.padreCategoryText strong,.padreCategoryText small { display:block; }
+.padreCategoryText strong { color:var(--padre-ink); font-size:12px; line-height:1.4; }
+.padreCategoryText small { margin-top:5px; color:var(--padre-muted); font-size:10px; font-weight:400; line-height:1.5; }
+.padreBookingTiming { gap:14px; }
+.padreBookingTiming label,.padreBookingContactFields label { display:grid; gap:8px; color:var(--padre-ink); font-size:11px; font-weight:800; }
+.padreBookingTiming input,.padreBookingTiming select,.padreBookingContactFields input,.padreBookingContactFields textarea { width:100%; min-height:48px; padding:12px 13px; border:1px solid #cbd5ca; border-radius:3px; background:#fffefa; color:var(--padre-ink); font:inherit; font-size:13px; }
+.padreBookingContactFields textarea { resize:vertical; }
+.padreBookingTiming input:focus,.padreBookingTiming select:focus,.padreBookingContactFields input:focus,.padreBookingContactFields textarea:focus { outline:2px solid #9aaf9d; outline-offset:2px; border-color:var(--padre-forest); }
+.padreBookingHint { display:flex; align-items:flex-start; gap:9px; margin:15px 0 0; padding:12px 13px; background:#f1efe6; color:var(--padre-muted); font-size:11px; line-height:1.65; }
+.padreBookingHint span { color:var(--padre-forest); font-size:15px; }
+.padreBookingContactFields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 13px; }
+.padreBookingContactFields>label:last-child { grid-column:1/-1; }
+.padreBookingPrivacy { margin-top:18px; }
+.padreBookingForm .padreSubmitButton { width:calc(100% - clamp(44px,6.6vw,68px)); margin:24px clamp(22px,3.3vw,34px) 0; }
+.padreBookingForm .padreFormFineprint { margin:12px clamp(22px,3.3vw,34px) 28px; font-size:11px; }
+.padreBookingAside { position:sticky; top:20px; border:1px solid var(--padre-line); background:var(--padre-paper); }
+.padreBookingAsideTop { padding:25px 23px 21px; background:#edf0e7; }
+.padreBookingAsideTop h2 { margin:13px 0 10px; font-family:Georgia,'Times New Roman',serif; font-size:29px; font-weight:500; line-height:1.08; letter-spacing:-.035em; }
+.padreBookingAsideTop p { margin:0; color:var(--padre-muted); font-size:12px; line-height:1.75; }
+.padreBookingTimeline { display:grid; gap:0; margin:0; padding:5px 23px; list-style:none; }
+.padreBookingTimeline li { display:flex; gap:12px; padding:17px 0; border-bottom:1px solid var(--padre-line); }
+.padreBookingTimeline li:last-child { border-bottom:0; }
+.padreBookingTimeline li>span { display:grid; place-items:center; flex:0 0 27px; width:27px; height:27px; border:1px solid var(--padre-line); border-radius:50%; color:var(--padre-forest); font-size:10px; font-weight:800; }
+.padreBookingTimeline strong { font-size:11px; }
+.padreBookingTimeline p { margin:5px 0 0; color:var(--padre-muted); font-size:10px; line-height:1.65; }
+.padreBookingAsideNote { margin:0 23px; padding:15px; border-left:3px solid var(--padre-gold); background:#f7f1e5; }
+.padreBookingAsideNote strong { font-size:11px; }
+.padreBookingAsideNote p { margin:6px 0 0; color:var(--padre-muted); font-size:10px; line-height:1.65; }
+.padreBookingAsideFoot { margin:17px 23px 22px; color:var(--padre-muted); font-size:10px; line-height:1.7; }
+.padreBookingSuccess { max-width:620px; }
+.padreBookingSuccess .padreButton { margin-top:8px; }
+.padreBookingSuccess .padreButtonSecondary { margin-top:14px; }
+@media(max-width:900px) {
+  .padreBookingIntro { grid-template-columns:1fr; gap:24px; }
+  .padreBookingProgress { grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+  .padreBookingProgress>span { align-items:flex-start; gap:8px; border:1px solid var(--padre-line); padding:12px 10px; }
+  .padreBookingProgress b { flex-basis:30px; width:30px; height:30px; }
+  .padreBookingLayout { grid-template-columns:1fr; }
+  .padreBookingAside { position:static; display:grid; grid-template-columns:1fr 1fr; }
+  .padreBookingAsideTop { grid-row:span 2; }
+  .padreBookingAsideFoot { align-self:end; }
+}
+@media(max-width:600px) {
+  .padreBookingEditorial { padding:18px 16px; }
+  .padreBookingIntro { margin-top:34px; }
+  .padreBookingIntroCopy h1 { font-size:clamp(43px,12vw,60px); }
+  .padreBookingProgress { grid-template-columns:1fr; gap:0; }
+  .padreBookingProgress>span { align-items:center; border:0; border-bottom:1px solid var(--padre-line); padding:9px 0; }
+  .padreBookingProgress>span:last-child { border-bottom:0; }
+  .padreBookingProgress b { flex-basis:32px; width:32px; height:32px; }
+  .padreCategoryGrid { grid-template-columns:1fr; }
+  .padreBookingSection { padding:22px 18px; }
+  .padreBookingSectionHeading { gap:11px; margin-bottom:18px; }
+  .padreBookingSectionHeading h2 { font-size:25px; }
+  .padreBookingContactFields { grid-template-columns:1fr; }
+  .padreBookingContactFields>label:last-child { grid-column:auto; }
+  .padreBookingAside { grid-template-columns:1fr; }
+  .padreBookingAsideTop { grid-row:auto; }
+  .padreBookingForm .padreSubmitButton { width:calc(100% - 36px); margin:22px 18px 0; }
+  .padreBookingForm .padreFormFineprint { margin:12px 18px 22px; }
+}
