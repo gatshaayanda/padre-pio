@@ -125,6 +125,7 @@ export default function HomePage() {
         <Link href="/" className="padreBrand"><span className="padreBrandMark" aria-hidden="true">✚</span><span><strong>PADRE PIO</strong><small>MEDICAL CENTRE</small></span></Link>
         <p>Plot 16739, Gaborone West Phase 1, Gaborone, Botswana</p>
         <span className="padreFooterNote">This website is not an emergency service. If you may be experiencing a medical emergency, seek urgent local medical help.</span>
+        <Link className="padreFooterAdmin" href="/admin">Admin access <span aria-hidden="true">↗</span></Link>
       </footer>
     </main>
   );
