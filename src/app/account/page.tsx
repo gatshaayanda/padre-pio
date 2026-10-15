@@ -146,7 +146,7 @@ export default function PatientAccountPage() {
       const code = typeof err === "object" && err && "code" in err ? String((err as { code?: unknown }).code) : "";
       if (["auth/credential-already-in-use", "auth/email-already-in-use", "auth/account-exists-with-different-credential"].includes(code)) {
         setShowExistingAccount(true);
-        setMessage("That Google account already has a separate identity. You can sign in to it, but this guest request will not be merged automatically.");
+        setMessage("That Google account already exists. Sign in to it and we will securely connect the requests from this guest session to that account.");
       } else if (code === "auth/popup-closed-by-user") {
         setMessage("Account setup was cancelled. Your guest request remains saved.");
       } else if (["auth/operation-not-allowed", "auth/unauthorized-domain", "auth/configuration-not-found"].includes(code)) {
@@ -160,17 +160,31 @@ export default function PatientAccountPage() {
   }
 
   async function signIntoExistingAccount() {
+    if (!user?.isAnonymous) return;
     setBusy(true);
     setError("");
+    setMessage("");
     try {
       await setPersistence(auth, browserLocalPersistence);
+      const guestIdToken = await user.getIdToken();
       const credential = await signInWithPopup(auth, new GoogleAuthProvider());
+      const accountIdToken = await credential.user.getIdToken();
+      const claimResponse = await fetch("/api/customer/appointments/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + accountIdToken },
+        cache: "no-store",
+        body: JSON.stringify({ guestIdToken }),
+      });
+      const claimResult = await claimResponse.json() as { moved?: number; error?: string };
+      if (!claimResponse.ok) throw new Error(claimResult.error || "Your earlier request could not be connected to this account.");
       setUser(credential.user);
       setShowExistingAccount(false);
       await loadRequests(credential.user);
-      setMessage("You are signed into your existing account. The earlier guest-session request was not merged; keep its reference for reception if you need help finding it.");
-    } catch {
-      setError("We could not open that Google account. Your guest request has not been cancelled.");
+      setMessage(claimResult.moved
+        ? `Your existing Google account is connected. ${claimResult.moved} request(s) from this guest session are now available in your patient history.`
+        : "Your existing Google account is connected. There were no requests in the guest session to move.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "We could not connect this patient history. Your original request remains saved.");
     } finally {
       setBusy(false);
     }
