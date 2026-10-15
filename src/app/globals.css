@@ -284,3 +284,32 @@ button, input, select, textarea { font: inherit; }
   .padreFloatingInstallCopy small { font-size:9px; }
   .padreFloatingInstallAction { min-height:40px; padding:9px 10px; font-size:10px; }
 }
+
+
+/* Approved discreet footer staff entry point and optional patient account. */
+.padreFooterAdmin { grid-column:1/-1; display:inline-flex; align-items:center; justify-self:start; gap:8px; padding:9px 12px; border:1px solid rgba(248,245,236,.36); color:#f8f5ec; font-size:11px; font-weight:800; text-decoration:none; }
+.padreFooterAdmin:hover,.padreFooterAdmin:focus-visible { border-color:#e9c78c; color:#e9c78c; outline-offset:3px; }
+.padreFormAdmin { color:var(--padre-forest); font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+.padreAccountHint { max-width:390px; margin:18px 0 0; color:var(--padre-muted); font-size:12px; line-height:1.7; }
+.padreAccountIntro { max-width:780px; margin:clamp(44px,8vw,84px) auto 32px; }
+.padreAccountIntro h1 { margin:14px 0; font-family:Georgia,serif; font-size:clamp(44px,7vw,76px); line-height:.98; font-weight:500; letter-spacing:-.04em; }
+.padreAccountIntro h1 em { color:var(--padre-forest); font-weight:500; }
+.padreAccountIntro>p,.padreAccountCard>p { max-width:620px; color:var(--padre-muted); font-size:14px; line-height:1.8; }
+.padreAccountCard { max-width:780px; margin:0 auto 28px; }
+.padreAccountSectionHead h2 { margin:8px 0 16px; font-family:Georgia,serif; font-size:clamp(26px,4vw,36px); font-weight:500; }
+.padreAccountRequests { max-width:780px; margin:42px auto 22px; }
+.padreAccountEmpty { padding:24px; border:1px solid var(--padre-line); background:rgba(255,255,255,.62); }
+.padreAccountEmpty>p { color:var(--padre-muted); font-size:13px; line-height:1.7; }
+.padreAccountEmpty .padreButton { margin-top:10px; }
+.padreAccountRequestList { display:grid; gap:12px; }
+.padreAccountRequest { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding:20px; border:1px solid var(--padre-line); background:rgba(255,255,255,.62); }
+.padreAccountRequest h3 { margin:8px 0; font-size:15px; }
+.padreAccountRequest p { margin:0; color:var(--padre-muted); font-size:12px; }
+.padreAccountRequest .padreStatus { flex-shrink:0; }
+.padreAccountPrivacy { max-width:780px; margin:26px auto; color:var(--padre-muted); font-size:11px; line-height:1.8; }
+@media(max-width:560px) {
+  .padreAccountRequest { flex-direction:column; gap:12px; }
+  .padreAccountRequest .padreStatus { align-self:flex-start; }
+  .padreAccountIntro { margin-top:42px; }
+  .padreFormFooter .padreFormAdmin { margin-left:0; }
+}
