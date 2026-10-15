@@ -8,7 +8,7 @@ function getAdminApp() {
   if (!raw) throw new Error("FIREBASE_ADMIN_KEY is not configured.");
   const account = JSON.parse(raw) as { project_id: string; client_email: string; private_key: string };
   const publicProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  if (publicProjectId && account.project_id !== publicProjectId) {
+  if (!publicProjectId || account.project_id !== publicProjectId) {
     throw new Error("Firebase Admin credentials do not match the public clinic project.");
   }
   return getApps().find((item) => item.name === "padre-pio-server") ?? initializeApp({
