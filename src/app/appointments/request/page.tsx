@@ -97,6 +97,7 @@ export default function AppointmentRequestPage() {
           <p className="padreAccountHint">Optional: save access to your request history. You do not need an account to request a visit.</p>
           <Link className="padreButton padreButtonSecondary" href="/">Back to clinic information <span aria-hidden="true">↗</span></Link>
         </section>
+        <footer className="padreFormFooter"><Link href="/">← Back to clinic information</Link><span>Not an emergency service</span><Link className="padreFormAdmin" href="/admin">Admin access ↗</Link></footer>
       </main>
     );
   }
