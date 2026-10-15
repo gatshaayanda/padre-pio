@@ -90,7 +90,8 @@ check("Storage remains default deny", /allow read, write: if false/.test(storage
 check("Firebase rules deployment is explicitly disabled", !exists(".github/workflows/firebase-rules-deploy.yml") || (/name: Firebase rules deployment guard \(no-op\)/.test(read(".github/workflows/firebase-rules-deploy.yml")) && /No deployment command is executed/.test(read(".github/workflows/firebase-rules-deploy.yml"))), "A present compatibility workflow must remain a no-op and must not deploy Firebase rules.");
 check("Inherited scheduled retail workflow is absent", !exists(".github/workflows/pickup-reminders.yml"));
 
-check("Legacy retail routes and APIs are removed", !exists("src/app/account/page.tsx") && !exists("src/app/request/page.tsx") && !exists("src/app/saved/page.tsx") && !exists("src/app/api/sourcing-request/route.ts"));
+check("Legacy retail routes and APIs are removed", !exists("src/app/request/page.tsx") && !exists("src/app/saved/page.tsx") && !exists("src/app/api/sourcing-request/route.ts"));
+check("Account route is the clinic-specific Padre Pio patient space", exists("src/app/account/page.tsx") && read("src/app/account/page.tsx").includes("YOUR PATIENT SPACE") && read("src/app/account/page.tsx").includes("/api/customer/appointments"));
 check("Legacy retail dashboard and integrations are removed", !exists("src/components/PlugAdminDashboard.tsx") && !exists("src/lib/uploadthing.ts") && !exists("src/lib/firebase/plug-data.ts"));
 check("No inherited source icon assets remain", !exists("public/plug-icon.svg") && !exists("public/plug-icon-192.png") && !exists("public/plug-icon-512.png"));
 check("Entrance video is present and is not an empty placeholder", exists("public/videos/padre.mp4") && fs.statSync(path.join(root, "public/videos/padre.mp4")).size > 1000000);

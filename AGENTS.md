@@ -38,6 +38,43 @@ Authorized staff can sign in, review requests, and persist truthful status chang
 6. Verify customer submission → persisted record → admin review → persisted status after refresh. Test unauthorized reads/writes and PWA behavior independently.
 7. Mark every gate PASS / FAIL / NOT RUN / BLOCKED. Source inspection and a build do not prove Firebase, PWA, device, or deployed behavior.
 
+
+## Locked visual and access conventions
+- Keep the approved compact floating forest-green/gold PWA install surface, direct native prompt on supported browsers, dismiss control, and platform guidance only as fallback. Do not restore a permanent homepage install card or substitute instructions for the native prompt.
+- Keep staff entry discreet in the homepage, appointment-request, and patient-account footers. Footer navigation is not an authorization boundary.
+- Padre Pio reception login uses the Tripple S one-word access pattern only as a technical reference: the browser posts the access word to a server route, the server checks a secret from environment configuration, issues a Firebase custom token, and the existing client/admin role check remains in force.
+- Unlike Tripple S's current implementation, Padre Pio's endpoint must never create or promote an `admins/{uid}` document from a public request. It requires `PADRE_PIO_ADMIN_UID` to point at an already-provisioned `admins/{uid}` with role `owner` or `staff`. Set `ADMIN_PASSWORD`, `FIREBASE_ADMIN_KEY`, and `PADRE_PIO_ADMIN_UID` only in the dedicated server environment; never commit secret values. The Admin SDK project must match `NEXT_PUBLIC_FIREBASE_PROJECT_ID`.
+- The one-word endpoint has no persistent rate limiter yet. Treat rate limiting/abuse protection as a pre-production hardening item; do not represent the login as production-hardened until verified.
+
+## Tripple S repository inspection — reusable patterns and limits
+Inspected Tripple S's `AGENTS.md`, `firestore.rules`, `src/app/book/book-form.tsx`, `src/app/api/bookings/route.ts`, `src/app/api/availability/route.ts`, `src/app/account/page.tsx`, `src/app/api/customer/bookings/route.ts`, `src/app/api/customer/profile/route.ts`, `src/app/api/customer/notifications/route.ts`, `src/components/NotificationSettings.tsx`, `src/lib/firebase/admin.ts`, and `src/app/admin/admin-gate.tsx` / `src/app/api/admin-login/route.ts`.
+- Reuse conceptually: guest-first booking; anonymous Firebase identity; an optional post-submit account invitation; explicit Google account linking; server-side ID-token verification for private customer history; customer queries scoped to the authenticated UID; no silent merging when a Google identity already exists; separate opt-in for appointment updates versus marketing; status copy that distinguishes request received from confirmed.
+- Do not copy Tripple S's product-specific wellness journal, garden/check-ins, offers, payment, treatment durations, or service catalogue into Padre Pio.
+- Tripple S availability is built on configured opening hours, duration-aware slot generation, `slotReservations` occupancy documents, and server-side transactional reservation checks. Padre Pio has no verified operating hours, appointment durations, provider capacity, or approved live calendar yet. Keep the current preferred-date + broad-time request as a request, not a reserved slot. Only add actual selectable times after the clinic confirms its hours, slot interval, appointment types/durations, capacity, exceptions, and who owns the calendar. Never invent availability.
+- Tripple S server routes use Firebase Admin SDK and validate customer identity from a verified bearer token. Padre Pio now uses the same separation for reading a patient's own request history; the API returns only reference, preferred timing, broad category, creation time and status—not phone, patient note, or reception-only notes.
+- Tripple S uses `linkWithPopup` to preserve an anonymous UID when a customer secures the same guest session with Google. If the Google credential already belongs to another Firebase identity, histories are not silently merged. Padre Pio follows that truth boundary. Patients can still request visits without creating an account.
+- Push notifications are a separate capability from account access. Do not add push/SMS reminders until delivery infrastructure, patient consent, message wording, opt-out, and real-device receipt can be verified. A status stored in Firestore does not prove a notification reached a patient.
+
+## Implemented customer/reception changes on branch `feat/padre-footer-admin-and-patient-onboarding`
+- Added discreet `Admin access` footer links on the homepage, appointment request page, and patient account page.
+- Added optional `/account` patient space. It keeps guest access available, offers Google linking to secure the existing anonymous identity, and shows only the signed-in UID's request history through a server endpoint. A separate Google identity is not silently merged.
+- Appointment success now offers `Keep my request with me`, leading to optional account setup; no account is required to submit a request.
+- Added `src/lib/firebase/admin.ts`, which uses the server-only Firebase Admin SDK and rejects service credentials whose project differs from the configured public Firebase project.
+- Added `/api/customer/appointments` to verify the Firebase ID token and query only `appointments.patientUid == token.uid`; response is private/no-store and omits patient notes and admin notes.
+- Added `/api/admin-login` for the one-word access flow. It checks `ADMIN_PASSWORD` server-side, checks a pre-existing authorized role at `admins/{PADRE_PIO_ADMIN_UID}`, and mints a custom token only after that check. It does not create roles. Admin UI still rechecks the role after sign-in.
+- Added the required environment variable names to `.env.example`; no secrets were added.
+- GitHub Actions quality run #63 (`https://github.com/gatshaayanda/padre-pio/actions/runs/38682689193`) PASS: dependency install, identity verification, Padre Pio readiness, TypeScript, ESLint, and production build. The earlier readiness failure exposed an outdated assertion that forbade all `/account` routes; the check now verifies the Padre Pio-specific account route while still rejecting inherited retail routes. Vercel's status check remains failed because of the platform build-rate limit, not a reported source/build failure. Live Firebase credentials/rules, Google account linking, private-history authorization, one-word login, and real-device QA remain NOT RUN.
+
+## Appointment and engagement acceptance criteria for QA
+1. Guest path: submit a request with no account; only successful Firestore write shows a reference and success screen; the screen states the request is not confirmed.
+2. Optional onboarding: `Keep my request with me` opens `/account`; dismissing/ignoring account setup does not affect the submitted request.
+3. Account linking: on the same browser, link Google to the anonymous identity and confirm the same request appears in history. If Google is already linked to a different identity, the UI must explain that histories are not merged automatically.
+4. Authorization: unauthenticated API request returns 401; signed-in patient sees only records with their own `patientUid`; response never includes phone, patient note, or admin note; responses use `Cache-Control: private, no-store`.
+5. Reception login: missing server configuration returns a clear setup error; incorrect access word is rejected; correct word still fails unless the configured UID already has `owner` or `staff` role; successful custom-token sign-in must pass the existing role check.
+6. Footer: homepage, request form, success state, and account page provide discreet navigation to `/admin`; footer visibility never grants access.
+7. Availability: keep date/time as preferences until authoritative clinic hours/capacity and a conflict-safe calendar are supplied. No test may describe a requested time as reserved or confirmed.
+8. Consent/retention: do not send marketing or push reminders without separate opt-in and verified send/receipt evidence.
+
 ## Current checkpoint
 - Initial clone/video commit: `ca237b650709ab25d42bf0e5632d1a86f34f8eb3`.
 - Baseline commit before the install correction: `3afce456771f3f4fbf7c51787f57e4711e0f999e`. Floating-install correction PR #6 (`https://github.com/gatshaayanda/padre-pio/pull/6`) was merged to `main` as `07556bf900b1741209199a21da341c1e9fd26dda`.
