@@ -4,6 +4,10 @@ import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 
+// One shared access word grants the fixed reception account access.
+// No separate UID or manually provisioned admins/{uid} document is required.
+const RECEPTION_UID = "padre-pio-reception";
+
 function matchesAccessWord(input: string, expected: string) {
   const actual = createHash("sha256").update(input).digest();
   const target = createHash("sha256").update(expected).digest();
@@ -12,8 +16,7 @@ function matchesAccessWord(input: string, expected: string) {
 
 export async function POST(request: Request) {
   const expected = process.env.ADMIN_PASSWORD;
-  const adminUid = process.env.PADRE_PIO_ADMIN_UID;
-  if (!expected || !adminUid || !process.env.FIREBASE_ADMIN_KEY) {
+  if (!expected || !process.env.FIREBASE_ADMIN_KEY) {
     return NextResponse.json(
       { error: "Reception access is not configured yet. The clinic administrator must complete the server setup." },
       { status: 503, headers: { "Cache-Control": "no-store" } },
@@ -30,14 +33,23 @@ export async function POST(request: Request) {
   }
 
   try {
-    const admin = await getAdminDb().collection("admins").doc(adminUid).get();
-    if (!admin.exists || !["owner", "staff"].includes(String(admin.data()?.role ?? ""))) {
-      return NextResponse.json(
-        { error: "This access account is not provisioned for Padre Pio reception." },
-        { status: 403, headers: { "Cache-Control": "no-store" } },
-      );
+    const adminAuth = getAdminAuth();
+    try {
+      await adminAuth.getUser(RECEPTION_UID);
+    } catch (error) {
+      if ((error as { code?: string }).code !== "auth/user-not-found") throw error;
+      await adminAuth.createUser({ uid: RECEPTION_UID, displayName: "Padre Pio Reception" });
     }
-    const token = await getAdminAuth().createCustomToken(adminUid);
+
+    // The access word is the sole reception authorization gate. Provision the
+    // fixed role only after the server has verified the correct word.
+    await getAdminDb().collection("admins").doc(RECEPTION_UID).set({
+      role: "owner",
+      label: "Padre Pio Reception",
+      updatedAt: new Date(),
+    }, { merge: true });
+
+    const token = await adminAuth.createCustomToken(RECEPTION_UID);
     return NextResponse.json({ token }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("[Padre Pio] Admin sign-in failed:", error instanceof Error ? error.message : "unknown error");
