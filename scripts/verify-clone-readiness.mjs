@@ -95,7 +95,7 @@ check("Inherited scheduled retail workflow is absent", !exists(".github/workflow
 
 check("Legacy retail routes and APIs are removed", !exists("src/app/request/page.tsx") && !exists("src/app/saved/page.tsx") && !exists("src/app/api/sourcing-request/route.ts"));
 check("Account route is the clinic-specific Padre Pio patient space", exists("src/app/account/page.tsx") && read("src/app/account/page.tsx").includes("YOUR PATIENT SPACE") && read("src/app/account/page.tsx").includes("/api/customer/appointments"));
-check("Patient account explains real value and can refresh saved status", accountPage.includes("cross-device") && accountPage.includes("Refresh request status") && accountPage.includes("not push notifications"));
+check("Patient account explains real value and can refresh saved status", accountPage.includes("change phones or browsers") && accountPage.includes("Refresh request status") && accountPage.includes("not push notifications"));
 check("Existing Google account flow connects only verified guest requests", accountPage.includes("/api/customer/appointments/claim") && accountClaim.includes('accountProvider !== "google.com"') && accountClaim.includes('guestProvider !== "anonymous"') && accountClaim.includes('where("patientUid", "==", guest.uid)'));
 check("Legacy retail dashboard and integrations are removed", !exists("src/components/PlugAdminDashboard.tsx") && !exists("src/lib/uploadthing.ts") && !exists("src/lib/firebase/plug-data.ts"));
 check("No inherited source icon assets remain", !exists("public/plug-icon.svg") && !exists("public/plug-icon-192.png") && !exists("public/plug-icon-512.png"));
