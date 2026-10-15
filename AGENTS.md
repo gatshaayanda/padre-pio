@@ -18,7 +18,7 @@ Authorized staff can sign in, review requests, and persist truthful status chang
 - Appointment request is not an appointment confirmation. Never claim confirmation until authorized staff records it.
 - Collect only name, phone, preferred date/time, broad administrative category, and optional short non-clinical note. Explicitly discourage detailed symptoms, medical history, ID numbers, and sensitive health data.
 - This is not an EMR, diagnostic/AI doctor, prescription service, or clinical decision-support tool.
-- Keep patient records private, default-deny data access, and restrict staff actions to authenticated accounts with an explicit `admins/{uid}` role. Never create admin roles from the public client.
+- Keep patient records private and default-deny data access. The server may provision the fixed reception account and its `admins/{uid}` role only after validating the server-held one-word access secret; never let the public client create admin roles.
 - Use a dedicated Firebase project and separate credentials. Never reuse source-project data, credentials, service workers, cache keys, or operational identity.
 - Do not deploy, connect production services, deploy rules/indexes, mutate production data, or deploy hosting without explicit authorization.
 
@@ -42,8 +42,8 @@ Authorized staff can sign in, review requests, and persist truthful status chang
 ## Locked visual and access conventions
 - Keep the approved compact floating forest-green/gold PWA install surface, direct native prompt on supported browsers, dismiss control, and platform guidance only as fallback. Do not restore a permanent homepage install card or substitute instructions for the native prompt.
 - Keep staff entry discreet in the homepage, appointment-request, and patient-account footers. Footer navigation is not an authorization boundary.
-- Padre Pio reception login uses the Tripple S one-word access pattern only as a technical reference: the browser posts the access word to a server route, the server checks a secret from environment configuration, issues a Firebase custom token, and the existing client/admin role check remains in force.
-- Unlike Tripple S's current implementation, Padre Pio's endpoint must never create or promote an `admins/{uid}` document from a public request. It requires `PADRE_PIO_ADMIN_UID` to point at an already-provisioned `admins/{uid}` with role `owner` or `staff`. Set `ADMIN_PASSWORD`, `FIREBASE_ADMIN_KEY`, and `PADRE_PIO_ADMIN_UID` only in the dedicated server environment; never commit secret values. The Admin SDK project must match `NEXT_PUBLIC_FIREBASE_PROJECT_ID`.
+- Reception login requirement: one access word, then entry to the admin dashboard. No email, Google sign-in, separately configured admin UID, or manual role-document provisioning. The browser posts the word to the server; the server checks `ADMIN_PASSWORD`, ensures the fixed `padre-pio-reception` Firebase identity exists, creates/sets its `admins/{uid}` owner role only after the correct word is verified, and issues a Firebase custom token. The client still verifies the resulting role.
+- `FIREBASE_ADMIN_KEY` is a server-only Firebase service credential required by the private patient-history API and custom-token issuance; it is infrastructure configuration, not a second login factor or another word the user must enter. Keep it out of source control and ensure its project matches `NEXT_PUBLIC_FIREBASE_PROJECT_ID`. Never expose either server secret with a `NEXT_PUBLIC_` prefix.
 - The one-word endpoint has no persistent rate limiter yet. Treat rate limiting/abuse protection as a pre-production hardening item; do not represent the login as production-hardened until verified.
 
 ## Tripple S repository inspection — reusable patterns and limits
@@ -61,7 +61,7 @@ Inspected Tripple S's `AGENTS.md`, `firestore.rules`, `src/app/book/book-form.ts
 - Appointment success now offers `Keep my request with me`, leading to optional account setup; no account is required to submit a request.
 - Added `src/lib/firebase/admin.ts`, which uses the server-only Firebase Admin SDK and rejects service credentials whose project differs from the configured public Firebase project.
 - Added `/api/customer/appointments` to verify the Firebase ID token and query only `appointments.patientUid == token.uid`; response is private/no-store and omits patient notes and admin notes.
-- Added `/api/admin-login` for the one-word access flow. It checks `ADMIN_PASSWORD` server-side, checks a pre-existing authorized role at `admins/{PADRE_PIO_ADMIN_UID}`, and mints a custom token only after that check. It does not create roles. Admin UI still rechecks the role after sign-in.
+- Added `/api/admin-login` for one-word access. After validating `ADMIN_PASSWORD`, it provisions the fixed `padre-pio-reception` Firebase identity and its `owner` role automatically, then mints a custom token. No separately configured UID or manual role setup is required. Admin UI still rechecks the role after sign-in.
 - Added the required environment variable names to `.env.example`; no secrets were added.
 - GitHub Actions quality run #64 (`https://github.com/gatshaayanda/padre-pio/actions/runs/38682826277`) PASS on the final PR head: dependency install, identity verification, Padre Pio readiness, TypeScript, ESLint, and production build. The earlier readiness failure exposed an outdated assertion that forbade all `/account` routes; the check now verifies the Padre Pio-specific account route while still rejecting inherited retail routes. Vercel's status check remains failed because of the platform build-rate limit, not a reported source/build failure. Live Firebase credentials/rules, Google account linking, private-history authorization, one-word login, and real-device QA remain NOT RUN.
 
@@ -70,7 +70,7 @@ Inspected Tripple S's `AGENTS.md`, `firestore.rules`, `src/app/book/book-form.ts
 2. Optional onboarding: `Keep my request with me` opens `/account`; dismissing/ignoring account setup does not affect the submitted request.
 3. Account linking: on the same browser, link Google to the anonymous identity and confirm the same request appears in history. If Google is already linked to a different identity, the UI must explain that histories are not merged automatically.
 4. Authorization: unauthenticated API request returns 401; signed-in patient sees only records with their own `patientUid`; response never includes phone, patient note, or admin note; responses use `Cache-Control: private, no-store`.
-5. Reception login: missing server configuration returns a clear setup error; incorrect access word is rejected; correct word still fails unless the configured UID already has `owner` or `staff` role; successful custom-token sign-in must pass the existing role check.
+5. Reception login: missing server configuration returns a clear setup error; incorrect access word is rejected; correct access word provisions the fixed reception identity/owner role automatically and signs in without a manually configured UID; successful custom-token sign-in passes the client role check.
 6. Footer: homepage, request form, success state, and account page provide discreet navigation to `/admin`; footer visibility never grants access.
 7. Availability: keep date/time as preferences until authoritative clinic hours/capacity and a conflict-safe calendar are supplied. No test may describe a requested time as reserved or confirmed.
 8. Consent/retention: do not send marketing or push reminders without separate opt-in and verified send/receipt evidence.
