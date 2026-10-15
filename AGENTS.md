@@ -63,7 +63,7 @@ Inspected Tripple S's `AGENTS.md`, `firestore.rules`, `src/app/book/book-form.ts
 - Added `/api/customer/appointments` to verify the Firebase ID token and query only `appointments.patientUid == token.uid`; response is private/no-store and omits patient notes and admin notes.
 - Added `/api/admin-login` for the one-word access flow. It checks `ADMIN_PASSWORD` server-side, checks a pre-existing authorized role at `admins/{PADRE_PIO_ADMIN_UID}`, and mints a custom token only after that check. It does not create roles. Admin UI still rechecks the role after sign-in.
 - Added the required environment variable names to `.env.example`; no secrets were added.
-- Source inspection only at this checkpoint. TypeScript/lint/build, deployed Firebase rules and credentials, real Google linking, private history access, one-word login, and mobile QA remain NOT RUN until executed.
+- GitHub Actions quality run #63 (`https://github.com/gatshaayanda/padre-pio/actions/runs/38682689193`) PASS: dependency install, identity verification, Padre Pio readiness, TypeScript, ESLint, and production build. The earlier readiness failure exposed an outdated assertion that forbade all `/account` routes; the check now verifies the Padre Pio-specific account route while still rejecting inherited retail routes. Vercel's status check remains failed because of the platform build-rate limit, not a reported source/build failure. Live Firebase credentials/rules, Google account linking, private-history authorization, one-word login, and real-device QA remain NOT RUN.
 
 ## Appointment and engagement acceptance criteria for QA
 1. Guest path: submit a request with no account; only successful Firestore write shows a reference and success screen; the screen states the request is not confirmed.
