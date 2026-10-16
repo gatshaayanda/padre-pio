@@ -141,7 +141,9 @@ button, input, select, textarea { font: inherit; }
   .padreBrandMark { width:36px; height:36px; font-size:20px; }
   .padreBrand strong { font-size:12px; }
   .padreBrand small { font-size:7px; }
-  .padreNav { display:none; }
+  .padreHeader { flex-wrap:wrap; padding-top:13px; padding-bottom:13px; }
+  .padreNav { display:flex; order:2; width:100%; flex-wrap:wrap; justify-content:space-between; gap:10px 14px; padding-top:11px; border-top:1px solid var(--padre-line); font-size:10px; }
+  .padreNav a { padding:3px 0; }
   .padreInstallLink { padding:10px 11px; font-size:10px!important; }
   .padreHero h1 { font-size:clamp(52px,15vw,76px); }
   .padreHeroIntro { font-size:14px; }
