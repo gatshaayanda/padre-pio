@@ -60,6 +60,8 @@ const envExample = read(".env.example");
 const adminLogin = read("src/app/api/admin-login/route.ts");
 const accountClaim = read("src/app/api/customer/appointments/claim/route.ts");
 const accountPage = read("src/app/account/page.tsx");
+const homePage = read("src/app/page.tsx");
+const css = read("src/app/globals.css");
 
 check("Package and lockfile names match", packageJson.name === lockJson.name && packageJson.name === lockJson.packages?.[""]?.name);
 check("Lockfile root dependencies match package.json", JSON.stringify(packageJson.dependencies ?? {}) === JSON.stringify(lockJson.packages?.[""]?.dependencies ?? {}), "Run npm install to reconcile if this fails.");
@@ -102,6 +104,7 @@ check("No inherited source icon assets remain", !exists("public/plug-icon.svg") 
 check("Entrance video is present and is not an empty placeholder", exists("public/videos/padre.mp4") && fs.statSync(path.join(root, "public/videos/padre.mp4")).size > 1000000);
 check("No Firebase project IDs or secrets are prefilled in .env.example", !/^NEXT_PUBLIC_FIREBASE_(?:API_KEY|AUTH_DOMAIN|PROJECT_ID|STORAGE_BUCKET|MESSAGING_SENDER_ID|APP_ID)=.+$/m.test(envExample) && !/^FIREBASE_ADMIN_KEY=.+$/m.test(envExample));
 check("One-word reception login needs no separately configured UID", !envExample.includes("PADRE_PIO_ADMIN_UID") && !adminLogin.includes("process.env.PADRE_PIO_ADMIN_UID") && adminLogin.includes('const RECEPTION_UID = "padre-pio-reception"') && /collection\("admins"\)\.doc\(RECEPTION_UID\)\.set/.test(adminLogin));
+check("Homepage navigation remains available on narrow mobile screens", homePage.includes('className="padreNav"') && /@media\(max-width:560px\)[\s\S]*?\.padreNav\s*\{[^}]*display:flex/.test(css));
 
 if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) warn("Dedicated Firebase configuration is not present in this static environment", "This is expected before a clinic-owned project is configured; runtime requests must remain disabled.");
 if (!process.env.NEXT_PUBLIC_BASE_URL) warn("Canonical production domain is not configured", "Do not invent a domain or publish canonical metadata until it is confirmed.");
